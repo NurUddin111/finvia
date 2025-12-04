@@ -17,7 +17,6 @@
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "type": "module",
   "bugs": {
     "url": "https://github.com/NurUddin111/finvia/issues"
   },
@@ -39,11 +38,28 @@
   "dependencies": {
     "@prisma/adapter-pg": "^7.0.1",
     "@prisma/client": "^7.0.1",
+    "@types/cookie-parser": "^1.4.10",
+    "@types/ejs": "^3.1.5",
+    "@types/express-session": "^1.18.2",
+    "@types/nodemailer": "^7.0.4",
+    "@types/passport": "^1.0.17",
+    "@types/passport-google-oauth20": "^2.0.17",
+    "@types/passport-local": "^1.0.38",
+    "bcryptjs": "^3.0.3",
+    "cookie-parser": "^1.4.7",
     "cors": "^2.8.5",
     "dotenv": "^17.2.3",
+    "ejs": "^3.1.10",
     "express": "^5.2.1",
+    "express-session": "^1.18.2",
+    "http-status-codes": "^2.3.0",
     "jsonwebtoken": "^9.0.2",
+    "nodemailer": "^7.0.11",
+    "passport": "^0.7.0",
+    "passport-google-oauth20": "^2.0.0",
+    "passport-local": "^1.0.0",
     "pg": "^8.16.3",
+    "redis": "^5.10.0",
     "zod": "^4.1.13"
   }
 }
