@@ -10,7 +10,6 @@ import { prisma } from "../../lib/prisma";
 
 export const checkAuth = (...authRoles: string[]) =>
   catchAsync(async (req: Request, res: Response, next: NextFunction) => {
-    
     const accessToken = req.cookies.accessToken;
 
     if (!accessToken) {

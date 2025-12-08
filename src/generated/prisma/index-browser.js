@@ -144,6 +144,28 @@ exports.Prisma.AuthProviderScalarFieldEnum = {
   createdAt: 'createdAt'
 };
 
+exports.Prisma.BusinessScalarFieldEnum = {
+  id: 'id',
+  name: 'name',
+  category: 'category',
+  email: 'email',
+  phone: 'phone',
+  address: 'address',
+  website: 'website',
+  isDeleted: 'isDeleted',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
+exports.Prisma.BusinessUserScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  businessId: 'businessId',
+  role: 'role',
+  status: 'status',
+  createdAt: 'createdAt'
+};
+
 exports.Prisma.SortOrder = {
   asc: 'asc',
   desc: 'desc'
@@ -175,9 +197,36 @@ exports.Provider = exports.$Enums.Provider = {
   credentials: 'credentials'
 };
 
+exports.BusinessCategory = exports.$Enums.BusinessCategory = {
+  AGENCY: 'AGENCY',
+  ECOMMERCE: 'ECOMMERCE',
+  RESTAURANT: 'RESTAURANT',
+  FREELANCER: 'FREELANCER',
+  SERVICE_PROVIDER: 'SERVICE_PROVIDER',
+  RETAIL: 'RETAIL',
+  SOFTWARE_COMPANY: 'SOFTWARE_COMPANY',
+  EDUCATION: 'EDUCATION',
+  HEALTHCARE: 'HEALTHCARE',
+  REAL_ESTATE: 'REAL_ESTATE',
+  OTHER: 'OTHER'
+};
+
+exports.BusinessRole = exports.$Enums.BusinessRole = {
+  BUSINESS_OWNER: 'BUSINESS_OWNER',
+  BUSINESS_ADMIN: 'BUSINESS_ADMIN'
+};
+
+exports.MemberStatus = exports.$Enums.MemberStatus = {
+  INVITED: 'INVITED',
+  ACTIVE: 'ACTIVE',
+  REMOVED: 'REMOVED'
+};
+
 exports.Prisma.ModelName = {
   User: 'User',
-  AuthProvider: 'AuthProvider'
+  AuthProvider: 'AuthProvider',
+  Business: 'Business',
+  BusinessUser: 'BusinessUser'
 };
 
 /**

@@ -1,4 +1,3 @@
-
 import { defineConfig } from "prisma/config";
 import { envVars } from "./src/app/config/env";
 

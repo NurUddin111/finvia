@@ -28,6 +28,8 @@ model User {
   address    String?
   createdAt  DateTime       @default(now())
   updatedAt  DateTime       @updatedAt
+
+  businessUsers BusinessUser[]
 }
 
 model AuthProvider {
@@ -58,4 +60,63 @@ enum IsActive {
   ACTIVE
   INACTIVE
   BLOCKED
+}
+
+model Business {
+  id        String           @id @default(uuid())
+  name      String
+  category  BusinessCategory
+  email     String?
+  phone     String?
+  address   String?
+  website   String?
+  isDeleted Boolean          @default(false)
+
+  members BusinessUser[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+enum BusinessRole {
+  BUSINESS_OWNER
+  BUSINESS_ADMIN
+}
+
+enum BusinessCategory {
+  AGENCY
+  ECOMMERCE
+  RESTAURANT
+  FREELANCER
+  SERVICE_PROVIDER
+  RETAIL
+  SOFTWARE_COMPANY
+  EDUCATION
+  HEALTHCARE
+  REAL_ESTATE
+  OTHER
+}
+
+model BusinessUser {
+  id String @id @default(uuid())
+
+  userId     String
+  businessId String
+
+  role BusinessRole @default(BUSINESS_ADMIN)
+
+  status MemberStatus @default(INVITED)
+
+  user     User     @relation(fields: [userId], references: [id])
+  business Business @relation(fields: [businessId], references: [id])
+
+  createdAt DateTime @default(now())
+
+  @@unique([userId, businessId])
+}
+
+enum MemberStatus {
+  INVITED
+  ACTIVE
+  REMOVED
 }
