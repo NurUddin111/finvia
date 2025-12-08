@@ -116,6 +116,28 @@ exports.Prisma.AuthProviderScalarFieldEnum = {
   createdAt: 'createdAt'
 };
 
+exports.Prisma.BusinessScalarFieldEnum = {
+  id: 'id',
+  name: 'name',
+  category: 'category',
+  email: 'email',
+  phone: 'phone',
+  address: 'address',
+  website: 'website',
+  isDeleted: 'isDeleted',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
+exports.Prisma.BusinessUserScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  businessId: 'businessId',
+  role: 'role',
+  status: 'status',
+  createdAt: 'createdAt'
+};
+
 exports.Prisma.SortOrder = {
   asc: 'asc',
   desc: 'desc'
@@ -147,9 +169,36 @@ exports.IsActive = exports.$Enums.IsActive = {
   BLOCKED: 'BLOCKED'
 };
 
+exports.BusinessRole = exports.$Enums.BusinessRole = {
+  BUSINESS_OWNER: 'BUSINESS_OWNER',
+  BUSINESS_ADMIN: 'BUSINESS_ADMIN'
+};
+
+exports.BusinessCategory = exports.$Enums.BusinessCategory = {
+  AGENCY: 'AGENCY',
+  ECOMMERCE: 'ECOMMERCE',
+  RESTAURANT: 'RESTAURANT',
+  FREELANCER: 'FREELANCER',
+  SERVICE_PROVIDER: 'SERVICE_PROVIDER',
+  RETAIL: 'RETAIL',
+  SOFTWARE_COMPANY: 'SOFTWARE_COMPANY',
+  EDUCATION: 'EDUCATION',
+  HEALTHCARE: 'HEALTHCARE',
+  REAL_ESTATE: 'REAL_ESTATE',
+  OTHER: 'OTHER'
+};
+
+exports.MemberStatus = exports.$Enums.MemberStatus = {
+  INVITED: 'INVITED',
+  ACTIVE: 'ACTIVE',
+  REMOVED: 'REMOVED'
+};
+
 exports.Prisma.ModelName = {
   User: 'User',
-  AuthProvider: 'AuthProvider'
+  AuthProvider: 'AuthProvider',
+  Business: 'Business',
+  BusinessUser: 'BusinessUser'
 };
 /**
  * Create the Client
@@ -159,10 +208,10 @@ const config = {
   "clientVersion": "7.0.1",
   "engineVersion": "f09f2815f091dbba658cdcd2264306d88bb5bda6",
   "activeProvider": "postgresql",
-  "inlineSchema": "// This is your Prisma schema file,\n// learn more about it in the docs: https://pris.ly/d/prisma-schema\n\n// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?\n// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init\n\ngenerator client {\n  provider = \"prisma-client-js\"\n  output   = \"../src/generated/prisma\"\n}\n\ndatasource db {\n  provider = \"postgresql\"\n}\n\nmodel User {\n  id         String         @id @default(uuid())\n  name       String\n  email      String         @unique\n  password   String\n  role       UserRole       @default(USER)\n  auths      AuthProvider[]\n  isVerified Boolean\n  isActive   IsActive       @default(ACTIVE)\n  isDeleted  Boolean        @default(false)\n  avatar     String?\n  phone      String?        @unique\n  address    String?\n  createdAt  DateTime       @default(now())\n  updatedAt  DateTime       @updatedAt\n}\n\nmodel AuthProvider {\n  id         String   @id @default(uuid())\n  provider   Provider\n  providerId String\n\n  userId String\n  user   User   @relation(fields: [userId], references: [id])\n\n  createdAt DateTime @default(now())\n\n  @@unique([provider, providerId])\n}\n\nenum UserRole {\n  ADMIN\n  USER\n  BUSINESS_OWNER\n}\n\nenum Provider {\n  google\n  credentials\n}\n\nenum IsActive {\n  ACTIVE\n  INACTIVE\n  BLOCKED\n}\n"
+  "inlineSchema": "// This is your Prisma schema file,\n// learn more about it in the docs: https://pris.ly/d/prisma-schema\n\n// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?\n// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init\n\ngenerator client {\n  provider = \"prisma-client-js\"\n  output   = \"../src/generated/prisma\"\n}\n\ndatasource db {\n  provider = \"postgresql\"\n}\n\nmodel User {\n  id         String         @id @default(uuid())\n  name       String\n  email      String         @unique\n  password   String\n  role       UserRole       @default(USER)\n  auths      AuthProvider[]\n  isVerified Boolean\n  isActive   IsActive       @default(ACTIVE)\n  isDeleted  Boolean        @default(false)\n  avatar     String?\n  phone      String?        @unique\n  address    String?\n  createdAt  DateTime       @default(now())\n  updatedAt  DateTime       @updatedAt\n\n  businessUsers BusinessUser[]\n}\n\nmodel AuthProvider {\n  id         String   @id @default(uuid())\n  provider   Provider\n  providerId String\n\n  userId String\n  user   User   @relation(fields: [userId], references: [id])\n\n  createdAt DateTime @default(now())\n\n  @@unique([provider, providerId])\n}\n\nenum UserRole {\n  ADMIN\n  USER\n  BUSINESS_OWNER\n}\n\nenum Provider {\n  google\n  credentials\n}\n\nenum IsActive {\n  ACTIVE\n  INACTIVE\n  BLOCKED\n}\n\nmodel Business {\n  id        String           @id @default(uuid())\n  name      String\n  category  BusinessCategory\n  email     String?\n  phone     String?\n  address   String?\n  website   String?\n  isDeleted Boolean          @default(false)\n\n  members BusinessUser[]\n\n  createdAt DateTime @default(now())\n  updatedAt DateTime @updatedAt\n}\n\nenum BusinessRole {\n  BUSINESS_OWNER\n  BUSINESS_ADMIN\n}\n\nenum BusinessCategory {\n  AGENCY\n  ECOMMERCE\n  RESTAURANT\n  FREELANCER\n  SERVICE_PROVIDER\n  RETAIL\n  SOFTWARE_COMPANY\n  EDUCATION\n  HEALTHCARE\n  REAL_ESTATE\n  OTHER\n}\n\nmodel BusinessUser {\n  id String @id @default(uuid())\n\n  userId     String\n  businessId String\n\n  role BusinessRole @default(BUSINESS_ADMIN)\n\n  status MemberStatus @default(INVITED)\n\n  user     User     @relation(fields: [userId], references: [id])\n  business Business @relation(fields: [businessId], references: [id])\n\n  createdAt DateTime @default(now())\n\n  @@unique([userId, businessId])\n}\n\nenum MemberStatus {\n  INVITED\n  ACTIVE\n  REMOVED\n}\n"
 }
 
-config.runtimeDataModel = JSON.parse("{\"models\":{\"User\":{\"fields\":[{\"name\":\"id\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"name\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"email\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"password\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"role\",\"kind\":\"enum\",\"type\":\"UserRole\"},{\"name\":\"auths\",\"kind\":\"object\",\"type\":\"AuthProvider\",\"relationName\":\"AuthProviderToUser\"},{\"name\":\"isVerified\",\"kind\":\"scalar\",\"type\":\"Boolean\"},{\"name\":\"isActive\",\"kind\":\"enum\",\"type\":\"IsActive\"},{\"name\":\"isDeleted\",\"kind\":\"scalar\",\"type\":\"Boolean\"},{\"name\":\"avatar\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"phone\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"address\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"createdAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"},{\"name\":\"updatedAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"}],\"dbName\":null},\"AuthProvider\":{\"fields\":[{\"name\":\"id\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"provider\",\"kind\":\"enum\",\"type\":\"Provider\"},{\"name\":\"providerId\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"userId\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"user\",\"kind\":\"object\",\"type\":\"User\",\"relationName\":\"AuthProviderToUser\"},{\"name\":\"createdAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"}],\"dbName\":null}},\"enums\":{},\"types\":{}}")
+config.runtimeDataModel = JSON.parse("{\"models\":{\"User\":{\"fields\":[{\"name\":\"id\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"name\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"email\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"password\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"role\",\"kind\":\"enum\",\"type\":\"UserRole\"},{\"name\":\"auths\",\"kind\":\"object\",\"type\":\"AuthProvider\",\"relationName\":\"AuthProviderToUser\"},{\"name\":\"isVerified\",\"kind\":\"scalar\",\"type\":\"Boolean\"},{\"name\":\"isActive\",\"kind\":\"enum\",\"type\":\"IsActive\"},{\"name\":\"isDeleted\",\"kind\":\"scalar\",\"type\":\"Boolean\"},{\"name\":\"avatar\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"phone\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"address\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"createdAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"},{\"name\":\"updatedAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"},{\"name\":\"businessUsers\",\"kind\":\"object\",\"type\":\"BusinessUser\",\"relationName\":\"BusinessUserToUser\"}],\"dbName\":null},\"AuthProvider\":{\"fields\":[{\"name\":\"id\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"provider\",\"kind\":\"enum\",\"type\":\"Provider\"},{\"name\":\"providerId\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"userId\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"user\",\"kind\":\"object\",\"type\":\"User\",\"relationName\":\"AuthProviderToUser\"},{\"name\":\"createdAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"}],\"dbName\":null},\"Business\":{\"fields\":[{\"name\":\"id\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"name\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"category\",\"kind\":\"enum\",\"type\":\"BusinessCategory\"},{\"name\":\"email\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"phone\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"address\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"website\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"isDeleted\",\"kind\":\"scalar\",\"type\":\"Boolean\"},{\"name\":\"members\",\"kind\":\"object\",\"type\":\"BusinessUser\",\"relationName\":\"BusinessToBusinessUser\"},{\"name\":\"createdAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"},{\"name\":\"updatedAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"}],\"dbName\":null},\"BusinessUser\":{\"fields\":[{\"name\":\"id\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"userId\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"businessId\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"role\",\"kind\":\"enum\",\"type\":\"BusinessRole\"},{\"name\":\"status\",\"kind\":\"enum\",\"type\":\"MemberStatus\"},{\"name\":\"user\",\"kind\":\"object\",\"type\":\"User\",\"relationName\":\"BusinessUserToUser\"},{\"name\":\"business\",\"kind\":\"object\",\"type\":\"Business\",\"relationName\":\"BusinessToBusinessUser\"},{\"name\":\"createdAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"}],\"dbName\":null}},\"enums\":{},\"types\":{}}")
 defineDmmfProperty(exports.Prisma, config.runtimeDataModel)
 config.compilerWasm = {
   getRuntime: async () => require('./query_compiler_bg.js'),

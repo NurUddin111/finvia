@@ -25,6 +25,8 @@ interface IEnvConfig {
   JWT_ACCESS_EXPIRES: string;
   JWT_REFRESH_SECRET: string;
   JWT_REFRESH_EXPIRES: string;
+  JWT_INVITATION_SECRET: string;
+  JWT_INVITATION_EXPIRES: string;
   BCRYPT_SALT_ROUND: string;
   EXPRESS_SESSION_SECRET: string;
   FRONTEND_URL: string;
@@ -52,9 +54,11 @@ const loadEnvVariables = (): IEnvConfig => {
     "JWT_ACCESS_EXPIRES",
     "JWT_REFRESH_SECRET",
     "JWT_REFRESH_EXPIRES",
+    "JWT_INVITATION_SECRET",
+    "JWT_INVITATION_EXPIRES",
     "BCRYPT_SALT_ROUND",
     "EXPRESS_SESSION_SECRET",
-    "FRONTEND_URL"
+    "FRONTEND_URL",
   ];
 
   requiredEnvVariables.forEach((key) => {
@@ -88,6 +92,8 @@ const loadEnvVariables = (): IEnvConfig => {
     JWT_ACCESS_EXPIRES: process.env.JWT_ACCESS_EXPIRES as string,
     JWT_REFRESH_SECRET: process.env.JWT_REFRESH_SECRET as string,
     JWT_REFRESH_EXPIRES: process.env.JWT_REFRESH_EXPIRES as string,
+    JWT_INVITATION_SECRET: process.env.JWT_INVITATION_SECRET as string,
+    JWT_INVITATION_EXPIRES: process.env.JWT_INVITATION_EXPIRES as string,
     BCRYPT_SALT_ROUND: process.env.BCRYPT_SALT_ROUND as string,
     EXPRESS_SESSION_SECRET: process.env.EXPRESS_SESSION_SECRET as string,
     FRONTEND_URL: process.env.FRONTEND_URL as string,
