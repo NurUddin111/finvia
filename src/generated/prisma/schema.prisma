@@ -66,13 +66,14 @@ model Business {
   id        String           @id @default(uuid())
   name      String
   category  BusinessCategory
-  email     String?
+  email     String?          @unique
   phone     String?
   address   String?
   website   String?
   isDeleted Boolean          @default(false)
 
-  members BusinessUser[]
+  members         BusinessUser[]
+  businessClients BusinessClient[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -119,4 +120,33 @@ enum MemberStatus {
   INVITED
   ACTIVE
   REMOVED
+}
+
+model Client {
+  id      String  @id @default(uuid())
+  name    String
+  email   String
+  phone   String?
+  address String?
+
+  links     BusinessClient[]
+  isDeleted Boolean          @default(false)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model BusinessClient {
+  id String @id @default(uuid())
+
+  businessId String
+  clientId   String
+
+  business Business @relation(fields: [businessId], references: [id])
+  client   Client   @relation(fields: [clientId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([businessId, clientId])
 }

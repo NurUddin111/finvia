@@ -1,0 +1,45 @@
+import { Router } from "express";
+import { checkAuth } from "../../middlewares/checkAuth";
+import { UserRole } from "../../../generated/prisma";
+import { ClientController } from "./client.controller";
+import {
+  AddClientZodSchemaValidation,
+  UpdateClientZodSchemaValidation,
+} from "./client.validation";
+import { validateRequest } from "../../middlewares/validateRequest";
+
+const router = Router();
+
+router.post(
+  "/add",
+  checkAuth(UserRole.BUSINESS_OWNER, UserRole.USER),
+  validateRequest(AddClientZodSchemaValidation),
+  ClientController.addClient
+);
+
+router.get(
+  "/:id",
+  checkAuth(UserRole.BUSINESS_OWNER, UserRole.USER),
+  ClientController.getMyClient
+);
+
+router.get(
+  "/:id",
+  checkAuth(UserRole.BUSINESS_OWNER),
+  ClientController.getSingleClient
+);
+
+router.patch(
+  "/edit/:id",
+  validateRequest(UpdateClientZodSchemaValidation),
+  checkAuth(UserRole.BUSINESS_OWNER, UserRole.USER),
+  ClientController.updateClient
+);
+
+router.patch(
+  "/delete/:id",
+  checkAuth(UserRole.BUSINESS_OWNER, UserRole.ADMIN),
+  ClientController.deleteClient
+);
+
+export const ClientRoutes = router;
