@@ -2,6 +2,7 @@ import { Router } from "express";
 import { AuthRoutes } from "../modules/auth/auth.routes";
 import { UserRoutes } from "../modules/user/user.routes";
 import { BusinessRoutes } from "../modules/business/business.routes";
+import { ClientRoutes } from "../modules/client/client.routes";
 
 export const router = Router();
 
@@ -17,6 +18,10 @@ const apiRoutes = [
   {
     path: "/business",
     route: BusinessRoutes,
+  },
+  {
+    path: "/client",
+    route: ClientRoutes,
   },
 ];
 

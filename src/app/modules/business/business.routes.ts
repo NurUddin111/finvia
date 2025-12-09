@@ -50,7 +50,7 @@ router.patch(
 
 router.patch(
   "/delete/:id",
-  checkAuth(UserRole.BUSINESS_OWNER, UserRole.ADMIN),
+  checkAuth(UserRole.BUSINESS_OWNER),
   BusinessController.deleteBusiness
 );
 
