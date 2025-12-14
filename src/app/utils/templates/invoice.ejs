@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <title>Invoice <%= invoiceNumber %></title>
+  </head>
+  <body
+    style="
+      margin: 0;
+      padding: 0;
+      background: #f5f7fa;
+      font-family: Arial, sans-serif;
+    "
+  >
+    <table width="100%" cellpadding="0" cellspacing="0">
+      <tr>
+        <td align="center" style="padding: 30px 15px">
+          <table
+            width="600"
+            cellpadding="0"
+            cellspacing="0"
+            style="background: #ffffff; border-radius: 8px; overflow: hidden"
+          >
+            <!-- Header -->
+            <tr>
+              <td style="background: #111827; padding: 20px">
+                <h2 style="color: #ffffff; margin: 0"><%= businessName %></h2>
+              </td>
+            </tr>
+
+            <!-- Body -->
+            <tr>
+              <td style="padding: 30px; color: #111827">
+                <p style="font-size: 16px">
+                  Hi <strong><%= clientName %></strong>,
+                </p>
+
+                <p>
+                  We hope you are doing well. Please find attached your invoice
+                  <strong>#<%= invoiceNumber %></strong>.
+                </p>
+
+                <!-- Invoice Info -->
+                <table width="100%" style="margin: 20px 0; font-size: 14px">
+                  <tr>
+                    <td><strong>Invoice Number:</strong></td>
+                    <td>#<%= invoiceNumber %></td>
+                  </tr>
+                  <tr>
+                    <td><strong>Issue Date:</strong></td>
+                    <td><%= issueDate %></td>
+                  </tr>
+                  <tr>
+                    <td><strong>Due Date:</strong></td>
+                    <td><%= dueDate %></td>
+                  </tr>
+                  <tr>
+                    <td><strong>Total Amount:</strong></td>
+                    <td><strong><%= currency %> <%= totalAmount %></strong></td>
+                  </tr>
+                </table>
+
+                <!-- Pay Now Button -->
+                <div style="text-align: center; margin: 30px 0">
+                  <a
+                    href="<%= paymentLink %>"
+                    style="
+                      background: #2563eb;
+                      color: #ffffff;
+                      padding: 14px 28px;
+                      text-decoration: none;
+                      border-radius: 6px;
+                      font-size: 16px;
+                      display: inline-block;
+                    "
+                  >
+                    Pay Now
+                  </a>
+                </div>
+
+                <p style="font-size: 14px; color: #374151">
+                  If the button doesn’t work, copy and paste this link into your
+                  browser:
+                </p>
+
+                <p
+                  style="font-size: 13px; word-break: break-all; color: #2563eb"
+                >
+                  <%= paymentLink %>
+                </p>
+
+                <p style="margin-top: 25px">
+                  The invoice PDF is attached with this email for your records.
+                </p>
+
+                <p>
+                  <strong>
+                    <a href="<%= invoicePdfLink %>" style="color: #2563eb">
+                      Click here to Download
+                    </a>
+                  </strong>
+                </p>
+
+                <p>
+                  If you have any questions, feel free to contact us at
+                  <a href="mailto:<%= supportEmail %>"><%= supportEmail %></a>.
+                </p>
+
+                <p style="margin-top: 30px">
+                  Thank you for your business ❤️<br />
+                  <strong><%= businessName %></strong>
+                </p>
+              </td>
+            </tr>
+
+            <!-- Footer -->
+            <tr>
+              <td
+                style="
+                  background: #f3f4f6;
+                  padding: 15px;
+                  text-align: center;
+                  font-size: 12px;
+                  color: #6b7280;
+                "
+              >
+                © <%= new Date().getFullYear() %> <%= businessName %>. All
+                rights reserved.
+              </td>
+            </tr>
+          </table>
+        </td>
+      </tr>
+    </table>
+  </body>
+</html>
