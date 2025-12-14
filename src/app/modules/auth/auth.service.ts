@@ -9,10 +9,10 @@ import { prisma } from "../../../lib/prisma";
 import { JwtPayload } from "jsonwebtoken";
 import { User } from "../../../generated/prisma";
 import bcrypt from "bcryptjs";
-import { IAuthProvider } from "../../interfaces/user.interface";
 import { createNewAccessTokenWithRefreshToken } from "../../utils/userTokens";
 import { checkUserStatus } from "../../utils/checkUserStatus";
 import { sendEmail } from "../../utils/sendEmail";
+import { IAuthProvider } from "./auth.interface";
 
 const createUserRequest = async (
   req: Request,

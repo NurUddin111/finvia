@@ -70,13 +70,15 @@ model Business {
   phone     String?
   address   String?
   website   String?
+  logoUrl   String?
   isDeleted Boolean          @default(false)
 
   members         BusinessUser[]
   businessClients BusinessClient[]
 
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  invoices  Invoice[]
 }
 
 enum BusinessRole {
@@ -132,8 +134,9 @@ model Client {
   links     BusinessClient[]
   isDeleted Boolean          @default(false)
 
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  invoices  Invoice[]
 }
 
 model BusinessClient {
@@ -149,4 +152,84 @@ model BusinessClient {
   updatedAt DateTime @updatedAt
 
   @@unique([businessId, clientId])
+}
+
+model Invoice {
+  id            String        @id @default(cuid())
+  business      Business      @relation(fields: [businessId], references: [id])
+  businessId    String
+  client        Client        @relation(fields: [clientId], references: [id])
+  clientId      String
+  createdById   String
+  invoiceNumber String        @unique
+  status        InvoiceStatus @default(PENDING)
+  issueDate     DateTime      @default(now())
+  dueDate       DateTime
+
+  items InvoiceItem[]
+
+  subtotal     Float
+  tax          Float
+  total        Float
+  currency     String    @default("BDT")
+  notes        String?
+  invPdfUrl    String?
+  paymentToken String?
+  payments     Payment[]
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+}
+
+model InvoiceItem {
+  id        String  @id @default(cuid())
+  invoice   Invoice @relation(fields: [invoiceId], references: [id])
+  invoiceId String
+
+  name         String
+  quantity     Float
+  pricePerUnit Float
+  total        Float
+
+  createdAt DateTime @default(now())
+}
+
+enum InvoiceStatus {
+  PENDING
+  SENT
+  PAID
+  FAILED
+  CANCELLED
+  OVERDUE
+}
+
+model Payment {
+  id        String         @id @default(uuid())
+  invoice   Invoice        @relation(fields: [invoiceId], references: [id])
+  invoiceId String
+  provider  PaymentGateway @default(SSLCOMMERZ)
+  tran_id   String
+  amount    Float
+  currency  String
+  status    PaymentStatus  @default(PENDING)
+  rcpNumber String?
+  rcpPdfUrl String?
+  metadata  Json?
+  createdAt DateTime       @default(now())
+  updatedAt DateTime       @updatedAt
+}
+
+enum PaymentGateway {
+  SSLCOMMERZ
+  STRRIPE
+  BKASH
+  NAGAD
+  ROCKET
+}
+
+enum PaymentStatus {
+  PENDING
+  INITIATED
+  SUCCESS
+  FAILED
+  CANCELLED
 }

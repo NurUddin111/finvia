@@ -3,6 +3,8 @@ import { AuthRoutes } from "../modules/auth/auth.routes";
 import { UserRoutes } from "../modules/user/user.routes";
 import { BusinessRoutes } from "../modules/business/business.routes";
 import { ClientRoutes } from "../modules/client/client.routes";
+import { InvoiceRoutes } from "../modules/invoice/invoice.routes";
+import { PaymentRoutes } from "../modules/payment/payment.routes";
 
 export const router = Router();
 
@@ -22,6 +24,14 @@ const apiRoutes = [
   {
     path: "/client",
     route: ClientRoutes,
+  },
+  {
+    path: "/invoice",
+    route: InvoiceRoutes,
+  },
+  {
+    path: "/payment",
+    route: PaymentRoutes,
   },
 ];
 

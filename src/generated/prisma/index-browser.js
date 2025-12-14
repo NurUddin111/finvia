@@ -152,6 +152,7 @@ exports.Prisma.BusinessScalarFieldEnum = {
   phone: 'phone',
   address: 'address',
   website: 'website',
+  logoUrl: 'logoUrl',
   isDeleted: 'isDeleted',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
@@ -185,9 +186,59 @@ exports.Prisma.BusinessClientScalarFieldEnum = {
   updatedAt: 'updatedAt'
 };
 
+exports.Prisma.InvoiceScalarFieldEnum = {
+  id: 'id',
+  businessId: 'businessId',
+  clientId: 'clientId',
+  createdById: 'createdById',
+  invoiceNumber: 'invoiceNumber',
+  status: 'status',
+  issueDate: 'issueDate',
+  dueDate: 'dueDate',
+  subtotal: 'subtotal',
+  tax: 'tax',
+  total: 'total',
+  currency: 'currency',
+  notes: 'notes',
+  invPdfUrl: 'invPdfUrl',
+  paymentToken: 'paymentToken',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
+exports.Prisma.InvoiceItemScalarFieldEnum = {
+  id: 'id',
+  invoiceId: 'invoiceId',
+  name: 'name',
+  quantity: 'quantity',
+  pricePerUnit: 'pricePerUnit',
+  total: 'total',
+  createdAt: 'createdAt'
+};
+
+exports.Prisma.PaymentScalarFieldEnum = {
+  id: 'id',
+  invoiceId: 'invoiceId',
+  provider: 'provider',
+  tran_id: 'tran_id',
+  amount: 'amount',
+  currency: 'currency',
+  status: 'status',
+  rcpNumber: 'rcpNumber',
+  rcpPdfUrl: 'rcpPdfUrl',
+  metadata: 'metadata',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
 exports.Prisma.SortOrder = {
   asc: 'asc',
   desc: 'desc'
+};
+
+exports.Prisma.NullableJsonNullValueInput = {
+  DbNull: Prisma.DbNull,
+  JsonNull: Prisma.JsonNull
 };
 
 exports.Prisma.QueryMode = {
@@ -198,6 +249,12 @@ exports.Prisma.QueryMode = {
 exports.Prisma.NullsOrder = {
   first: 'first',
   last: 'last'
+};
+
+exports.Prisma.JsonNullValueFilter = {
+  DbNull: Prisma.DbNull,
+  JsonNull: Prisma.JsonNull,
+  AnyNull: Prisma.AnyNull
 };
 exports.UserRole = exports.$Enums.UserRole = {
   ADMIN: 'ADMIN',
@@ -241,13 +298,41 @@ exports.MemberStatus = exports.$Enums.MemberStatus = {
   REMOVED: 'REMOVED'
 };
 
+exports.InvoiceStatus = exports.$Enums.InvoiceStatus = {
+  PENDING: 'PENDING',
+  SENT: 'SENT',
+  PAID: 'PAID',
+  FAILED: 'FAILED',
+  CANCELLED: 'CANCELLED',
+  OVERDUE: 'OVERDUE'
+};
+
+exports.PaymentGateway = exports.$Enums.PaymentGateway = {
+  SSLCOMMERZ: 'SSLCOMMERZ',
+  STRRIPE: 'STRRIPE',
+  BKASH: 'BKASH',
+  NAGAD: 'NAGAD',
+  ROCKET: 'ROCKET'
+};
+
+exports.PaymentStatus = exports.$Enums.PaymentStatus = {
+  PENDING: 'PENDING',
+  INITIATED: 'INITIATED',
+  SUCCESS: 'SUCCESS',
+  FAILED: 'FAILED',
+  CANCELLED: 'CANCELLED'
+};
+
 exports.Prisma.ModelName = {
   User: 'User',
   AuthProvider: 'AuthProvider',
   Business: 'Business',
   BusinessUser: 'BusinessUser',
   Client: 'Client',
-  BusinessClient: 'BusinessClient'
+  BusinessClient: 'BusinessClient',
+  Invoice: 'Invoice',
+  InvoiceItem: 'InvoiceItem',
+  Payment: 'Payment'
 };
 
 /**
