@@ -3,6 +3,7 @@ import app from "./app";
 import { errorShutDown, gracefullShutDown } from "./app/utils/shutDown";
 import { envVars } from "./app/config/env";
 import { connectRedis } from "./app/config/redis.config";
+import { seedSuperAdmin } from "./app/utils/seedSuperAdmin";
 
 let server: Server;
 const startServer = async () => {
@@ -20,6 +21,7 @@ const startServer = async () => {
 (async () => {
   await connectRedis();
   await startServer();
+  await seedSuperAdmin();
 })();
 
 // Termination Signals

@@ -6,6 +6,8 @@ interface IEnvConfig {
   PORT: string;
   DB_URL: string;
   NODE_ENV: "development" | "production";
+  SUPER_ADMIN_EMAIL: string;
+  SUPER_ADMIN_PASSWORD: string;
   REDIS_USERNAME: string;
   REDIS_PASSWORD: string;
   REDIS_HOST: string;
@@ -55,6 +57,8 @@ const loadEnvVariables = (): IEnvConfig => {
     "PORT",
     "DB_URL",
     "NODE_ENV",
+    "SUPER_ADMIN_EMAIL",
+    "SUPER_ADMIN_PASSWORD",
     "REDIS_USERNAME",
     "REDIS_PASSWORD",
     "REDIS_HOST",
@@ -103,6 +107,8 @@ const loadEnvVariables = (): IEnvConfig => {
     PORT: process.env.PORT as string,
     DB_URL: process.env.DB_URL as string,
     NODE_ENV: process.env.NODE_ENV as "development" | "production",
+    SUPER_ADMIN_EMAIL: process.env.SUPER_ADMIN_EMAIL as string,
+    SUPER_ADMIN_PASSWORD: process.env.SUPER_ADMIN_PASSWORD as string,
     REDIS_USERNAME: process.env.REDIS_USERNAME as string,
     REDIS_PASSWORD: process.env.REDIS_PASSWORD as string,
     REDIS_HOST: process.env.REDIS_HOST as string,
