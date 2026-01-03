@@ -60,6 +60,37 @@ const addClient = async (userId: string, payload: Client) => {
   return result;
 };
 
+const getAllClients = async (userId: string) => {
+  const isOwner = await prisma.businessUser.findFirst({
+    where: { userId: userId, business: { isDeleted: false } },
+  });
+
+  if (!isOwner) {
+    throw new AppError(
+      HttpStatusCodes.NOT_FOUND,
+      "Only Business Owner or Admin can view all clients."
+    );
+  }
+
+  const clients = await prisma.businessClient.findMany({
+    where: {
+      businessId: isOwner.businessId,
+      client: {
+        isDeleted: false,
+      },
+    },
+    include: {
+      client: true,
+    },
+  });
+
+  if (!clients) {
+    throw new AppError(HttpStatusCodes.NOT_FOUND, "No clients found.");
+  }
+
+  return clients;
+};
+
 const getSingleClient = async (clientId: string) => {
   const client = await prisma.client.findUnique({
     where: {
@@ -196,6 +227,7 @@ const deleteClient = async (clientId: string, decodedToken: JwtPayload) => {
 
 export const ClientServices = {
   addClient,
+  getAllClients,
   getSingleClient,
   getMyClient,
   updateClient,

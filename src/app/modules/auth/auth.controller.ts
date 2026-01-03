@@ -15,6 +15,7 @@ import { JwtPayload } from "jsonwebtoken";
 const createUserRequest = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
     const { name, email } = req.body;
+
     await AuthServices.createUserRequest(req, res, name, email);
     sendResponse(res, {
       statusCode: 200,
@@ -198,6 +199,44 @@ const resetPassword = catchAsync(
   }
 );
 
+const addFinviaAdmin = catchAsync(
+  async (req: Request, res: Response, next: NextFunction) => {
+    const decodedToken = req.user as JwtPayload;
+    const { name, email } = req.body;
+    const role = "ADMIN";
+
+    await AuthServices.addFinviaAdmin(name, email, role, decodedToken);
+
+    sendResponse(res, {
+      success: true,
+      statusCode: HttpStatusCodes.OK,
+      message: "Invitation sent successfully.",
+      data: null,
+    });
+  }
+);
+
+const joinFinvia = catchAsync(
+  async (req: Request, res: Response, next: NextFunction) => {
+    const decodedToken = req.user as JwtPayload;
+    const { invitationToken } = req.body;
+
+    const newAdmin = await AuthServices.joinFinvia(
+      req,
+      res,
+      decodedToken,
+      invitationToken
+    );
+
+    sendResponse(res, {
+      success: true,
+      statusCode: HttpStatusCodes.OK,
+      message: "Joined Finvia successfully.",
+      data: newAdmin,
+    });
+  }
+);
+
 export const AuthControllers = {
   createUserRequest,
   createUserVerification,
@@ -208,4 +247,6 @@ export const AuthControllers = {
   changePassword,
   forgotPassword,
   resetPassword,
+  addFinviaAdmin,
+  joinFinvia,
 };

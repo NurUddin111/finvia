@@ -12,19 +12,19 @@ import {
 const router = Router();
 
 router.post(
-  "/register-request",
+  "/signup",
   validateRequest(RegisterRequestZodSchemaValidation),
   AuthControllers.createUserRequest
 );
 
 router.post(
-  "/register-verification",
+  "/signup/verify",
   validateRequest(RegisterVerificationZodSchemaValidation),
   AuthControllers.createUserVerification
 );
 
 router.post(
-  "/register-success",
+  "/signup/password",
   validateRequest(RegisterSuccessZodSchemaValidation),
   AuthControllers.createUserSuccess
 );
@@ -37,7 +37,11 @@ router.post(
   AuthControllers.getNewAccessToken
 );
 
-router.post("/logout",checkAuth(...Object.values(UserRole)), AuthControllers.logout);
+router.post(
+  "/logout",
+  checkAuth(...Object.values(UserRole)),
+  AuthControllers.logout
+);
 
 router.post(
   "/change-password",
@@ -48,5 +52,17 @@ router.post(
 router.post("/forgot-password", AuthControllers.forgotPassword);
 
 router.post("/reset-password", AuthControllers.resetPassword);
+
+router.post(
+  "/add-admin",
+  checkAuth(UserRole.ADMIN),
+  AuthControllers.addFinviaAdmin
+);
+
+router.post(
+  "/join-finvia",
+  checkAuth(UserRole.USER),
+  AuthControllers.joinFinvia
+);
 
 export const AuthRoutes = router;

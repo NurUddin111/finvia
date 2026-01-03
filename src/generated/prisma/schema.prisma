@@ -49,6 +49,7 @@ enum UserRole {
   ADMIN
   USER
   BUSINESS_OWNER
+  BUSINESS_ADMIN
 }
 
 enum Provider {
@@ -125,11 +126,12 @@ enum MemberStatus {
 }
 
 model Client {
-  id      String  @id @default(uuid())
-  name    String
-  email   String
-  phone   String?
-  address String?
+  id            String  @id @default(uuid())
+  name          String
+  email         String
+  phone         String?
+  address       String?
+  totalInvoices Int     @default(0)
 
   links     BusinessClient[]
   isDeleted Boolean          @default(false)

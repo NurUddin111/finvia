@@ -36,7 +36,7 @@ export const UpdateUserZodSchemaValidation = z.object({
     })
     .optional(),
 
-  picture: z
+  avatar: z
     .url({
       error: () => {
         return "Invalid url!";

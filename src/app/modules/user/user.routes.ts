@@ -13,10 +13,16 @@ router.get(
   UserControllers.getMe
 );
 
+router.get(
+  "/all",
+  checkAuth(UserRole.ADMIN),
+  UserControllers.getAllFinviaUsers
+);
+
 router.get("/:id", checkAuth(UserRole.USER), UserControllers.getSingleUser);
 
 router.patch(
-  "/:id",
+  "/edit/:id",
   validateRequest(UpdateUserZodSchemaValidation),
   checkAuth(...Object.values(UserRole)),
   UserControllers.updateUser

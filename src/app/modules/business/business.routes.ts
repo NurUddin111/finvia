@@ -19,7 +19,7 @@ router.post(
 
 router.get(
   "/my-business",
-  checkAuth(UserRole.BUSINESS_OWNER),
+  checkAuth(UserRole.BUSINESS_OWNER, UserRole.BUSINESS_ADMIN),
   BusinessController.getMyBusiness
 );
 

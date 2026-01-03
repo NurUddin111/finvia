@@ -247,14 +247,17 @@ const addBusinessOwnerOrAdmin = async (
     where: {
       user: {
         email: email,
-        role: UserRole.BUSINESS_OWNER,
       },
     },
   });
 
   if (newOwnerCheck) {
-    throw new AppError(HttpStatusCodes.NOT_FOUND, "User is already a owner!");
+    throw new AppError(
+      HttpStatusCodes.NOT_FOUND,
+      `User is already a ${newOwnerCheck.role}`
+    );
   }
+
   const payload = {
     email: email,
     bsId: isOwner.business.id,
@@ -331,7 +334,8 @@ const joinBusinessOwnerOrAdmin = async (
     await tx.user.update({
       where: { id: userId },
       data: {
-        role: role === "OWNER" ? UserRole.BUSINESS_OWNER : UserRole.USER,
+        role:
+          role === "OWNER" ? UserRole.BUSINESS_OWNER : UserRole.BUSINESS_ADMIN,
       },
     });
 

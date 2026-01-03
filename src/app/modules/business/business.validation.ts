@@ -45,8 +45,7 @@ export const CreateBusinessZodSchemaValidation = z.object({
           return `Email cannot exceed ${issue.minimum} characters!`;
         }
       },
-    })
-    .optional(),
+    }),
 
   phone: z
     .string({
@@ -73,7 +72,15 @@ export const CreateBusinessZodSchemaValidation = z.object({
   website: z
     .url({
       error: () => {
-        return "Invalid url!";
+        return "Invalid website url!";
+      },
+    })
+    .optional(),
+
+  logoUrl: z
+    .url({
+      error: () => {
+        return "Invalid logo url!";
       },
     })
     .optional(),
@@ -101,14 +108,6 @@ export const UpdateBusinessZodSchemaValidation = z.object({
     })
     .optional(),
 
-  category: z
-    .enum(BusinessCategory, {
-      error: () => {
-        return "Category not available.";
-      },
-    })
-    .optional(),
-
   email: z
     .email({
       error: "Invalid Email",
@@ -125,6 +124,14 @@ export const UpdateBusinessZodSchemaValidation = z.object({
         if (issue.code === "too_big") {
           return `Email cannot exceed ${issue.minimum} characters!`;
         }
+      },
+    })
+    .optional(),
+
+  category: z
+    .enum(BusinessCategory, {
+      error: () => {
+        return "Category not available.";
       },
     })
     .optional(),
@@ -155,6 +162,14 @@ export const UpdateBusinessZodSchemaValidation = z.object({
     .url({
       error: () => {
         return "Invalid url!";
+      },
+    })
+    .optional(),
+
+  logoUrl: z
+    .url({
+      error: () => {
+        return "Invalid logo url!";
       },
     })
     .optional(),

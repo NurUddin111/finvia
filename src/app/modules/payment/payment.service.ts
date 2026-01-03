@@ -38,13 +38,22 @@ const initPayment = async (invId: string) => {
       },
     });
 
-    const client = await tx.client.findUnique({
+    let client = await tx.client.findUnique({
       where: { id: invoice.clientId },
     });
 
     if (!client) {
       throw new AppError(HttpStatusCodes.NOT_FOUND, "Client not found");
     }
+
+    client = await tx.client.update({
+      where: {
+        id: client.id,
+      },
+      data: {
+        totalInvoices: client.totalInvoices + 1,
+      },
+    });
 
     const business = await tx.business.findUnique({
       where: {

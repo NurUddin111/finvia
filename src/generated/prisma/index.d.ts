@@ -66,7 +66,8 @@ export namespace $Enums {
   export const UserRole: {
   ADMIN: 'ADMIN',
   USER: 'USER',
-  BUSINESS_OWNER: 'BUSINESS_OWNER'
+  BUSINESS_OWNER: 'BUSINESS_OWNER',
+  BUSINESS_ADMIN: 'BUSINESS_ADMIN'
 };
 
 export type UserRole = (typeof UserRole)[keyof typeof UserRole]
@@ -6426,8 +6427,18 @@ export namespace Prisma {
 
   export type AggregateClient = {
     _count: ClientCountAggregateOutputType | null
+    _avg: ClientAvgAggregateOutputType | null
+    _sum: ClientSumAggregateOutputType | null
     _min: ClientMinAggregateOutputType | null
     _max: ClientMaxAggregateOutputType | null
+  }
+
+  export type ClientAvgAggregateOutputType = {
+    totalInvoices: number | null
+  }
+
+  export type ClientSumAggregateOutputType = {
+    totalInvoices: number | null
   }
 
   export type ClientMinAggregateOutputType = {
@@ -6436,6 +6447,7 @@ export namespace Prisma {
     email: string | null
     phone: string | null
     address: string | null
+    totalInvoices: number | null
     isDeleted: boolean | null
     createdAt: Date | null
     updatedAt: Date | null
@@ -6447,6 +6459,7 @@ export namespace Prisma {
     email: string | null
     phone: string | null
     address: string | null
+    totalInvoices: number | null
     isDeleted: boolean | null
     createdAt: Date | null
     updatedAt: Date | null
@@ -6458,6 +6471,7 @@ export namespace Prisma {
     email: number
     phone: number
     address: number
+    totalInvoices: number
     isDeleted: number
     createdAt: number
     updatedAt: number
@@ -6465,12 +6479,21 @@ export namespace Prisma {
   }
 
 
+  export type ClientAvgAggregateInputType = {
+    totalInvoices?: true
+  }
+
+  export type ClientSumAggregateInputType = {
+    totalInvoices?: true
+  }
+
   export type ClientMinAggregateInputType = {
     id?: true
     name?: true
     email?: true
     phone?: true
     address?: true
+    totalInvoices?: true
     isDeleted?: true
     createdAt?: true
     updatedAt?: true
@@ -6482,6 +6505,7 @@ export namespace Prisma {
     email?: true
     phone?: true
     address?: true
+    totalInvoices?: true
     isDeleted?: true
     createdAt?: true
     updatedAt?: true
@@ -6493,6 +6517,7 @@ export namespace Prisma {
     email?: true
     phone?: true
     address?: true
+    totalInvoices?: true
     isDeleted?: true
     createdAt?: true
     updatedAt?: true
@@ -6537,6 +6562,18 @@ export namespace Prisma {
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
      * 
+     * Select which fields to average
+    **/
+    _avg?: ClientAvgAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to sum
+    **/
+    _sum?: ClientSumAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
      * Select which fields to find the minimum value
     **/
     _min?: ClientMinAggregateInputType
@@ -6567,6 +6604,8 @@ export namespace Prisma {
     take?: number
     skip?: number
     _count?: ClientCountAggregateInputType | true
+    _avg?: ClientAvgAggregateInputType
+    _sum?: ClientSumAggregateInputType
     _min?: ClientMinAggregateInputType
     _max?: ClientMaxAggregateInputType
   }
@@ -6577,10 +6616,13 @@ export namespace Prisma {
     email: string
     phone: string | null
     address: string | null
+    totalInvoices: number
     isDeleted: boolean
     createdAt: Date
     updatedAt: Date
     _count: ClientCountAggregateOutputType | null
+    _avg: ClientAvgAggregateOutputType | null
+    _sum: ClientSumAggregateOutputType | null
     _min: ClientMinAggregateOutputType | null
     _max: ClientMaxAggregateOutputType | null
   }
@@ -6605,6 +6647,7 @@ export namespace Prisma {
     email?: boolean
     phone?: boolean
     address?: boolean
+    totalInvoices?: boolean
     isDeleted?: boolean
     createdAt?: boolean
     updatedAt?: boolean
@@ -6619,6 +6662,7 @@ export namespace Prisma {
     email?: boolean
     phone?: boolean
     address?: boolean
+    totalInvoices?: boolean
     isDeleted?: boolean
     createdAt?: boolean
     updatedAt?: boolean
@@ -6630,6 +6674,7 @@ export namespace Prisma {
     email?: boolean
     phone?: boolean
     address?: boolean
+    totalInvoices?: boolean
     isDeleted?: boolean
     createdAt?: boolean
     updatedAt?: boolean
@@ -6641,12 +6686,13 @@ export namespace Prisma {
     email?: boolean
     phone?: boolean
     address?: boolean
+    totalInvoices?: boolean
     isDeleted?: boolean
     createdAt?: boolean
     updatedAt?: boolean
   }
 
-  export type ClientOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "name" | "email" | "phone" | "address" | "isDeleted" | "createdAt" | "updatedAt", ExtArgs["result"]["client"]>
+  export type ClientOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "name" | "email" | "phone" | "address" | "totalInvoices" | "isDeleted" | "createdAt" | "updatedAt", ExtArgs["result"]["client"]>
   export type ClientInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     links?: boolean | Client$linksArgs<ExtArgs>
     invoices?: boolean | Client$invoicesArgs<ExtArgs>
@@ -6667,6 +6713,7 @@ export namespace Prisma {
       email: string
       phone: string | null
       address: string | null
+      totalInvoices: number
       isDeleted: boolean
       createdAt: Date
       updatedAt: Date
@@ -7100,6 +7147,7 @@ export namespace Prisma {
     readonly email: FieldRef<"Client", 'String'>
     readonly phone: FieldRef<"Client", 'String'>
     readonly address: FieldRef<"Client", 'String'>
+    readonly totalInvoices: FieldRef<"Client", 'Int'>
     readonly isDeleted: FieldRef<"Client", 'Boolean'>
     readonly createdAt: FieldRef<"Client", 'DateTime'>
     readonly updatedAt: FieldRef<"Client", 'DateTime'>
@@ -12329,6 +12377,7 @@ export namespace Prisma {
     email: 'email',
     phone: 'phone',
     address: 'address',
+    totalInvoices: 'totalInvoices',
     isDeleted: 'isDeleted',
     createdAt: 'createdAt',
     updatedAt: 'updatedAt'
@@ -12568,6 +12617,20 @@ export namespace Prisma {
 
 
   /**
+   * Reference to a field of type 'Int'
+   */
+  export type IntFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Int'>
+    
+
+
+  /**
+   * Reference to a field of type 'Int[]'
+   */
+  export type ListIntFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Int[]'>
+    
+
+
+  /**
    * Reference to a field of type 'InvoiceStatus'
    */
   export type EnumInvoiceStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'InvoiceStatus'>
@@ -12634,20 +12697,6 @@ export namespace Prisma {
    * Reference to a field of type 'QueryMode'
    */
   export type EnumQueryModeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'QueryMode'>
-    
-
-
-  /**
-   * Reference to a field of type 'Int'
-   */
-  export type IntFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Int'>
-    
-
-
-  /**
-   * Reference to a field of type 'Int[]'
-   */
-  export type ListIntFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Int[]'>
     
   /**
    * Deep Input Types
@@ -12972,6 +13021,7 @@ export namespace Prisma {
     email?: StringFilter<"Client"> | string
     phone?: StringNullableFilter<"Client"> | string | null
     address?: StringNullableFilter<"Client"> | string | null
+    totalInvoices?: IntFilter<"Client"> | number
     isDeleted?: BoolFilter<"Client"> | boolean
     createdAt?: DateTimeFilter<"Client"> | Date | string
     updatedAt?: DateTimeFilter<"Client"> | Date | string
@@ -12985,6 +13035,7 @@ export namespace Prisma {
     email?: SortOrder
     phone?: SortOrderInput | SortOrder
     address?: SortOrderInput | SortOrder
+    totalInvoices?: SortOrder
     isDeleted?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
@@ -13001,6 +13052,7 @@ export namespace Prisma {
     email?: StringFilter<"Client"> | string
     phone?: StringNullableFilter<"Client"> | string | null
     address?: StringNullableFilter<"Client"> | string | null
+    totalInvoices?: IntFilter<"Client"> | number
     isDeleted?: BoolFilter<"Client"> | boolean
     createdAt?: DateTimeFilter<"Client"> | Date | string
     updatedAt?: DateTimeFilter<"Client"> | Date | string
@@ -13014,12 +13066,15 @@ export namespace Prisma {
     email?: SortOrder
     phone?: SortOrderInput | SortOrder
     address?: SortOrderInput | SortOrder
+    totalInvoices?: SortOrder
     isDeleted?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
     _count?: ClientCountOrderByAggregateInput
+    _avg?: ClientAvgOrderByAggregateInput
     _max?: ClientMaxOrderByAggregateInput
     _min?: ClientMinOrderByAggregateInput
+    _sum?: ClientSumOrderByAggregateInput
   }
 
   export type ClientScalarWhereWithAggregatesInput = {
@@ -13031,6 +13086,7 @@ export namespace Prisma {
     email?: StringWithAggregatesFilter<"Client"> | string
     phone?: StringNullableWithAggregatesFilter<"Client"> | string | null
     address?: StringNullableWithAggregatesFilter<"Client"> | string | null
+    totalInvoices?: IntWithAggregatesFilter<"Client"> | number
     isDeleted?: BoolWithAggregatesFilter<"Client"> | boolean
     createdAt?: DateTimeWithAggregatesFilter<"Client"> | Date | string
     updatedAt?: DateTimeWithAggregatesFilter<"Client"> | Date | string
@@ -13732,6 +13788,7 @@ export namespace Prisma {
     email: string
     phone?: string | null
     address?: string | null
+    totalInvoices?: number
     isDeleted?: boolean
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -13745,6 +13802,7 @@ export namespace Prisma {
     email: string
     phone?: string | null
     address?: string | null
+    totalInvoices?: number
     isDeleted?: boolean
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -13758,6 +13816,7 @@ export namespace Prisma {
     email?: StringFieldUpdateOperationsInput | string
     phone?: NullableStringFieldUpdateOperationsInput | string | null
     address?: NullableStringFieldUpdateOperationsInput | string | null
+    totalInvoices?: IntFieldUpdateOperationsInput | number
     isDeleted?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -13771,6 +13830,7 @@ export namespace Prisma {
     email?: StringFieldUpdateOperationsInput | string
     phone?: NullableStringFieldUpdateOperationsInput | string | null
     address?: NullableStringFieldUpdateOperationsInput | string | null
+    totalInvoices?: IntFieldUpdateOperationsInput | number
     isDeleted?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -13784,6 +13844,7 @@ export namespace Prisma {
     email: string
     phone?: string | null
     address?: string | null
+    totalInvoices?: number
     isDeleted?: boolean
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -13795,6 +13856,7 @@ export namespace Prisma {
     email?: StringFieldUpdateOperationsInput | string
     phone?: NullableStringFieldUpdateOperationsInput | string | null
     address?: NullableStringFieldUpdateOperationsInput | string | null
+    totalInvoices?: IntFieldUpdateOperationsInput | number
     isDeleted?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -13806,6 +13868,7 @@ export namespace Prisma {
     email?: StringFieldUpdateOperationsInput | string
     phone?: NullableStringFieldUpdateOperationsInput | string | null
     address?: NullableStringFieldUpdateOperationsInput | string | null
+    totalInvoices?: IntFieldUpdateOperationsInput | number
     isDeleted?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -14596,15 +14659,31 @@ export namespace Prisma {
     _max?: NestedEnumMemberStatusFilter<$PrismaModel>
   }
 
+  export type IntFilter<$PrismaModel = never> = {
+    equals?: number | IntFieldRefInput<$PrismaModel>
+    in?: number[] | ListIntFieldRefInput<$PrismaModel>
+    notIn?: number[] | ListIntFieldRefInput<$PrismaModel>
+    lt?: number | IntFieldRefInput<$PrismaModel>
+    lte?: number | IntFieldRefInput<$PrismaModel>
+    gt?: number | IntFieldRefInput<$PrismaModel>
+    gte?: number | IntFieldRefInput<$PrismaModel>
+    not?: NestedIntFilter<$PrismaModel> | number
+  }
+
   export type ClientCountOrderByAggregateInput = {
     id?: SortOrder
     name?: SortOrder
     email?: SortOrder
     phone?: SortOrder
     address?: SortOrder
+    totalInvoices?: SortOrder
     isDeleted?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
+  }
+
+  export type ClientAvgOrderByAggregateInput = {
+    totalInvoices?: SortOrder
   }
 
   export type ClientMaxOrderByAggregateInput = {
@@ -14613,6 +14692,7 @@ export namespace Prisma {
     email?: SortOrder
     phone?: SortOrder
     address?: SortOrder
+    totalInvoices?: SortOrder
     isDeleted?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
@@ -14624,9 +14704,30 @@ export namespace Prisma {
     email?: SortOrder
     phone?: SortOrder
     address?: SortOrder
+    totalInvoices?: SortOrder
     isDeleted?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
+  }
+
+  export type ClientSumOrderByAggregateInput = {
+    totalInvoices?: SortOrder
+  }
+
+  export type IntWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: number | IntFieldRefInput<$PrismaModel>
+    in?: number[] | ListIntFieldRefInput<$PrismaModel>
+    notIn?: number[] | ListIntFieldRefInput<$PrismaModel>
+    lt?: number | IntFieldRefInput<$PrismaModel>
+    lte?: number | IntFieldRefInput<$PrismaModel>
+    gt?: number | IntFieldRefInput<$PrismaModel>
+    gte?: number | IntFieldRefInput<$PrismaModel>
+    not?: NestedIntWithAggregatesFilter<$PrismaModel> | number
+    _count?: NestedIntFilter<$PrismaModel>
+    _avg?: NestedFloatFilter<$PrismaModel>
+    _sum?: NestedIntFilter<$PrismaModel>
+    _min?: NestedIntFilter<$PrismaModel>
+    _max?: NestedIntFilter<$PrismaModel>
   }
 
   export type ClientScalarRelationFilter = {
@@ -15300,6 +15401,14 @@ export namespace Prisma {
     connect?: InvoiceWhereUniqueInput | InvoiceWhereUniqueInput[]
   }
 
+  export type IntFieldUpdateOperationsInput = {
+    set?: number
+    increment?: number
+    decrement?: number
+    multiply?: number
+    divide?: number
+  }
+
   export type BusinessClientUpdateManyWithoutClientNestedInput = {
     create?: XOR<BusinessClientCreateWithoutClientInput, BusinessClientUncheckedCreateWithoutClientInput> | BusinessClientCreateWithoutClientInput[] | BusinessClientUncheckedCreateWithoutClientInput[]
     connectOrCreate?: BusinessClientCreateOrConnectWithoutClientInput | BusinessClientCreateOrConnectWithoutClientInput[]
@@ -15768,11 +15877,20 @@ export namespace Prisma {
     _max?: NestedEnumMemberStatusFilter<$PrismaModel>
   }
 
-  export type NestedEnumInvoiceStatusFilter<$PrismaModel = never> = {
-    equals?: $Enums.InvoiceStatus | EnumInvoiceStatusFieldRefInput<$PrismaModel>
-    in?: $Enums.InvoiceStatus[] | ListEnumInvoiceStatusFieldRefInput<$PrismaModel>
-    notIn?: $Enums.InvoiceStatus[] | ListEnumInvoiceStatusFieldRefInput<$PrismaModel>
-    not?: NestedEnumInvoiceStatusFilter<$PrismaModel> | $Enums.InvoiceStatus
+  export type NestedIntWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: number | IntFieldRefInput<$PrismaModel>
+    in?: number[] | ListIntFieldRefInput<$PrismaModel>
+    notIn?: number[] | ListIntFieldRefInput<$PrismaModel>
+    lt?: number | IntFieldRefInput<$PrismaModel>
+    lte?: number | IntFieldRefInput<$PrismaModel>
+    gt?: number | IntFieldRefInput<$PrismaModel>
+    gte?: number | IntFieldRefInput<$PrismaModel>
+    not?: NestedIntWithAggregatesFilter<$PrismaModel> | number
+    _count?: NestedIntFilter<$PrismaModel>
+    _avg?: NestedFloatFilter<$PrismaModel>
+    _sum?: NestedIntFilter<$PrismaModel>
+    _min?: NestedIntFilter<$PrismaModel>
+    _max?: NestedIntFilter<$PrismaModel>
   }
 
   export type NestedFloatFilter<$PrismaModel = never> = {
@@ -15784,6 +15902,13 @@ export namespace Prisma {
     gt?: number | FloatFieldRefInput<$PrismaModel>
     gte?: number | FloatFieldRefInput<$PrismaModel>
     not?: NestedFloatFilter<$PrismaModel> | number
+  }
+
+  export type NestedEnumInvoiceStatusFilter<$PrismaModel = never> = {
+    equals?: $Enums.InvoiceStatus | EnumInvoiceStatusFieldRefInput<$PrismaModel>
+    in?: $Enums.InvoiceStatus[] | ListEnumInvoiceStatusFieldRefInput<$PrismaModel>
+    notIn?: $Enums.InvoiceStatus[] | ListEnumInvoiceStatusFieldRefInput<$PrismaModel>
+    not?: NestedEnumInvoiceStatusFilter<$PrismaModel> | $Enums.InvoiceStatus
   }
 
   export type NestedEnumInvoiceStatusWithAggregatesFilter<$PrismaModel = never> = {
@@ -16557,6 +16682,7 @@ export namespace Prisma {
     email: string
     phone?: string | null
     address?: string | null
+    totalInvoices?: number
     isDeleted?: boolean
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -16569,6 +16695,7 @@ export namespace Prisma {
     email: string
     phone?: string | null
     address?: string | null
+    totalInvoices?: number
     isDeleted?: boolean
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -16640,6 +16767,7 @@ export namespace Prisma {
     email?: StringFieldUpdateOperationsInput | string
     phone?: NullableStringFieldUpdateOperationsInput | string | null
     address?: NullableStringFieldUpdateOperationsInput | string | null
+    totalInvoices?: IntFieldUpdateOperationsInput | number
     isDeleted?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -16652,6 +16780,7 @@ export namespace Prisma {
     email?: StringFieldUpdateOperationsInput | string
     phone?: NullableStringFieldUpdateOperationsInput | string | null
     address?: NullableStringFieldUpdateOperationsInput | string | null
+    totalInvoices?: IntFieldUpdateOperationsInput | number
     isDeleted?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -16701,6 +16830,7 @@ export namespace Prisma {
     email: string
     phone?: string | null
     address?: string | null
+    totalInvoices?: number
     isDeleted?: boolean
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -16713,6 +16843,7 @@ export namespace Prisma {
     email: string
     phone?: string | null
     address?: string | null
+    totalInvoices?: number
     isDeleted?: boolean
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -16850,6 +16981,7 @@ export namespace Prisma {
     email?: StringFieldUpdateOperationsInput | string
     phone?: NullableStringFieldUpdateOperationsInput | string | null
     address?: NullableStringFieldUpdateOperationsInput | string | null
+    totalInvoices?: IntFieldUpdateOperationsInput | number
     isDeleted?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -16862,6 +16994,7 @@ export namespace Prisma {
     email?: StringFieldUpdateOperationsInput | string
     phone?: NullableStringFieldUpdateOperationsInput | string | null
     address?: NullableStringFieldUpdateOperationsInput | string | null
+    totalInvoices?: IntFieldUpdateOperationsInput | number
     isDeleted?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string

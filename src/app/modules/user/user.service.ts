@@ -1,8 +1,87 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { JwtPayload } from "jsonwebtoken";
-import { User, UserRole } from "../../../generated/prisma";
+import { Prisma, User, UserRole } from "../../../generated/prisma";
 import { prisma } from "../../../lib/prisma";
 import AppError from "../../errorHelpers/AppError";
 import { HttpStatusCodes } from "../../utils/httpStatusCodes";
+import { IPaginationOptions } from "../../interfaces/pagination";
+import { paginationHelper } from "../../utils/paginationHelper";
+import { userSearchAbleFields } from "./user.constants";
+
+const getAllFinviaUsers = async (params: any, options: IPaginationOptions) => {
+  const { page, limit, skip, sortBy, sortOrder } =
+    paginationHelper.calculatePagination(options);
+
+  const { searchTerm, ...filterData } = params;
+
+  const andConditions: Prisma.UserWhereInput[] = [{ isDeleted: false }];
+
+  if (searchTerm) {
+    andConditions.push({
+      OR: userSearchAbleFields.map((field) => ({
+        [field]: {
+          contains: searchTerm,
+          mode: "insensitive",
+        },
+      })),
+    });
+  }
+
+  if (Object.keys(filterData).length > 0) {
+    andConditions.push({
+      AND: Object.keys(filterData).map((key) => ({
+        [key]: {
+          equals: filterData[key],
+        },
+      })),
+    });
+  }
+
+  const whereConditions: Prisma.UserWhereInput =
+    andConditions.length > 0 ? { AND: andConditions } : {};
+
+  const data = await prisma.user.findMany({
+    where: whereConditions,
+    skip,
+    take: limit,
+    orderBy: {
+      [sortBy]: sortOrder,
+    },
+    select: {
+      id: true,
+      name: true,
+      email: true,
+      role: true,
+      password: false,
+      auths: true,
+      isVerified: true,
+      isActive: true,
+      avatar: true,
+      phone: true,
+      address: true,
+      createdAt: true,
+      updatedAt: true,
+      businessUsers: {
+        include: {
+          business: true,
+        },
+      },
+    },
+  });
+
+  const total = await prisma.user.count({ where: whereConditions });
+  const totalPage = Math.ceil(total / limit);
+
+  return {
+    meta: {
+      page,
+      limit,
+      total,
+      totalPage,
+    },
+    data,
+  };
+};
 
 const getSingleUser = async (userId: string) => {
   const user = await prisma.user.findUnique({
@@ -107,10 +186,10 @@ const deleteUser = async (userId: string) => {
       isDeleted: true,
     },
   });
-
 };
 
 export const UserServices = {
+  getAllFinviaUsers,
   getSingleUser,
   getMe,
   updateUser,

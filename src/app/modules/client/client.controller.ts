@@ -5,6 +5,8 @@ import { JwtPayload } from "jsonwebtoken";
 import { sendResponse } from "../../utils/sendResponse";
 import { HttpStatusCodes } from "../../utils/httpStatusCodes";
 import { ClientServices } from "./client.service";
+import pick from "../../utils/pick";
+import { clientFilterableFields } from "./client.constants";
 
 const addClient = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
@@ -18,6 +20,23 @@ const addClient = catchAsync(
       success: true,
       statusCode: HttpStatusCodes.CREATED,
       message: "Client added successfully",
+      data: business,
+    });
+  }
+);
+
+const getAllClients = catchAsync(
+  async (req: Request, res: Response, next: NextFunction) => {
+    const user = req.user as JwtPayload;
+    const userId = user.userId;
+    const filters = pick(req.query, clientFilterableFields);
+    const options = pick(req.query, ["page", "limit", "sortBy", "sortOrder"]);
+
+    const business = await ClientServices.getAllClients(userId);
+    sendResponse(res, {
+      success: true,
+      statusCode: HttpStatusCodes.OK,
+      message: "All Clients details retrieved successfully",
       data: business,
     });
   }
@@ -87,6 +106,7 @@ const deleteClient = catchAsync(
 
 export const ClientController = {
   addClient,
+  getAllClients,
   getSingleClient,
   getMyClient,
   updateClient,
