@@ -103,4 +103,66 @@ const createInvoice = async (
   return result;
 };
 
-export const InvoiceServices = { createInvoice };
+const getAllInvoices = async (userId: string) => {
+  const isOwner = await prisma.businessUser.findFirst({
+    where: { userId: userId, business: { isDeleted: false } },
+  });
+
+  if (!isOwner) {
+    throw new AppError(
+      HttpStatusCodes.NOT_FOUND,
+      "Only Business Owner or Admin can view all clients."
+    );
+  }
+
+  const invoices = await prisma.invoice.findMany({
+    where: {
+      businessId: isOwner.businessId,
+    },
+    include: {
+      client: {
+        select: {
+          email: true,
+        },
+      },
+    },
+  });
+
+  return invoices;
+};
+
+const getSingleInvoice = async (userId: string, invId: string) => {
+  const isOwner = await prisma.businessUser.findFirst({
+    where: { userId: userId, business: { isDeleted: false } },
+  });
+
+  if (!isOwner) {
+    throw new AppError(
+      HttpStatusCodes.NOT_FOUND,
+      "Only Business Owner or Admin can view all clients."
+    );
+  }
+
+  const invoice = await prisma.invoice.findFirst({
+    where: {
+      id: invId,
+      businessId: isOwner.businessId,
+    },
+    include: {
+      client: {
+        select: {
+          email: true,
+        },
+      },
+      items: true,
+    },
+  });
+
+  return invoice;
+};
+
+export const InvoiceServices = {
+  createInvoice,
+  getAllInvoices,
+  getSingleInvoice,
+};

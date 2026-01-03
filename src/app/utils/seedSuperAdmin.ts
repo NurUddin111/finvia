@@ -12,8 +12,21 @@ export const seedSuperAdmin = async () => {
       },
     });
 
-    if (isSuperAdminExist) {
+    if (isSuperAdminExist && !isSuperAdminExist.isDeleted) {
       console.log("Super Admin Already Exists!");
+      return;
+    }
+
+    if (isSuperAdminExist && isSuperAdminExist.isDeleted) {
+      await prisma.user.update({
+        where: {
+          email: isSuperAdminExist.email,
+        },
+        data: {
+          isDeleted: false,
+        },
+      });
+      console.log("Super Admin Revived!");
       return;
     }
 

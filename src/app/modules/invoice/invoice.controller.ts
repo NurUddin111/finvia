@@ -29,4 +29,37 @@ const createInvoice = catchAsync(
   }
 );
 
-export const InvoiceController = { createInvoice };
+const getAllInvoices = catchAsync(
+  async (req: Request, res: Response, next: NextFunction) => {
+    const user = req.user as JwtPayload;
+    const userId = user.userId;
+
+    const invoices = await InvoiceServices.getAllInvoices(userId);
+
+    sendResponse(res, {
+      success: true,
+      statusCode: HttpStatusCodes.CREATED,
+      message: "All Invoices retrieved successfully",
+      data: invoices,
+    });
+  }
+);
+
+const getSingleInvoice = catchAsync(
+  async (req: Request, res: Response, next: NextFunction) => {
+    const user = req.user as JwtPayload;
+    const userId = user.userId;
+    const invId = req.params.id
+
+    const invoice = await InvoiceServices.getSingleInvoice(userId,invId);
+
+    sendResponse(res, {
+      success: true,
+      statusCode: HttpStatusCodes.CREATED,
+      message: "Invoice retrieved successfully",
+      data: invoice,
+    });
+  }
+);
+
+export const InvoiceController = { createInvoice, getAllInvoices,getSingleInvoice };

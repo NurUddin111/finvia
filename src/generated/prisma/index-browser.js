@@ -173,6 +173,7 @@ exports.Prisma.ClientScalarFieldEnum = {
   email: 'email',
   phone: 'phone',
   address: 'address',
+  totalInvoices: 'totalInvoices',
   isDeleted: 'isDeleted',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
@@ -259,7 +260,8 @@ exports.Prisma.JsonNullValueFilter = {
 exports.UserRole = exports.$Enums.UserRole = {
   ADMIN: 'ADMIN',
   USER: 'USER',
-  BUSINESS_OWNER: 'BUSINESS_OWNER'
+  BUSINESS_OWNER: 'BUSINESS_OWNER',
+  BUSINESS_ADMIN: 'BUSINESS_ADMIN'
 };
 
 exports.IsActive = exports.$Enums.IsActive = {

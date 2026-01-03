@@ -35,6 +35,7 @@ export const setAuthCookie = (
       httpOnly: true,
       secure: envVars.NODE_ENV === "production" ? true : false,
       sameSite: envVars.NODE_ENV === "production" ? "none" : "lax",
+      // maxAge: 2 * 60 * 1000,
     });
   }
 
@@ -44,6 +45,7 @@ export const setAuthCookie = (
       httpOnly: true,
       secure: envVars.NODE_ENV === "production" ? true : false,
       sameSite: envVars.NODE_ENV === "production" ? "none" : "lax",
+      maxAge: 10 * 60 * 1000,
     });
   }
 
@@ -53,6 +55,7 @@ export const setAuthCookie = (
       httpOnly: true,
       secure: envVars.NODE_ENV === "production" ? true : false,
       sameSite: envVars.NODE_ENV === "production" ? "none" : "lax",
+      maxAge: 24 * 60 * 60 * 1000,
     });
   }
 
@@ -61,6 +64,7 @@ export const setAuthCookie = (
       httpOnly: true,
       secure: envVars.NODE_ENV === "production" ? true : false,
       sameSite: envVars.NODE_ENV === "production" ? "none" : "lax",
+      maxAge: 30 * 24 * 60 * 60 * 1000,
     });
   }
 

@@ -7,9 +7,12 @@ import { envVars } from "../../config/env";
 import { setAuthCookie } from "../../utils/setCookie";
 import { prisma } from "../../../lib/prisma";
 import { JwtPayload } from "jsonwebtoken";
-import { User } from "../../../generated/prisma";
+import { User, UserRole } from "../../../generated/prisma";
 import bcrypt from "bcryptjs";
-import { createNewAccessTokenWithRefreshToken } from "../../utils/userTokens";
+import {
+  createNewAccessTokenWithRefreshToken,
+  createUserTokens,
+} from "../../utils/userTokens";
 import { checkUserStatus } from "../../utils/checkUserStatus";
 import { sendEmail } from "../../utils/sendEmail";
 import { IAuthProvider } from "./auth.interface";
@@ -97,6 +100,8 @@ const createUserVerification = async (
       "Failed to decode Name and Email from CREATION_TOKEN"
     );
   }
+
+  console.log(email,otp)
 
   await OTPServices.verifyOTP(email, otp);
 
@@ -409,6 +414,116 @@ const resetPassword = async (
   });
 };
 
+const addFinviaAdmin = async (
+  name: string,
+  email: string,
+  role: string,
+  decodedToken: JwtPayload
+) => {
+  const userId = decodedToken.userId;
+
+  const isAdmin = await prisma.user.findFirst({
+    where: { id: userId, role: "ADMIN" },
+  });
+
+  if (!isAdmin) {
+    throw new AppError(HttpStatusCodes.NOT_FOUND, "You're not an Admin.");
+  }
+
+  const newAdminCheck = await prisma.businessUser.findFirst({
+    where: {
+      user: {
+        email: email,
+      },
+    },
+  });
+
+  if (newAdminCheck) {
+    throw new AppError(
+      HttpStatusCodes.NOT_FOUND,
+      `A ${newAdminCheck.role} can't be added as an Admin of Finvia`
+    );
+  }
+
+  const payload = {
+    email: email,
+    role: role,
+  };
+
+  const invitationToken = generateToken(
+    payload,
+    envVars.JWT_INVITATION_SECRET,
+    envVars.JWT_INVITATION_EXPIRES
+  );
+
+  const inviteLink = `${envVars.FRONTEND_URL}?token=${invitationToken}`;
+
+  await sendEmail({
+    to: email,
+    subject: "FINVIA is inviting you!",
+    templateName: "addAuthority",
+    templateData: {
+      businessName: "FINVIA",
+      receiverName: name,
+      inviterName: isAdmin.name,
+      role: role,
+      inviteLink: inviteLink,
+    },
+  });
+};
+
+const joinFinvia = async (
+  req: Request,
+  res: Response,
+  decodedToken: JwtPayload,
+  invitationToken: string
+) => {
+  const verifiedInvToken = verifyToken(
+    invitationToken,
+    envVars.JWT_INVITATION_SECRET
+  ) as JwtPayload;
+
+  if (!verifiedInvToken) {
+    throw new AppError(
+      HttpStatusCodes.BAD_REQUEST,
+      "Invitation link has expired!"
+    );
+  }
+
+  const userEmail = decodedToken.email;
+  const invitationReceiver = verifiedInvToken.email;
+
+  if (userEmail !== invitationReceiver) {
+    throw new AppError(
+      HttpStatusCodes.UNAUTHORIZED,
+      "You're not the user who was invited to join!"
+    );
+  }
+
+  const userId = decodedToken.userId;
+
+  const result = await prisma.$transaction(async (tx) => {
+    await tx.user.update({
+      where: { id: userId },
+      data: {
+        role: UserRole.ADMIN,
+      },
+    });
+
+    const user = (await tx.user.findUnique({
+      where: { id: userId },
+    })) as User;
+
+    const userTokens = createUserTokens(user);
+
+    setAuthCookie(req, res, userTokens);
+
+    return user;
+  });
+
+  return result;
+};
+
 export const AuthServices = {
   createUserRequest,
   createUserVerification,
@@ -417,4 +532,6 @@ export const AuthServices = {
   changePassword,
   forgotPassword,
   resetPassword,
+  addFinviaAdmin,
+  joinFinvia,
 };

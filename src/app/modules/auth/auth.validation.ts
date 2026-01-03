@@ -19,9 +19,7 @@ export const RegisterRequestZodSchemaValidation = z.object({
           return `Name cannot exceed ${issue.minimum} characters!`;
         }
       },
-    })
-    .optional(),
-
+    }),
   email: z
     .email({
       error: (issue) =>
@@ -40,8 +38,7 @@ export const RegisterRequestZodSchemaValidation = z.object({
           return `Email cannot exceed ${issue.minimum} characters!`;
         }
       },
-    })
-    .optional(),
+    }),
 });
 
 export const RegisterVerificationZodSchemaValidation = z.object({

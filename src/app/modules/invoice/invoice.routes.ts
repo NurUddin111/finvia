@@ -9,12 +9,23 @@ const router = Router();
 router.post(
   "/create",
   checkAuth(UserRole.BUSINESS_OWNER, UserRole.USER),
-  //   validateRequest(AddClientZodSchemaValidation),
   InvoiceController.createInvoice
 );
 
+router.get(
+  "/all",
+  checkAuth(UserRole.BUSINESS_OWNER, UserRole.BUSINESS_ADMIN),
+  InvoiceController.getAllInvoices
+);
+
+router.get(
+  "/:id",
+  checkAuth(UserRole.BUSINESS_OWNER, UserRole.BUSINESS_ADMIN),
+  InvoiceController.getSingleInvoice
+);
+
 router.post(
-  "/sent/:id",
+  "/send/:id",
   checkAuth(UserRole.BUSINESS_OWNER, UserRole.USER),
   PaymentController.initPayment
 );

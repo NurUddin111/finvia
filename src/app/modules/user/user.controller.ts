@@ -1,3 +1,4 @@
+import { userFilterableFields } from "./user.constants";
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { NextFunction, Request, Response } from "express";
 import { catchAsync } from "../../utils/catchAsync";
@@ -6,6 +7,24 @@ import { sendResponse } from "../../utils/sendResponse";
 import { HttpStatusCodes } from "../../utils/httpStatusCodes";
 import { JwtPayload } from "jsonwebtoken";
 import { User } from "../../../generated/prisma";
+import pick from "../../utils/pick";
+
+const getAllFinviaUsers = catchAsync(
+  async (req: Request, res: Response, next: NextFunction) => {
+    const filters = pick(req.query, userFilterableFields);
+    const options = pick(req.query, ["page", "limit", "sortBy", "sortOrder"]);
+
+    const result = await UserServices.getAllFinviaUsers(filters, options);
+
+    sendResponse(res, {
+      statusCode: HttpStatusCodes.OK,
+      success: true,
+      message: "Users data retrieved succcessfully!",
+      meta: result.meta,
+      data: result.data,
+    });
+  }
+);
 
 const getSingleUser = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
@@ -63,6 +82,7 @@ const deleteUser = catchAsync(
 );
 
 export const UserControllers = {
+  getAllFinviaUsers,
   getSingleUser,
   getMe,
   updateUser,

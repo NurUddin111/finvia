@@ -10,6 +10,8 @@ import { envVars } from "./app/config/env";
 import { globalErrorHandler } from "./app/middlewares/globalErrorHandler";
 
 const app = express();
+
+app.use(cookieParser());
 app.use(
   expressSession({
     secret: envVars.EXPRESS_SESSION_SECRET,
@@ -19,9 +21,13 @@ app.use(
 );
 app.use(passport.initialize());
 app.use(passport.session());
-app.use(cors());
+app.use(
+  cors({
+    origin: "http://localhost:3000",
+    credentials: true,
+  })
+);
 app.use(express.json());
-app.use(cookieParser());
 
 app.use("/api/v1", router);
 
