@@ -30,7 +30,7 @@ router.post(
 );
 
 router.post(
-  "/join-business",
+  "/join",
   checkAuth(UserRole.USER),
   BusinessController.joinBusinessOwnerOrAdmin
 );

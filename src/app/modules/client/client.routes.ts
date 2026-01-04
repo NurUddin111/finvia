@@ -29,11 +29,11 @@ router.get(
   ClientController.getMyClient
 );
 
-router.get(
-  "/:id",
-  checkAuth(UserRole.BUSINESS_OWNER, UserRole.BUSINESS_ADMIN),
-  ClientController.getSingleClient
-);
+// router.get(
+//   "/:id",
+//   checkAuth(UserRole.BUSINESS_OWNER, UserRole.BUSINESS_ADMIN),
+//   ClientController.getSingleClient
+// );
 
 router.patch(
   "/edit/:id",

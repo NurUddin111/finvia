@@ -1,205 +1,301 @@
-Finvia – Backend Service
+# 💼 Finvia – Backend API
 
-Finvia is a modern SaaS platform designed to manage businesses, clients, invoices, and payments efficiently.
-This repository contains the backend service responsible for authentication, business logic, data persistence, and secure API access.
+A full-featured **SaaS Backend System** built using modern web technologies.  
+Finvia helps businesses manage **clients, invoices, and payments** efficiently with secure authentication and scalable architecture.
 
-🧠 Overview
+---
 
-The backend is built with scalability, security, and maintainability in mind.
-It follows a modular architecture, supports role-based access control, and is designed to serve multiple businesses (multi-tenant SaaS).
+## 🚀 Project Overview
 
-🛠 Tech Stack
-
-Node.js – Runtime environment
-
-Express.js – HTTP server framework
-
-TypeScript – Type safety & maintainable code
-
-PostgreSQL – Primary relational database
-
-Prisma ORM – Database modeling & querying
-
-JWT – Authentication & authorization
-
-Zod – Request validation
-
-bcrypt – Password hashing
-
-dotenv – Environment variable management
-
-📁 Project Structure
-src/
-├── app/
-│ ├── modules/
-│ │ ├── auth/
-│ │ ├── user/
-│ │ ├── business/
-│ │ ├── client/
-│ │ ├── invoice/
-│ │ └── payment/
-│ ├── middlewares/
-│ ├── routes/
-│ └── utils/
-├── prisma/
-│ ├── schema.prisma
-│ └── migrations/
-├── config/
-├── app.ts
-└── server.ts
-
-🔐 Authentication & Authorization
-
-JWT-based authentication
-
-Secure access token handling
-
-Role-based authorization:
-
-SUPER_ADMIN
-
-ADMIN
-
-USER
-
-Protected routes using middleware
-
-Business-scoped access control (multi-tenant safety)
-
-🏢 Core Modules
-Auth Module
-
-User registration & login
-
-Email-based verification (OTP)
-
-Token generation & validation
-
-User Module
-
-User profile management
-
-Role assignment
-
-Soft delete support
-
-Business Module
-
-Business creation & management
-
-Business members
-
-Business-scoped data isolation
-
-Client Module
-
-Client CRUD operations
-
-Search, filter, pagination
-
-Business-specific clients
-
-Invoice Module
-
-Invoice creation & updates
-
-Draft / Sent / Paid status handling
-
-Due date & total calculations
-
-Payment Module
-
-Invoice payment tracking
-
-Payment status updates
-
-Future gateway integration ready
-
-📦 Environment Variables
-
-Create a .env file in the root directory:
-
-NODE_ENV=development
-PORT=5000
-
-DATABASE_URL=postgresql://user:password@localhost:5432/finvia
-
-JWT_ACCESS_SECRET=your_access_secret
-JWT_REFRESH_SECRET=your_refresh_secret
-JWT_ACCESS_EXPIRES_IN=15m
-JWT_REFRESH_EXPIRES_IN=7d
-
-🚀 Getting Started
-1️⃣ Install Dependencies
-npm install
-
-2️⃣ Setup Database
-npx prisma migrate dev
-npx prisma generate
-
-3️⃣ Run Development Server
-npm run dev
-
-Server will start on:
-
-http://localhost:5000
-
-🧪 API Standards
-
-RESTful API design
-
-Consistent response format:
-
-{
-"success": true,
-"message": "Operation successful",
-"data": {}
-}
-
-Centralized error handling
-
-Proper HTTP status codes
-
-🔒 Security Practices
-
-Password hashing with bcrypt
-
-JWT expiration & rotation support
-
-Input validation using Zod
-
-Soft deletes instead of hard deletes
-
-Business-level data isolation
-
-📈 Scalability Considerations
-
-Modular architecture
-
-Clean service–controller separation
-
-Database-indexed filtering & searching
-
-Ready for microservice split in future
-
-API versioning friendly
-
-🧭 Future Improvements
-
-Payment gateway integration
-
-Email service abstraction
-
-Audit logs
-
-Rate limiting
-
-Webhook support
-
-Background jobs (queues)
-
-👨‍💻 Maintained By
-
-Muhammad Nur Uddin
-Backend & Full-Stack Developer
-Project: Finvia
+Finvia is designed as a **multi-tenant SaaS backend**, where multiple businesses can operate independently.
+
+It supports different user roles — **Owner, Admin, Client, User** — each with controlled access and permissions.
+
+This project focuses on **scalability**, **security**, and **clean API design**, making it suitable for real-world SaaS applications.
+
+---
+
+## ✨ Features
+
+### 👤 User
+
+- Sign up / Log in using JWT authentication
+- Email verification using OTP
+- Secure access to business-scoped data
+- View and update profile information
+
+### 🏢 Business
+
+- Create and manage businesses
+- Add and manage business members
+- Role-based access control (Admin / Member)
+- Business-level data isolation
+
+### 👥 Client
+
+- Create, update, and delete clients
+- Search, filter, and paginate clients
+- Clients scoped to specific businesses
+
+### 🧾 Invoice
+
+- Create invoices for clients
+- Save invoices as draft
+- Send invoices
+- Update invoice status (Draft → Sent → Paid)
+- Calculate totals and due dates
+
+### 🔐 General
+
+- Secure authentication using JWT
+- Centralized error handling and validation
+- Scalable and modular backend structure
+- Soft delete support
+
+---
+
+## 🧰 Tech Stack
+
+---
+
+| Category                   | Technologies                    |
+| -------------------------- | ------------------------------- |
+| **Backend**                | Node.js, Express.js, TypeScript |
+| **Database**               | PostgreSQL                      |
+| **ORM**                    | Prisma                          |
+| **Authentication**         | JWT (JSON Web Tokens), bcrypt   |
+| **Validation**             | Zod                             |
+| **API Testing**            | Postman                         |
+| **Environment Management** | dotenv                          |
+| **Version Control**        | Git & GitHub                    |
+
+---
+
+---
+
+## 🧩 API Endpoints
+
+### 🔐 AUTH MODULE
+
+    ---------------------------------------------------------------------------------------------------
+    | METHOD |            ENDPOINT           |           BODY             |      DESCRIPTION          |
+    ---------------------------------------------------------------------------------------------------
+    | POST   | /api/v1/auth/signup           | {                          | Create a new user         |
+    |        |                               |  "name": "John Doe",       | registration request.     |
+    |        |                               |  "email":"john@example.com"| Sends a 6 digit OTP to    |
+    |        |                               | }                          | verify email.             |
+    ---------------------------------------------------------------------------------------------------
+    | POST   | /api/v1/auth/signup-verify    | {                          | Verify user registration  |
+    |        |                               |  "otp": "123456"           | using OTP.                |
+    |        |                               | }                          |                           |
+    |        |                               |                            |                           |
+    ---------------------------------------------------------------------------------------------------
+    | POST   | /api/v1/auth/signup-password  | {                          | Complete user registration|
+    |        |                               |  "password": "Abc123@&$",  |                           |
+    |        |                               | }                          |                           |
+    ---------------------------------------------------------------------------------------------------
+    | POST   | /api/v1/auth/login            |                            | Login using email and     |
+    |        |                               |                            | password                  |
+    ---------------------------------------------------------------------------------------------------
+    | POST   | /api/v1/auth/refresh-token    |                            | Get a new access token    |
+    ---------------------------------------------------------------------------------------------------
+    | POST   | /api/v1/auth/logout           |                            | Logout user (invalidate   |
+    |        |                               |                            | token)                    |
+    ---------------------------------------------------------------------------------------------------
+    | POST   | /api/v1/auth/change-password  | {                          | Change user password      |
+    |        |                               |  "oldPass": "123...",      |                           |
+    |        |                               |  "newPass": "654...",      |                           |
+    |        |                               |  "confirmNewPass": "654..."|                           |
+    |        |                               | }                          |                           |
+    ---------------------------------------------------------------------------------------------------
+    | POST   | /api/v1/auth/forgot-password  | {                          | Send reset link to user   |
+    |        |                               |  "email":"john@example.com"| email                     |
+    |        |                               | }                          |                           |
+    ---------------------------------------------------------------------------------------------------
+    | POST   | /api/v1/auth/reset-passw      | {                          | Reset password using token|
+    |        | ord/:id                       |  "newPass":"654...",       |                           |
+    |        |                               |  "confirmNewPass":"654..." |                           |
+    |        |                               | }                          |                           |
+    ---------------------------------------------------------------------------------------------------
+
+### 👤 USER MODULE
+
+    ---------------------------------------------------------------------------------------------------
+    | METHOD |            ENDPOINT           |           BODY             |      DESCRIPTION          |
+    ---------------------------------------------------------------------------------------------------
+    | GET    | /api/v1/user                  |                            | Get All Users(Admin Only) |
+    ---------------------------------------------------------------------------------------------------
+    | GET    | /api/v1/user/me               |                            | Get logged-in user profile|
+    ---------------------------------------------------------------------------------------------------
+    | GET    | /api/v1/user/:id              |                            | Get single user by Id     |
+    |        |                               |                            | (Admin Only)              |
+    ---------------------------------------------------------------------------------------------------
+    | PATCH  | /api/v1/user/edit/:id         | {                          | Update user details.      |
+    |        |                               |  "name":"Mark Henry",      |                           |
+    |        |                               |  "phone":"+880...",        |                           |
+    |        |                               | ...                        |                           |
+    |        |                               | }                          |                           |
+    ---------------------------------------------------------------------------------------------------
+    | PATCH  | /api/v1/user/vehicle-locat    | {                          | Update driver’s vehicle   |
+    |        |  ion/:id                      |  "address":"...address"    | location                  |
+    |        |                               | }                          |                           |
+    ---------------------------------------------------------------------------------------------------
+    | PATCH  | /api/v1/user/delete/:id       |                            | Soft delete a user        |
+    ---------------------------------------------------------------------------------------------------
+
+### 🏢 BUSINESS MODULE
+
+    ---------------------------------------------------------------------------------------------------
+    | METHOD |            ENDPOINT           |           BODY             |      DESCRIPTION          |
+    ---------------------------------------------------------------------------------------------------
+    | POST   | /api/v1/business/add          | {                          | Add your business.        |
+    |        |                               |  "name": "Amazon",         |                           |
+    |        |                               |  "email":"amz@example.com" |                           |
+    |        |                               |  "category":"AGENCY"       |                           |
+    |        |                               |   ...                      |                           |
+    |        |                               | }                          |                           |
+    ---------------------------------------------------------------------------------------------------
+    | GET    | /api/v1/business/:id          |                            | Get business by Id        |
+    |        |                               |                            | (Admin Only)              |
+    ---------------------------------------------------------------------------------------------------
+    | GET    | /api/v1/business/my-business  |                            | Get your business details |
+    ---------------------------------------------------------------------------------------------------
+    | PATCH  | /api/v1/business/edit/:id     | {                          | Update your business.     |
+    |        |                               |  "name": "Amazon",         |                           |
+    |        |                               |  "email":"amz@example.com" |                           |
+    |        |                               |  "category":"AGENCY"       |                           |
+    |        |                               |   ...                      |                           |
+    |        |                               | }                          |                           |
+    ---------------------------------------------------------------------------------------------------
+    | PATCH  | /api/v1/business/delete/:id   |                            | Soft delete business      |
+    ---------------------------------------------------------------------------------------------------
+    | POST   | /api/v1/business/add-authoriry| {                          | Add Owners or Admins      |
+    |        |                               |  "name": "Amazon",         |                           |
+    |        |                               |  "email":"amz@example.com" |                           |
+    |        |                               |  "role":"OWNER" OR "ADMIN" |                           |
+    |        |                               | }                          |                           |
+    ---------------------------------------------------------------------------------------------------
+    | POST   | /api/v1/business/join         | {                          | Join as Owners or Admins  |
+    |        |                               |  "invitationToken":"eyJ..."|                           |
+    |        |                               | }                          |                           |
+    ---------------------------------------------------------------------------------------------------
+
+### 👥 CLIENT MODULE
+
+    ---------------------------------------------------------------------------------------------------
+    | METHOD |            ENDPOINT           |           BODY             |      DESCRIPTION          |
+    ---------------------------------------------------------------------------------------------------
+    | POST   | /api/v1/client/add            | {                          | Add new client.           |
+    |        |                               |  "name": "John Doe",       |                           |
+    |        |                               |  "email":"john@example.com"|                           |
+    |        |                               | }                          |                           |
+    ---------------------------------------------------------------------------------------------------
+    | GET    | /api/v1/client/all            |                            | Get all clients(BUSINESS  |
+    |        |                               |                            | OWNER OR ADMIN)           |
+    ---------------------------------------------------------------------------------------------------
+    | GET    | /api/v1/client/:id            |                            | Get your client(BUSINESS  |
+    |        |                               |                            | OWNER OR ADMIN)           |
+    ---------------------------------------------------------------------------------------------------
+    | PATCH  | /api/v1/client/edit/:id       | {                          | Update client details.    |
+    |        |                               |  "name":"Mark Henry",      |                           |
+    |        |                               |  "phone":"+880...",        |                           |
+    |        |                               | ...                        |                           |
+    |        |                               | }                          |                           |
+    ---------------------------------------------------------------------------------------------------
+    | PATCH  | /api/v1/user/delete/:id       |                            | Soft delete a client      |
+    ---------------------------------------------------------------------------------------------------
+
+### 🧾 INVOICE MODULE
+
+    ---------------------------------------------------------------------------------------------------
+    | METHOD |            ENDPOINT           |           BODY             |      DESCRIPTION          |
+    ---------------------------------------------------------------------------------------------------
+    | POST   | /api/v1/invoice/create        | {                          | Create invoice.           |
+    |        |                               |  "email":"amz@example.com",|                           |
+    |        |                               |  "dueDays": 3,             |                           |
+    |        |                               |  "items": [                |                           |
+    |        |                               |    {                       |                           |
+    |        |                               |   "name":"Raymond Sunglass"|                           |
+    |        |                               |   "pricePerUnit": 1000,    |                           |
+    |        |                               |   "quantity": 2            |                           |
+    |        |                               |    }                       |                           |
+    |        |                               |           ],               |                           |
+    |        |                               |   "taxRate": 25,           |                           |
+    |        |                               |   "notes": "First Customer"|                           |
+    |        |                               | }                          |                           |
+    ---------------------------------------------------------------------------------------------------
+    | POST   | /api/v1/invoice/send/:id      |                            | Send invoice              |
+    ---------------------------------------------------------------------------------------------------
+    | GET    | /api/v1/invoice/all           |                            | Get all invoices          |
+    ---------------------------------------------------------------------------------------------------
+    | GET    | /api/v1/invoice/:id           |                            | Get single invoice        |
+    ---------------------------------------------------------------------------------------------------
+
+## ⚙️ Installation & Setup
+
+    ```bash
+    # Clone the repository
+    git clone https://github.com/NurUddin111/finvia.git
+
+    # Navigate to the project directory
+    cd finvia
+
+    # Install dependencies
+    npm install
+
+    # Create an .env file
+    cp .env.example .env
+    # (Add your environment variables)
+
+    # Run database migrations
+    npx prisma migrate dev
+
+    # Run the development server
+    npm run dev
+
+## 🧪 Testing the API
+
+---
+
+## 📮 Postman Collection
+
+    🔗 **[Finvia  – Postman Collection](https://api.postman.com/collections/46020985-22b24d14-fb08-4166-ac42-514b8781d9b2?access_key=PMAT-01KE57YWFWCY8PSR7X7K7JCVV8)**
+
+    Set the base URL: http://localhost:1126
+
+## 📁 Folder Structure
+
+    src/
+    │
+    ├── app/
+    │   ├── config/
+    │   ├── errorHelpers/
+    │   ├── helpers/
+    │   ├── interfaces/
+    │   ├── middlewares/
+    │   ├── modules/
+    │   ├── routes/
+    │   ├── utils/
+    │   └── constants.ts
+    ├── prisma/
+    │ ├── schema.prisma
+    │ └── migrations/
+    │
+    ├── app.ts
+    └── server.ts
+
+## 🧠 Future Improvements
+
+    Email service abstraction
+    Webhooks for invoice events
+    Activity & audit logs
+    Background jobs (queues)
+    Subscription & billing plans
+
+👨‍💻 Author
+
+    Muhammad Nur Uddin
+
+    “Don’t be shy, know the why!”
+    📧 nuruddinmuhammad38@gmail.com
+    🌐 https://github.com/NurUddin111
