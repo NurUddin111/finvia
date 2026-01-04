@@ -259,7 +259,7 @@ This project focuses on **scalability**, **security**, and **clean API design**,
 
 ## 📮 Postman Collection
 
-    🔗 **[Finvia  – Postman Collection](https://api.postman.com/collections/46020985-22b24d14-fb08-4166-ac42-514b8781d9b2?access_key=)**
+    🔗 **[Finvia  – Postman Collection]()**
 
     Set the base URL: http://localhost:1126
 
