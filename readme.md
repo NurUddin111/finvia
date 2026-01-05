@@ -292,7 +292,7 @@ This project focuses on **scalability**, **security**, and **clean API design**,
     Background jobs (queues)
     Subscription & billing plans
 
-👨‍💻 Author
+## 👨‍💻 Author
 
     Muhammad Nur Uddin
 
