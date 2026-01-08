@@ -1,0 +1,32 @@
+"use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+const app_1 = __importDefault(require("./app"));
+const shutDown_1 = require("./app/utils/shutDown");
+const env_1 = require("./app/config/env");
+const redis_config_1 = require("./app/config/redis.config");
+const seedSuperAdmin_1 = require("./app/utils/seedSuperAdmin");
+let server;
+const startServer = async () => {
+    try {
+        console.log("...Connecting to DB");
+        server = app_1.default.listen(env_1.envVars.PORT, () => {
+            console.log(`Server is listening to PORT ${env_1.envVars.PORT}`);
+        });
+    }
+    catch (error) {
+        console.error("Failed to run server. Error:", error);
+    }
+};
+(async () => {
+    await (0, redis_config_1.connectRedis)();
+    await startServer();
+    await (0, seedSuperAdmin_1.seedSuperAdmin)();
+})();
+// Termination Signals
+process.on("SIGTERM", () => (0, shutDown_1.gracefullShutDown)("SIGTERM", server));
+process.on("SIGINT", () => (0, shutDown_1.gracefullShutDown)("SIGTERM", server));
+process.on("unhandledRejection", () => (0, shutDown_1.errorShutDown)("Unhandled Rejection", server));
+process.on("uncaughtException", () => (0, shutDown_1.errorShutDown)("Uncaught Exception", server));

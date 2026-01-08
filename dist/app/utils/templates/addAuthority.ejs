@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>You're Invited</title>
+    <style>
+      body {
+        background: #f5f7fa;
+        font-family: Arial, sans-serif;
+        margin: 0;
+        padding: 0;
+        color: #333;
+      }
+
+      .container {
+        max-width: 600px;
+        background: #ffffff;
+        margin: 40px auto;
+        border-radius: 10px;
+        padding: 30px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+      }
+
+      .title {
+        font-size: 22px;
+        font-weight: bold;
+        color: #222;
+        margin-bottom: 20px;
+        text-align: center;
+      }
+
+      .content {
+        font-size: 16px;
+        line-height: 1.6;
+      }
+      .btn-container {
+        text-align: center;
+        padding: 20px 0;
+      }
+      .btn {
+        display: inline-block;
+        padding: 12px 24px;
+        text-decoration: none;
+        color: #ffffff;
+        border: 1px solid #220579;
+        border-radius: 5px;
+        font-weight: bold;
+      }
+
+      .footer {
+        margin-top: 35px;
+        font-size: 13px;
+        color: #666;
+        text-align: center;
+      }
+
+      .highlight {
+        font-weight: bold;
+        color: #000;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="title">You're Invited to Join <%= businessName %></div>
+
+      <div class="content">
+        Hello <span class="highlight"><%= receiverName %></span>,<br /><br />
+
+        <span class="highlight"><%= inviterName %></span> has invited you to
+        join the business <span class="highlight"><%= businessName %></span> as
+        an <span class="highlight"><%= role %></span>. <br /><br />
+
+        To accept this invitation and get started, please click the button
+        below:
+        <br />
+
+        <div class="btn-container">
+          <a class="btn" href="<%= inviteLink %>">Accept Invitation</a>
+        </div>
+
+        <br />
+        If you did not expect this email, you can safely ignore it.
+      </div>
+
+      <div class="footer">
+        <p>
+          This message was sent by
+          <span class="highlight"><%= businessName %></span>. Please do not
+          reply directly to this email.
+        </p>
+        <p>&copy; <%= businessName %>. All rights reserved.</p>
+      </div>
+    </div>
+  </body>
+</html>

@@ -8,7 +8,6 @@ import { seedSuperAdmin } from "./app/utils/seedSuperAdmin";
 let server: Server;
 const startServer = async () => {
   try {
-    console.log("...Connecting to DB");
 
     server = app.listen(envVars.PORT, () => {
       console.log(`Server is listening to PORT ${envVars.PORT}`);
