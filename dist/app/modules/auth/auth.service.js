@@ -11,7 +11,7 @@ const jwt_1 = require("../../utils/jwt");
 const env_1 = require("../../config/env");
 const setCookie_1 = require("../../utils/setCookie");
 const prisma_1 = require("../../../lib/prisma");
-const prisma_2 = require("../../../generated/prisma");
+const client_1 = require("@prisma/client");
 const bcryptjs_1 = __importDefault(require("bcryptjs"));
 const userTokens_1 = require("../../utils/userTokens");
 const checkUserStatus_1 = require("../../utils/checkUserStatus");
@@ -276,7 +276,7 @@ const joinFinvia = async (req, res, decodedToken, invitationToken) => {
         await tx.user.update({
             where: { id: userId },
             data: {
-                role: prisma_2.UserRole.ADMIN,
+                role: client_1.UserRole.ADMIN,
             },
         });
         const user = (await tx.user.findUnique({

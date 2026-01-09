@@ -10,7 +10,7 @@ const env_1 = require("../config/env");
 const httpStatusCodes_1 = require("../utils/httpStatusCodes");
 const handleZodError_1 = require("../errorHelpers/handleZodError");
 const AppError_1 = __importDefault(require("../errorHelpers/AppError"));
-const prisma_1 = require("../../generated/prisma");
+const client_1 = require("@prisma/client");
 /**
  * Hide sensitive Prisma details in production
  */
@@ -38,7 +38,7 @@ const globalErrorHandler = (err, req, res, next) => {
         errorSources = simplifiedError.errorSources;
     }
     //  Prisma Errors
-    else if (err instanceof prisma_1.Prisma.PrismaClientKnownRequestError) {
+    else if (err instanceof client_1.Prisma.PrismaClientKnownRequestError) {
         // P2002 — Unique constraint violation
         if (err.code === "P2002") {
             statusCode = httpStatusCodes_1.HttpStatusCodes.BAD_REQUEST;
@@ -65,7 +65,7 @@ const globalErrorHandler = (err, req, res, next) => {
             message = err.message;
         }
     }
-    else if (err instanceof prisma_1.Prisma.PrismaClientValidationError) {
+    else if (err instanceof client_1.Prisma.PrismaClientValidationError) {
         statusCode = httpStatusCodes_1.HttpStatusCodes.BAD_REQUEST;
         message = "Prisma validation error";
         errorSources = [

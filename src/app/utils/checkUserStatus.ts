@@ -4,7 +4,7 @@ import { HttpStatusCodes } from "./httpStatusCodes";
 import { verifyToken } from "./jwt";
 import { JwtPayload } from "jsonwebtoken";
 import { Request } from "express";
-import { IsActive, User } from "../../generated/prisma";
+import { IsActive, User } from "@prisma/client";
 import { prisma } from "../../lib/prisma";
 
 export const checkUserStatus = async (

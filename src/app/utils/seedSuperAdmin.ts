@@ -2,7 +2,7 @@ import bcryptjs from "bcryptjs";
 import { envVars } from "../config/env";
 import { prisma } from "../../lib/prisma";
 import { IAuthProvider } from "../modules/auth/auth.interface";
-import { UserRole } from "../../generated/prisma";
+import { UserRole } from "@prisma/client";
 
 export const seedSuperAdmin = async () => {
   try {

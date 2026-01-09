@@ -2,13 +2,13 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.InvoiceRoutes = void 0;
 const express_1 = require("express");
-const prisma_1 = require("../../../generated/prisma");
+const client_1 = require("@prisma/client");
 const checkAuth_1 = require("../../middlewares/checkAuth");
 const invoice_controller_1 = require("./invoice.controller");
 const payment_controller_1 = require("../payment/payment.controller");
 const router = (0, express_1.Router)();
-router.post("/create", (0, checkAuth_1.checkAuth)(prisma_1.UserRole.BUSINESS_OWNER, prisma_1.UserRole.USER), invoice_controller_1.InvoiceController.createInvoice);
-router.get("/all", (0, checkAuth_1.checkAuth)(prisma_1.UserRole.BUSINESS_OWNER, prisma_1.UserRole.BUSINESS_ADMIN), invoice_controller_1.InvoiceController.getAllInvoices);
-router.get("/:id", (0, checkAuth_1.checkAuth)(prisma_1.UserRole.BUSINESS_OWNER, prisma_1.UserRole.BUSINESS_ADMIN), invoice_controller_1.InvoiceController.getSingleInvoice);
-router.post("/send/:id", (0, checkAuth_1.checkAuth)(prisma_1.UserRole.BUSINESS_OWNER, prisma_1.UserRole.USER), payment_controller_1.PaymentController.initPayment);
+router.post("/create", (0, checkAuth_1.checkAuth)(client_1.UserRole.BUSINESS_OWNER, client_1.UserRole.USER), invoice_controller_1.InvoiceController.createInvoice);
+router.get("/all", (0, checkAuth_1.checkAuth)(client_1.UserRole.BUSINESS_OWNER, client_1.UserRole.BUSINESS_ADMIN), invoice_controller_1.InvoiceController.getAllInvoices);
+router.get("/:id", (0, checkAuth_1.checkAuth)(client_1.UserRole.BUSINESS_OWNER, client_1.UserRole.BUSINESS_ADMIN), invoice_controller_1.InvoiceController.getSingleInvoice);
+router.post("/send/:id", (0, checkAuth_1.checkAuth)(client_1.UserRole.BUSINESS_OWNER, client_1.UserRole.USER), payment_controller_1.PaymentController.initPayment);
 exports.InvoiceRoutes = router;

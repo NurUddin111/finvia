@@ -5,7 +5,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.UpdateBusinessZodSchemaValidation = exports.CreateBusinessZodSchemaValidation = void 0;
 const zod_1 = __importDefault(require("zod"));
-const prisma_1 = require("../../../generated/prisma");
+const client_1 = require("@prisma/client");
 exports.CreateBusinessZodSchemaValidation = zod_1.default.object({
     name: zod_1.default
         .string({
@@ -25,7 +25,7 @@ exports.CreateBusinessZodSchemaValidation = zod_1.default.object({
             }
         },
     }),
-    category: zod_1.default.enum(prisma_1.BusinessCategory, {
+    category: zod_1.default.enum(client_1.BusinessCategory, {
         error: () => {
             return "Category not available.";
         },
@@ -123,7 +123,7 @@ exports.UpdateBusinessZodSchemaValidation = zod_1.default.object({
     })
         .optional(),
     category: zod_1.default
-        .enum(prisma_1.BusinessCategory, {
+        .enum(client_1.BusinessCategory, {
         error: () => {
             return "Category not available.";
         },

@@ -8,8 +8,8 @@ const env_1 = require("../config/env");
 const jwt_1 = require("./jwt");
 const AppError_1 = __importDefault(require("../errorHelpers/AppError"));
 const httpStatusCodes_1 = require("./httpStatusCodes");
-const prisma_1 = require("../../generated/prisma");
-const prisma_2 = require("../../lib/prisma");
+const client_1 = require("@prisma/client");
+const prisma_1 = require("../../lib/prisma");
 const createUserTokens = (user) => {
     const jwtPayload = {
         userId: user.id,
@@ -27,7 +27,7 @@ exports.createUserTokens = createUserTokens;
 const createNewAccessTokenWithRefreshToken = async (refreshToken) => {
     const verifiedRefreshToken = (0, jwt_1.verifyToken)(refreshToken, env_1.envVars.JWT_REFRESH_SECRET);
     const email = verifiedRefreshToken.email;
-    const user = await prisma_2.prisma.user.findUnique({
+    const user = await prisma_1.prisma.user.findUnique({
         where: {
             email: email,
         },
@@ -38,8 +38,8 @@ const createNewAccessTokenWithRefreshToken = async (refreshToken) => {
     if (user.isDeleted) {
         throw new AppError_1.default(httpStatusCodes_1.HttpStatusCodes.BAD_REQUEST, "User is deleted");
     }
-    if (user.isActive === prisma_1.IsActive.BLOCKED ||
-        user.isActive === prisma_1.IsActive.INACTIVE) {
+    if (user.isActive === client_1.IsActive.BLOCKED ||
+        user.isActive === client_1.IsActive.INACTIVE) {
         throw new AppError_1.default(httpStatusCodes_1.HttpStatusCodes.BAD_REQUEST, `User is ${user.isActive}`);
     }
     const jwtPayload = {

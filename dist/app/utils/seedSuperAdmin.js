@@ -7,7 +7,7 @@ exports.seedSuperAdmin = void 0;
 const bcryptjs_1 = __importDefault(require("bcryptjs"));
 const env_1 = require("../config/env");
 const prisma_1 = require("../../lib/prisma");
-const prisma_2 = require("../../generated/prisma");
+const client_1 = require("@prisma/client");
 const seedSuperAdmin = async () => {
     try {
         const isSuperAdminExist = await prisma_1.prisma.user.findUnique({
@@ -40,7 +40,7 @@ const seedSuperAdmin = async () => {
         const superAdmin = await prisma_1.prisma.user.create({
             data: {
                 name: "SUPER_ADMIN",
-                role: prisma_2.UserRole.ADMIN,
+                role: client_1.UserRole.ADMIN,
                 email: env_1.envVars.SUPER_ADMIN_EMAIL,
                 password: hashedPassword,
                 isVerified: true,

@@ -4,8 +4,8 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.UserServices = void 0;
-const prisma_1 = require("../../../generated/prisma");
-const prisma_2 = require("../../../lib/prisma");
+const client_1 = require("@prisma/client");
+const prisma_1 = require("../../../lib/prisma");
 const AppError_1 = __importDefault(require("../../errorHelpers/AppError"));
 const httpStatusCodes_1 = require("../../utils/httpStatusCodes");
 const paginationHelper_1 = require("../../utils/paginationHelper");
@@ -34,7 +34,7 @@ const getAllFinviaUsers = async (params, options) => {
         });
     }
     const whereConditions = andConditions.length > 0 ? { AND: andConditions } : {};
-    const data = await prisma_2.prisma.user.findMany({
+    const data = await prisma_1.prisma.user.findMany({
         where: whereConditions,
         skip,
         take: limit,
@@ -62,7 +62,7 @@ const getAllFinviaUsers = async (params, options) => {
             },
         },
     });
-    const total = await prisma_2.prisma.user.count({ where: whereConditions });
+    const total = await prisma_1.prisma.user.count({ where: whereConditions });
     const totalPage = Math.ceil(total / limit);
     return {
         meta: {
@@ -75,7 +75,7 @@ const getAllFinviaUsers = async (params, options) => {
     };
 };
 const getSingleUser = async (userId) => {
-    const user = await prisma_2.prisma.user.findUnique({
+    const user = await prisma_1.prisma.user.findUnique({
         where: {
             id: userId,
         },
@@ -86,7 +86,7 @@ const getSingleUser = async (userId) => {
     return user;
 };
 const getMe = async (userId) => {
-    const user = await prisma_2.prisma.user.findUnique({
+    const user = await prisma_1.prisma.user.findUnique({
         where: {
             id: userId,
         },
@@ -99,7 +99,7 @@ const getMe = async (userId) => {
     };
 };
 const updateUser = async (userId, payload, decodedToken) => {
-    const user = await prisma_2.prisma.user.findUnique({
+    const user = await prisma_1.prisma.user.findUnique({
         where: {
             id: userId,
         },
@@ -107,23 +107,23 @@ const updateUser = async (userId, payload, decodedToken) => {
     if (!user) {
         throw new AppError_1.default(httpStatusCodes_1.HttpStatusCodes.NOT_FOUND, "User Not Found!");
     }
-    if (decodedToken.role === prisma_1.UserRole.USER ||
-        decodedToken.role === prisma_1.UserRole.BUSINESS_OWNER) {
+    if (decodedToken.role === client_1.UserRole.USER ||
+        decodedToken.role === client_1.UserRole.BUSINESS_OWNER) {
         if (userId !== decodedToken.userId) {
             throw new AppError_1.default(401, "It looks like you're trying to edit another user's profile. You can only make changes to your own profile.");
         }
     }
-    if (payload.role && payload.role === prisma_1.UserRole.ADMIN) {
-        if (decodedToken.role !== prisma_1.UserRole.ADMIN) {
+    if (payload.role && payload.role === client_1.UserRole.ADMIN) {
+        if (decodedToken.role !== client_1.UserRole.ADMIN) {
             throw new AppError_1.default(httpStatusCodes_1.HttpStatusCodes.FORBIDDEN, "Setting up Admin role is a restricted action. For security, only users with an existing Admin role can assign it to others.");
         }
     }
     if (payload.isActive || payload.isDeleted || payload.isVerified) {
-        if (decodedToken.role !== prisma_1.UserRole.ADMIN) {
+        if (decodedToken.role !== client_1.UserRole.ADMIN) {
             throw new AppError_1.default(httpStatusCodes_1.HttpStatusCodes.FORBIDDEN, "This is a restricted action. For security, only Admin can update these information.");
         }
     }
-    const updatedUser = await prisma_2.prisma.user.update({
+    const updatedUser = await prisma_1.prisma.user.update({
         where: {
             id: userId,
         },
@@ -132,7 +132,7 @@ const updateUser = async (userId, payload, decodedToken) => {
     return updatedUser;
 };
 const deleteUser = async (userId) => {
-    const user = await prisma_2.prisma.user.findUnique({
+    const user = await prisma_1.prisma.user.findUnique({
         where: {
             id: userId,
             isDeleted: false,
@@ -141,7 +141,7 @@ const deleteUser = async (userId) => {
     if (!user) {
         throw new AppError_1.default(httpStatusCodes_1.HttpStatusCodes.BAD_REQUEST, "No user found.");
     }
-    await prisma_2.prisma.user.update({
+    await prisma_1.prisma.user.update({
         where: {
             id: userId,
         },

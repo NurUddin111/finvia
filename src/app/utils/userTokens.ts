@@ -3,7 +3,7 @@ import { envVars } from "../config/env";
 import { generateToken, verifyToken } from "./jwt";
 import AppError from "../errorHelpers/AppError";
 import { HttpStatusCodes } from "./httpStatusCodes";
-import { IsActive, User } from "../../generated/prisma";
+import { IsActive, User } from "@prisma/client";
 import { prisma } from "../../lib/prisma";
 
 const createUserTokens = (user: Partial<User>) => {

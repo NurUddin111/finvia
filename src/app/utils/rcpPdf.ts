@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import PDFDocument from "pdfkit";
 import axios from "axios";
-import { Invoice, InvoiceItem } from "../../generated/prisma";
+import { Invoice, InvoiceItem } from "@prisma/client";
 import { prisma } from "../../lib/prisma";
 import AppError from "../errorHelpers/AppError";
 import { HttpStatusCodes } from "./httpStatusCodes";

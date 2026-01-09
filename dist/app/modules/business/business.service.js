@@ -4,8 +4,8 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.BusinessServices = void 0;
-const prisma_1 = require("../../../generated/prisma");
-const prisma_2 = require("../../../lib/prisma");
+const client_1 = require("@prisma/client");
+const prisma_1 = require("../../../lib/prisma");
 const AppError_1 = __importDefault(require("../../errorHelpers/AppError"));
 const httpStatusCodes_1 = require("../../utils/httpStatusCodes");
 const userTokens_1 = require("../../utils/userTokens");
@@ -14,13 +14,13 @@ const sendEmail_1 = require("../../utils/sendEmail");
 const env_1 = require("../../config/env");
 const jwt_1 = require("../../utils/jwt");
 const addBusiness = async (req, res, userId, payload) => {
-    const isOwner = await prisma_2.prisma.businessUser.findFirst({
+    const isOwner = await prisma_1.prisma.businessUser.findFirst({
         where: { userId, business: { isDeleted: false } },
     });
     if (isOwner) {
         throw new AppError_1.default(httpStatusCodes_1.HttpStatusCodes.BAD_REQUEST, "You already belong to a business");
     }
-    const result = await prisma_2.prisma.$transaction(async (tx) => {
+    const result = await prisma_1.prisma.$transaction(async (tx) => {
         const business = await tx.business.create({
             data: {
                 name: payload.name,
@@ -35,8 +35,8 @@ const addBusiness = async (req, res, userId, payload) => {
             data: {
                 userId,
                 businessId: business.id,
-                role: prisma_1.BusinessRole.BUSINESS_OWNER,
-                status: prisma_1.MemberStatus.ACTIVE,
+                role: client_1.BusinessRole.BUSINESS_OWNER,
+                status: client_1.MemberStatus.ACTIVE,
             },
         });
         await tx.user.update({
@@ -53,7 +53,7 @@ const addBusiness = async (req, res, userId, payload) => {
     return result;
 };
 const getSinglBusiness = async (businessId) => {
-    const business = await prisma_2.prisma.business.findUnique({
+    const business = await prisma_1.prisma.business.findUnique({
         where: {
             id: businessId,
         },
@@ -64,13 +64,13 @@ const getSinglBusiness = async (businessId) => {
     return business;
 };
 const getMyBusiness = async (userId) => {
-    const isOwner = await prisma_2.prisma.businessUser.findFirst({
+    const isOwner = await prisma_1.prisma.businessUser.findFirst({
         where: { userId: userId, business: { isDeleted: false } },
     });
     if (!isOwner) {
         throw new AppError_1.default(httpStatusCodes_1.HttpStatusCodes.NOT_FOUND, "You do not belong to any business");
     }
-    const business = await prisma_2.prisma.business.findFirst({
+    const business = await prisma_1.prisma.business.findFirst({
         where: {
             id: isOwner.businessId,
             isDeleted: false,
@@ -92,7 +92,7 @@ const getMyBusiness = async (userId) => {
 };
 const updateBusiness = async (businessId, payload, decodedToken) => {
     const userId = decodedToken.userId;
-    const isOwner = await prisma_2.prisma.businessUser.findFirst({
+    const isOwner = await prisma_1.prisma.businessUser.findFirst({
         where: { userId, business: { isDeleted: false } },
     });
     if (!isOwner) {
@@ -101,7 +101,7 @@ const updateBusiness = async (businessId, payload, decodedToken) => {
     if (businessId !== isOwner.businessId) {
         throw new AppError_1.default(httpStatusCodes_1.HttpStatusCodes.UNAUTHORIZED, "It looks like you're trying to edit another user's business. You can only make changes to your own business.");
     }
-    const updatedBusiness = await prisma_2.prisma.business.update({
+    const updatedBusiness = await prisma_1.prisma.business.update({
         where: {
             id: businessId,
             isDeleted: false,
@@ -112,7 +112,7 @@ const updateBusiness = async (businessId, payload, decodedToken) => {
 };
 const deleteBusiness = async (req, res, businessId, decodedToken) => {
     const userId = decodedToken.userId;
-    const isOwner = await prisma_2.prisma.businessUser.findFirst({
+    const isOwner = await prisma_1.prisma.businessUser.findFirst({
         where: { userId, business: { isDeleted: false } },
     });
     if (!isOwner) {
@@ -121,7 +121,7 @@ const deleteBusiness = async (req, res, businessId, decodedToken) => {
     if (businessId !== isOwner.businessId) {
         throw new AppError_1.default(httpStatusCodes_1.HttpStatusCodes.UNAUTHORIZED, "It looks like you're trying to delete another user's business. You can only make changes to your own business.");
     }
-    await prisma_2.prisma.$transaction(async (tx) => {
+    await prisma_1.prisma.$transaction(async (tx) => {
         await tx.business.update({
             where: {
                 id: businessId,
@@ -134,7 +134,7 @@ const deleteBusiness = async (req, res, businessId, decodedToken) => {
         await tx.user.update({
             where: { id: userId },
             data: {
-                role: prisma_1.UserRole.USER,
+                role: client_1.UserRole.USER,
             },
         });
         const user = (await tx.user.findUnique({
@@ -146,7 +146,7 @@ const deleteBusiness = async (req, res, businessId, decodedToken) => {
 };
 const addBusinessOwnerOrAdmin = async (name, email, role, decodedToken) => {
     const userId = decodedToken.userId;
-    const isOwner = await prisma_2.prisma.businessUser.findFirst({
+    const isOwner = await prisma_1.prisma.businessUser.findFirst({
         where: { userId, business: { isDeleted: false } },
         include: {
             business: {
@@ -165,7 +165,7 @@ const addBusinessOwnerOrAdmin = async (name, email, role, decodedToken) => {
     if (!isOwner) {
         throw new AppError_1.default(httpStatusCodes_1.HttpStatusCodes.NOT_FOUND, "You do not belong to any business");
     }
-    const newOwnerCheck = await prisma_2.prisma.businessUser.findFirst({
+    const newOwnerCheck = await prisma_1.prisma.businessUser.findFirst({
         where: {
             user: {
                 email: email,
@@ -208,21 +208,21 @@ const joinBusinessOwnerOrAdmin = async (req, res, decodedToken, invitationToken)
     const userId = decodedToken.userId;
     const bsId = verifiedInvToken.bsId;
     const role = verifiedInvToken.role;
-    const result = await prisma_2.prisma.$transaction(async (tx) => {
+    const result = await prisma_1.prisma.$transaction(async (tx) => {
         await tx.businessUser.create({
             data: {
                 userId,
                 businessId: bsId,
                 role: role === "OWNER"
-                    ? prisma_1.BusinessRole.BUSINESS_OWNER
-                    : prisma_1.BusinessRole.BUSINESS_ADMIN,
-                status: prisma_1.MemberStatus.ACTIVE,
+                    ? client_1.BusinessRole.BUSINESS_OWNER
+                    : client_1.BusinessRole.BUSINESS_ADMIN,
+                status: client_1.MemberStatus.ACTIVE,
             },
         });
         await tx.user.update({
             where: { id: userId },
             data: {
-                role: role === "OWNER" ? prisma_1.UserRole.BUSINESS_OWNER : prisma_1.UserRole.BUSINESS_ADMIN,
+                role: role === "OWNER" ? client_1.UserRole.BUSINESS_OWNER : client_1.UserRole.BUSINESS_ADMIN,
             },
         });
         const user = (await tx.user.findUnique({

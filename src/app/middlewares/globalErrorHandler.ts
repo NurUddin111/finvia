@@ -7,7 +7,7 @@ import { IErrorSources } from "../interfaces/error.types";
 import { HttpStatusCodes } from "../utils/httpStatusCodes";
 import { handlerZodError } from "../errorHelpers/handleZodError";
 import AppError from "../errorHelpers/AppError";
-import { Prisma } from "../../generated/prisma";
+import { Prisma } from "@prisma/client";
 
 /**
  * Hide sensitive Prisma details in production
