@@ -5,7 +5,7 @@ import {
   MemberStatus,
   User,
   UserRole,
-} from "../../../generated/prisma";
+} from "@prisma/client";
 import { prisma } from "../../../lib/prisma";
 import AppError from "../../errorHelpers/AppError";
 import { HttpStatusCodes } from "../../utils/httpStatusCodes";

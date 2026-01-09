@@ -1,5 +1,5 @@
 import { JwtPayload } from "jsonwebtoken";
-import { Client } from "../../../generated/prisma";
+import { Client } from "@prisma/client";
 import { prisma } from "../../../lib/prisma";
 import AppError from "../../errorHelpers/AppError";
 import { HttpStatusCodes } from "../../utils/httpStatusCodes";

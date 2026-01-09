@@ -1,7 +1,7 @@
 import { validateRequest } from "./../../middlewares/validateRequest";
 import { Router } from "express";
 import { checkAuth } from "../../middlewares/checkAuth";
-import { UserRole } from "../../../generated/prisma";
+import { UserRole } from "@prisma/client";
 import { BusinessController } from "./business.controller";
 import {
   CreateBusinessZodSchemaValidation,

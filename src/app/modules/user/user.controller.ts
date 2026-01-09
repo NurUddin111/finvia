@@ -6,7 +6,7 @@ import { UserServices } from "./user.service";
 import { sendResponse } from "../../utils/sendResponse";
 import { HttpStatusCodes } from "../../utils/httpStatusCodes";
 import { JwtPayload } from "jsonwebtoken";
-import { User } from "../../../generated/prisma";
+import { User } from "@prisma/client";
 import pick from "../../utils/pick";
 
 const getAllFinviaUsers = catchAsync(

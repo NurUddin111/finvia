@@ -9,8 +9,8 @@ import passport from "passport";
 import AppError from "../../errorHelpers/AppError";
 import { createUserTokens } from "../../utils/userTokens";
 import { clearAllCookies, setAuthCookie } from "../../utils/setCookie";
-import { User } from "../../../generated/prisma";
 import { JwtPayload } from "jsonwebtoken";
+import { User } from "@prisma/client";
 
 const createUserRequest = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {

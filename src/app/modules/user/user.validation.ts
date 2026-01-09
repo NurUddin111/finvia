@@ -1,5 +1,5 @@
 import z from "zod";
-import { UserRole } from "../../../generated/prisma";
+import { UserRole } from "@prisma/client";
 
 export const UpdateUserZodSchemaValidation = z.object({
   name: z

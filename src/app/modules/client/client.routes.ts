@@ -1,6 +1,6 @@
 import { Router } from "express";
 import { checkAuth } from "../../middlewares/checkAuth";
-import { UserRole } from "../../../generated/prisma";
+import { UserRole } from "@prisma/client";
 import { ClientController } from "./client.controller";
 import {
   AddClientZodSchemaValidation,

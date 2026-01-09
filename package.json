@@ -8,7 +8,8 @@
     "lint": "npx eslint ./src",
     "start": "node ./dist/server.js",
     "dev": "ts-node-dev --respawn --transpile-only ./src/server.ts",
-    "build": "tsc"
+    "build": "tsc",
+    "postinstall": "npx prisma generate"
   },
   "repository": {
     "type": "git",

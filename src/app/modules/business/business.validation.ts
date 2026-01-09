@@ -1,5 +1,5 @@
 import z from "zod";
-import { BusinessCategory } from "../../../generated/prisma";
+import { BusinessCategory } from "@prisma/client";
 
 export const CreateBusinessZodSchemaValidation = z.object({
   name: z

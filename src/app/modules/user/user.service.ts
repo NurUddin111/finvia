@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { JwtPayload } from "jsonwebtoken";
-import { Prisma, User, UserRole } from "../../../generated/prisma";
+import { Prisma, User, UserRole } from "@prisma/client";
 import { prisma } from "../../../lib/prisma";
 import AppError from "../../errorHelpers/AppError";
 import { HttpStatusCodes } from "../../utils/httpStatusCodes";

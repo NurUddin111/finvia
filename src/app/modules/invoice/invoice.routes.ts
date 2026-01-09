@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { UserRole } from "../../../generated/prisma";
+import { UserRole } from "@prisma/client";
 import { checkAuth } from "../../middlewares/checkAuth";
 import { InvoiceController } from "./invoice.controller";
 import { PaymentController } from "../payment/payment.controller";

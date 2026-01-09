@@ -11,7 +11,6 @@ const seedSuperAdmin_1 = require("./app/utils/seedSuperAdmin");
 let server;
 const startServer = async () => {
     try {
-        console.log("...Connecting to DB");
         server = app_1.default.listen(env_1.envVars.PORT, () => {
             console.log(`Server is listening to PORT ${env_1.envVars.PORT}`);
         });

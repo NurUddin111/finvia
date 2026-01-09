@@ -7,7 +7,7 @@ import { envVars } from "../../config/env";
 import { setAuthCookie } from "../../utils/setCookie";
 import { prisma } from "../../../lib/prisma";
 import { JwtPayload } from "jsonwebtoken";
-import { User, UserRole } from "../../../generated/prisma";
+import { User, UserRole } from "@prisma/client";
 import bcrypt from "bcryptjs";
 import {
   createNewAccessTokenWithRefreshToken,
