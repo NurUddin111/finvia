@@ -8,26 +8,26 @@ const router = Router();
 
 router.post(
   "/create",
-  checkAuth(UserRole.BUSINESS_OWNER, UserRole.USER),
-  InvoiceController.createInvoice
+  checkAuth(UserRole.BUSINESS_OWNER, UserRole.BUSINESS_ADMIN),
+  InvoiceController.createInvoice,
 );
 
 router.get(
   "/all",
   checkAuth(UserRole.BUSINESS_OWNER, UserRole.BUSINESS_ADMIN),
-  InvoiceController.getAllInvoices
+  InvoiceController.getAllInvoices,
 );
 
 router.get(
   "/:id",
   checkAuth(UserRole.BUSINESS_OWNER, UserRole.BUSINESS_ADMIN),
-  InvoiceController.getSingleInvoice
+  InvoiceController.getSingleInvoice,
 );
 
 router.post(
   "/send/:id",
-  checkAuth(UserRole.BUSINESS_OWNER, UserRole.USER),
-  PaymentController.initPayment
+  checkAuth(UserRole.BUSINESS_OWNER, UserRole.BUSINESS_ADMIN),
+  PaymentController.initPayment,
 );
 
 export const InvoiceRoutes = router;
