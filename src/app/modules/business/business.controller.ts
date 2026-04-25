@@ -16,7 +16,7 @@ const addBusiness = catchAsync(
       req,
       res,
       userId,
-      payload
+      payload,
     );
 
     sendResponse(res, {
@@ -25,7 +25,7 @@ const addBusiness = catchAsync(
       message: "Business created successfully",
       data: business,
     });
-  }
+  },
 );
 
 const getSingleBusiness = catchAsync(
@@ -38,7 +38,7 @@ const getSingleBusiness = catchAsync(
       message: "Business retrieved successfully",
       data: business,
     });
-  }
+  },
 );
 
 const getMyBusiness = catchAsync(
@@ -52,7 +52,7 @@ const getMyBusiness = catchAsync(
       message: "Your Business Retrieved Successfully",
       data: result.data,
     });
-  }
+  },
 );
 
 const updateBusiness = catchAsync(
@@ -63,7 +63,7 @@ const updateBusiness = catchAsync(
     const business = await BusinessServices.updateBusiness(
       id,
       payload,
-      verifiedToken
+      verifiedToken,
     );
     sendResponse(res, {
       success: true,
@@ -71,7 +71,7 @@ const updateBusiness = catchAsync(
       message: "Business details updated successfully",
       data: business,
     });
-  }
+  },
 );
 
 const deleteBusiness = catchAsync(
@@ -85,7 +85,7 @@ const deleteBusiness = catchAsync(
       message: "Business deleted successfully",
       data: null,
     });
-  }
+  },
 );
 
 const addBusinessOwnerOrAdmin = catchAsync(
@@ -97,7 +97,7 @@ const addBusinessOwnerOrAdmin = catchAsync(
       name,
       email,
       role,
-      decodedToken
+      decodedToken,
     );
     sendResponse(res, {
       success: true,
@@ -105,7 +105,7 @@ const addBusinessOwnerOrAdmin = catchAsync(
       message: "Invitation sent successfully.",
       data: null,
     });
-  }
+  },
 );
 
 const joinBusinessOwnerOrAdmin = catchAsync(
@@ -117,7 +117,7 @@ const joinBusinessOwnerOrAdmin = catchAsync(
       req,
       res,
       decodedToken,
-      invitationToken
+      invitationToken,
     );
 
     sendResponse(res, {
@@ -126,7 +126,23 @@ const joinBusinessOwnerOrAdmin = catchAsync(
       message: "Joined Business successfully.",
       data: business,
     });
-  }
+  },
+);
+
+const getKPICardDetails = catchAsync(
+  async (req: Request, res: Response, next: NextFunction) => {
+    const decodedToken = req.user as JwtPayload;
+    const userId = decodedToken.userId;
+
+    const businessDetails = await BusinessServices.getKPICardDetails(userId);
+
+    sendResponse(res, {
+      success: true,
+      statusCode: HttpStatusCodes.OK,
+      message: "KPI card details retrieved successfully!",
+      data: businessDetails,
+    });
+  },
 );
 
 export const BusinessController = {
@@ -137,4 +153,5 @@ export const BusinessController = {
   deleteBusiness,
   addBusinessOwnerOrAdmin,
   joinBusinessOwnerOrAdmin,
+  getKPICardDetails,
 };

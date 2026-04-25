@@ -64,7 +64,7 @@ const initPayment = async (invId: string) => {
     if (!business) {
       throw new AppError(
         HttpStatusCodes.NOT_FOUND,
-        "Business details not found"
+        "Business details not found",
       );
     }
 
@@ -77,7 +77,7 @@ const initPayment = async (invId: string) => {
     if (!payment) {
       throw new AppError(
         HttpStatusCodes.NOT_FOUND,
-        "Payment details not found"
+        "Payment details not found",
       );
     }
 
@@ -98,7 +98,7 @@ const initPayment = async (invId: string) => {
   if (!invPdf) {
     throw new AppError(
       HttpStatusCodes.BAD_REQUEST,
-      "Failed to create Invoice PDF"
+      "Failed to create Invoice PDF",
     );
   }
 
@@ -107,7 +107,7 @@ const initPayment = async (invId: string) => {
   if (!cloudinaryResult) {
     throw new AppError(
       HttpStatusCodes.BAD_REQUEST,
-      "Failed to upload invoice pdf at cloudinary"
+      "Failed to upload invoice pdf at cloudinary",
     );
   }
 
@@ -195,7 +195,7 @@ const successPayment = async (query: Record<string, string>) => {
     if (!business) {
       throw new AppError(
         HttpStatusCodes.NOT_FOUND,
-        "Business details not found"
+        "Business details not found",
       );
     }
 
@@ -238,7 +238,7 @@ const successPayment = async (query: Record<string, string>) => {
   if (!rcpPdf) {
     throw new AppError(
       HttpStatusCodes.BAD_REQUEST,
-      "Failed to create Invoice PDF"
+      "Failed to create Invoice PDF",
     );
   }
 
@@ -247,7 +247,7 @@ const successPayment = async (query: Record<string, string>) => {
   if (!cloudinaryResult) {
     throw new AppError(
       HttpStatusCodes.BAD_REQUEST,
-      "Failed to upload receipt pdf at cloudinary"
+      "Failed to upload receipt pdf at cloudinary",
     );
   }
 
@@ -302,7 +302,7 @@ const failPayment = async (query: Record<string, string>) => {
     if (!payment) {
       throw new AppError(
         HttpStatusCodes.NOT_FOUND,
-        "Payment Details Not Found"
+        "Payment Details Not Found",
       );
     }
 
@@ -315,7 +315,7 @@ const failPayment = async (query: Record<string, string>) => {
     if (!invoice) {
       throw new AppError(
         HttpStatusCodes.NOT_FOUND,
-        "Invoice Details Not Found"
+        "Invoice Details Not Found",
       );
     }
 
@@ -354,7 +354,7 @@ const cancelPayment = async (query: Record<string, string>) => {
     if (!payment) {
       throw new AppError(
         HttpStatusCodes.NOT_FOUND,
-        "Payment Details Not Found"
+        "Payment Details Not Found",
       );
     }
 
@@ -367,7 +367,7 @@ const cancelPayment = async (query: Record<string, string>) => {
     if (!invoice) {
       throw new AppError(
         HttpStatusCodes.NOT_FOUND,
-        "Invoice Details Not Found"
+        "Invoice Details Not Found",
       );
     }
 
