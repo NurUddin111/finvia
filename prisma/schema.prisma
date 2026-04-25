@@ -165,6 +165,7 @@ model Invoice {
   createdById   String
   invoiceNumber String        @unique
   status        InvoiceStatus @default(PENDING)
+  // todo:remove defaults from issue date
   issueDate     DateTime      @default(now())
   dueDate       DateTime
 
@@ -201,6 +202,7 @@ enum InvoiceStatus {
   PAID
   FAILED
   CANCELLED
+  // todo:remove overdue 
   OVERDUE
 }
 

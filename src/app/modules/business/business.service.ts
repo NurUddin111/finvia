@@ -2,6 +2,7 @@ import { JwtPayload } from "jsonwebtoken";
 import {
   Business,
   BusinessRole,
+  InvoiceStatus,
   MemberStatus,
   User,
   UserRole,
@@ -21,7 +22,7 @@ const addBusiness = async (
   req: Request,
   res: Response,
   userId: string,
-  payload: Business
+  payload: Business,
 ) => {
   const isOwner = await prisma.businessUser.findFirst({
     where: { userId, business: { isDeleted: false } },
@@ -30,7 +31,7 @@ const addBusiness = async (
   if (isOwner) {
     throw new AppError(
       HttpStatusCodes.BAD_REQUEST,
-      "You already belong to a business"
+      "You already belong to a business",
     );
   }
 
@@ -94,7 +95,7 @@ const getMyBusiness = async (userId: string) => {
   if (!isOwner) {
     throw new AppError(
       HttpStatusCodes.NOT_FOUND,
-      "You do not belong to any business"
+      "You do not belong to any business",
     );
   }
 
@@ -124,7 +125,7 @@ const getMyBusiness = async (userId: string) => {
 const updateBusiness = async (
   businessId: string,
   payload: Business,
-  decodedToken: JwtPayload
+  decodedToken: JwtPayload,
 ) => {
   const userId = decodedToken.userId;
 
@@ -135,14 +136,14 @@ const updateBusiness = async (
   if (!isOwner) {
     throw new AppError(
       HttpStatusCodes.NOT_FOUND,
-      "You do not belong to any business"
+      "You do not belong to any business",
     );
   }
 
   if (businessId !== isOwner.businessId) {
     throw new AppError(
       HttpStatusCodes.UNAUTHORIZED,
-      "It looks like you're trying to edit another user's business. You can only make changes to your own business."
+      "It looks like you're trying to edit another user's business. You can only make changes to your own business.",
     );
   }
 
@@ -161,7 +162,7 @@ const deleteBusiness = async (
   req: Request,
   res: Response,
   businessId: string,
-  decodedToken: JwtPayload
+  decodedToken: JwtPayload,
 ) => {
   const userId = decodedToken.userId;
 
@@ -172,14 +173,14 @@ const deleteBusiness = async (
   if (!isOwner) {
     throw new AppError(
       HttpStatusCodes.NOT_FOUND,
-      "You do not belong to any business"
+      "You do not belong to any business",
     );
   }
 
   if (businessId !== isOwner.businessId) {
     throw new AppError(
       HttpStatusCodes.UNAUTHORIZED,
-      "It looks like you're trying to delete another user's business. You can only make changes to your own business."
+      "It looks like you're trying to delete another user's business. You can only make changes to your own business.",
     );
   }
 
@@ -215,7 +216,7 @@ const addBusinessOwnerOrAdmin = async (
   name: string,
   email: string,
   role: OfferingRole,
-  decodedToken: JwtPayload
+  decodedToken: JwtPayload,
 ) => {
   const userId = decodedToken.userId;
 
@@ -239,7 +240,7 @@ const addBusinessOwnerOrAdmin = async (
   if (!isOwner) {
     throw new AppError(
       HttpStatusCodes.NOT_FOUND,
-      "You do not belong to any business"
+      "You do not belong to any business",
     );
   }
 
@@ -254,7 +255,7 @@ const addBusinessOwnerOrAdmin = async (
   if (newOwnerCheck) {
     throw new AppError(
       HttpStatusCodes.NOT_FOUND,
-      `User is already a ${newOwnerCheck.role}`
+      `User is already a ${newOwnerCheck.role}`,
     );
   }
 
@@ -267,7 +268,7 @@ const addBusinessOwnerOrAdmin = async (
   const invitationToken = generateToken(
     payload,
     envVars.JWT_INVITATION_SECRET,
-    envVars.JWT_INVITATION_EXPIRES
+    envVars.JWT_INVITATION_EXPIRES,
   );
 
   const inviteLink = `${envVars.FRONTEND_URL}/business?token=${invitationToken}`;
@@ -290,17 +291,17 @@ const joinBusinessOwnerOrAdmin = async (
   req: Request,
   res: Response,
   decodedToken: JwtPayload,
-  invitationToken: string
+  invitationToken: string,
 ) => {
   const verifiedInvToken = verifyToken(
     invitationToken,
-    envVars.JWT_INVITATION_SECRET
+    envVars.JWT_INVITATION_SECRET,
   ) as JwtPayload;
 
   if (!verifiedInvToken) {
     throw new AppError(
       HttpStatusCodes.BAD_REQUEST,
-      "Invitation link has expired!"
+      "Invitation link has expired!",
     );
   }
 
@@ -310,7 +311,7 @@ const joinBusinessOwnerOrAdmin = async (
   if (userEmail !== invReceiverEmail) {
     throw new AppError(
       HttpStatusCodes.UNAUTHORIZED,
-      "You're not the user who was invited to join!"
+      "You're not the user who was invited to join!",
     );
   }
 
@@ -362,6 +363,123 @@ const joinBusinessOwnerOrAdmin = async (
   return result;
 };
 
+const getKPICardDetails = async (userId: string) => {
+  const business = await prisma.businessUser.findFirst({
+    where: { userId: userId, business: { isDeleted: false } },
+  });
+
+  if (!business) {
+    throw new AppError(
+      HttpStatusCodes.NOT_FOUND,
+      "You do not belong to any business",
+    );
+  }
+
+  const [
+    allInvoices,
+    totalInvoices,
+    pendingInvoices,
+    paidInvoices,
+    totalOverdueInvoices,
+  ] = await prisma.$transaction([
+    prisma.invoice.findMany({ where: { businessId: business.businessId } }),
+    prisma.invoice.count({ where: { businessId: business.businessId } }),
+    prisma.invoice.count({
+      where: { businessId: business.businessId, status: { not: "PAID" } },
+    }),
+    prisma.invoice.count({
+      where: { businessId: business.businessId, status: "PAID" },
+    }),
+    prisma.invoice.count({
+      where: {
+        businessId: business.businessId,
+        status: { notIn: ["PENDING", "PAID"] },
+        dueDate: { lt: new Date() },
+      },
+    }),
+  ]);
+
+  // Revenue Calculations
+
+  let totalRevenue = 0;
+  let thisMonthRevenue = 0;
+  let lastMonthRevenue = 0;
+
+  allInvoices.map((inv) => {
+    if (inv.status === InvoiceStatus.PAID) {
+      totalRevenue = totalRevenue + inv.subtotal;
+    }
+  });
+
+  const now = new Date();
+  const thirtyDaysAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
+  const sixtyDaysAgo = new Date(now.getTime() - 60 * 24 * 60 * 60 * 1000);
+
+  allInvoices.map((inv) => {
+    if (inv.status === InvoiceStatus.PAID && inv.issueDate >= thirtyDaysAgo) {
+      thisMonthRevenue = thisMonthRevenue + inv.subtotal;
+    }
+  });
+
+  allInvoices.map((inv) => {
+    if (
+      inv.status === InvoiceStatus.PAID &&
+      inv.issueDate >= sixtyDaysAgo &&
+      inv.issueDate < thirtyDaysAgo
+    ) {
+      lastMonthRevenue = lastMonthRevenue + inv.subtotal;
+    }
+  });
+
+  const revenueDiff = thisMonthRevenue - lastMonthRevenue;
+
+  const revenueDiffInPercentage = Math.abs(
+    Number(((revenueDiff / lastMonthRevenue) * 100).toFixed(2)),
+  );
+
+  const collectionRate = Math.ceil((paidInvoices / totalInvoices) * 100);
+
+  const sevenDaysAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+  const fourteenDaysAgo = new Date(now.getTime() - 14 * 24 * 60 * 60 * 1000);
+
+  const currentWeekCount = await prisma.invoice.count({
+    where: {
+      businessId: business.businessId,
+      status: { notIn: ["PENDING", "PAID"] },
+      issueDate: { gte: sevenDaysAgo },
+      dueDate: { lt: new Date() },
+    },
+  });
+
+  const lastWeekCount = await prisma.invoice.count({
+    where: {
+      businessId: business.businessId,
+      status: { notIn: ["PENDING", "PAID"] },
+      issueDate: {
+        gte: fourteenDaysAgo,
+        lt: sevenDaysAgo,
+      },
+      dueDate: { lt: new Date() },
+    },
+  });
+
+  const overdueInvDiff = currentWeekCount - lastWeekCount;
+
+  return {
+    KPICardDetails: {
+      totalRevenue,
+      revenueDiff,
+      revenueDiffInPercentage,
+      totalInvoices,
+      pendingInvoices,
+      paidInvoices,
+      collectionRate,
+      totalOverdueInvoices,
+      overdueInvDiff,
+    },
+  };
+};
+
 export const BusinessServices = {
   addBusiness,
   getSinglBusiness,
@@ -370,4 +488,5 @@ export const BusinessServices = {
   deleteBusiness,
   addBusinessOwnerOrAdmin,
   joinBusinessOwnerOrAdmin,
+  getKPICardDetails,
 };

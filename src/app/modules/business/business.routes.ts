@@ -14,44 +14,50 @@ router.post(
   "/add",
   checkAuth(UserRole.USER),
   validateRequest(CreateBusinessZodSchemaValidation),
-  BusinessController.addBusiness
+  BusinessController.addBusiness,
 );
 
 router.get(
   "/my-business",
   checkAuth(UserRole.BUSINESS_OWNER, UserRole.BUSINESS_ADMIN),
-  BusinessController.getMyBusiness
+  BusinessController.getMyBusiness,
+);
+
+router.get(
+  "/kpi-card-details",
+  checkAuth(UserRole.BUSINESS_OWNER, UserRole.BUSINESS_ADMIN),
+  BusinessController.getKPICardDetails,
 );
 
 router.post(
   "/add-authority",
   checkAuth(UserRole.BUSINESS_OWNER),
-  BusinessController.addBusinessOwnerOrAdmin
+  BusinessController.addBusinessOwnerOrAdmin,
 );
 
 router.post(
   "/join",
   checkAuth(UserRole.USER),
-  BusinessController.joinBusinessOwnerOrAdmin
+  BusinessController.joinBusinessOwnerOrAdmin,
 );
 
 router.get(
   "/:id",
   checkAuth(UserRole.ADMIN),
-  BusinessController.getSingleBusiness
+  BusinessController.getSingleBusiness,
 );
 
 router.patch(
   "/edit/:id",
   validateRequest(UpdateBusinessZodSchemaValidation),
   checkAuth(UserRole.BUSINESS_OWNER),
-  BusinessController.updateBusiness
+  BusinessController.updateBusiness,
 );
 
 router.patch(
   "/delete/:id",
   checkAuth(UserRole.BUSINESS_OWNER),
-  BusinessController.deleteBusiness
+  BusinessController.deleteBusiness,
 );
 
 export const BusinessRoutes = router;
