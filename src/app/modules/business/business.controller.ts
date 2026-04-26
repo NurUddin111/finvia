@@ -145,6 +145,22 @@ const getKPICardDetails = catchAsync(
   },
 );
 
+const getMonthlyRevenue = catchAsync(
+  async (req: Request, res: Response, next: NextFunction) => {
+    const decodedToken = req.user as JwtPayload;
+    const userId = decodedToken.userId;
+
+    const monthlyRevenue = await BusinessServices.getMonthlyRevenue(userId);
+
+    sendResponse(res, {
+      success: true,
+      statusCode: HttpStatusCodes.OK,
+      message: "Monthly revenue retrieved successfully!",
+      data: monthlyRevenue,
+    });
+  },
+);
+
 export const BusinessController = {
   addBusiness,
   getSingleBusiness,
@@ -154,4 +170,5 @@ export const BusinessController = {
   addBusinessOwnerOrAdmin,
   joinBusinessOwnerOrAdmin,
   getKPICardDetails,
+  getMonthlyRevenue,
 };

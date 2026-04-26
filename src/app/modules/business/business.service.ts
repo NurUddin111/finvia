@@ -480,6 +480,64 @@ const getKPICardDetails = async (userId: string) => {
   };
 };
 
+const getMonthlyRevenue = async (userId: string) => {
+  const business = await prisma.businessUser.findFirst({
+    where: { userId: userId, business: { isDeleted: false } },
+  });
+
+  if (!business) {
+    throw new AppError(
+      HttpStatusCodes.NOT_FOUND,
+      "You do not belong to any business",
+    );
+  }
+
+  const months = [
+    "Jan",
+    "Feb",
+    "Mar",
+    "Apr",
+    "May",
+    "Jun",
+    "Jul",
+    "Aug",
+    "Sep",
+    "Oct",
+    "Nov",
+    "Dec",
+  ];
+
+  const monthlyRevenue: Record<string, number> = {};
+  const currentMonth = new Date().getMonth();
+
+  for (let i = 0; i <= currentMonth; i++) {
+    monthlyRevenue[months[i]] = 0;
+  }
+
+  const currentYear = new Date().getFullYear();
+  const allInvoices = await prisma.invoice.findMany({
+    where: {
+      businessId: business.businessId,
+      status: "PAID",
+      issueDate: {
+        gte: new Date(`${currentYear}-01-01T00:00:00Z`),
+        lte: new Date(), // Up to right now
+      },
+    },
+  });
+
+  allInvoices.forEach((inv) => {
+    const monthIndex = inv.issueDate.getMonth();
+    const monthName = months[monthIndex];
+
+    if (monthlyRevenue[monthName] !== undefined) {
+      monthlyRevenue[monthName] += inv.subtotal;
+    }
+  });
+
+  return monthlyRevenue;
+};
+
 export const BusinessServices = {
   addBusiness,
   getSinglBusiness,
@@ -489,4 +547,5 @@ export const BusinessServices = {
   addBusinessOwnerOrAdmin,
   joinBusinessOwnerOrAdmin,
   getKPICardDetails,
+  getMonthlyRevenue,
 };
