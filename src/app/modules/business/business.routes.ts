@@ -29,6 +29,12 @@ router.get(
   BusinessController.getKPICardDetails,
 );
 
+router.get(
+  "/monthly-revenue",
+  checkAuth(UserRole.BUSINESS_OWNER, UserRole.BUSINESS_ADMIN),
+  BusinessController.getMonthlyRevenue,
+);
+
 router.post(
   "/add-authority",
   checkAuth(UserRole.BUSINESS_OWNER),
