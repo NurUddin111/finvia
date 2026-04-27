@@ -643,8 +643,52 @@ const getRecentTransactions = async (userId: string) => {
     formattedDate: formatDateTime(new Date(tx.updatedAt)),
   }));
 
-  console.log(formattedTransactions);
   return formattedTransactions;
+};
+
+const getOverdueInvoices = async (userId: string) => {
+  const business = await prisma.businessUser.findFirst({
+    where: { userId: userId, business: { isDeleted: false } },
+  });
+
+  if (!business) {
+    throw new AppError(
+      HttpStatusCodes.NOT_FOUND,
+      "You do not belong to any business",
+    );
+  }
+
+  const overDueInvoices = await prisma.invoice.findMany({
+    where: {
+      businessId: business.businessId,
+      status: { notIn: ["DRAFT", "PAID"] },
+      dueDate: { lt: new Date() },
+    },
+    orderBy: {
+      dueDate: "desc",
+    },
+    select: {
+      client: {
+        select: {
+          name: true,
+        },
+      },
+      invoiceNumber: true,
+      dueDate: true,
+      total: true,
+    },
+  });
+
+  const formattedOverdueInvoices = overDueInvoices.map((tx) => ({
+    ...tx,
+    formattedDueDate: formatDateTime(new Date(tx.dueDate)),
+    daysAgo: Math.floor(
+      (new Date().getTime() - new Date(tx.dueDate).getTime()) /
+        (24 * 60 * 60 * 1000),
+    ),
+  }));
+
+  return formattedOverdueInvoices;
 };
 
 export const BusinessServices = {
@@ -659,4 +703,5 @@ export const BusinessServices = {
   getMonthlyRevenue,
   getTopClients,
   getRecentTransactions,
+  getOverdueInvoices,
 };
