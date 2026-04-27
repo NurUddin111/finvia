@@ -194,6 +194,22 @@ const getRecentTransactions = catchAsync(
   },
 );
 
+const getOverdueInvoices = catchAsync(
+  async (req: Request, res: Response, next: NextFunction) => {
+    const decodedToken = req.user as JwtPayload;
+    const userId = decodedToken.userId;
+
+    const overdueInvoices = await BusinessServices.getOverdueInvoices(userId);
+
+    sendResponse(res, {
+      success: true,
+      statusCode: HttpStatusCodes.OK,
+      message: "Overdue Invoices details retrieved successfully!",
+      data: overdueInvoices,
+    });
+  },
+);
+
 export const BusinessController = {
   addBusiness,
   getSingleBusiness,
@@ -206,4 +222,5 @@ export const BusinessController = {
   getMonthlyRevenue,
   getTopClients,
   getRecentTransactions,
+  getOverdueInvoices,
 };
