@@ -12,7 +12,7 @@ const createInvoice = async (
   dueDays: number,
   items: IItems[],
   taxRate: number,
-  notes?: string
+  notes?: string,
 ) => {
   const userId = decodedToken.userId;
 
@@ -23,7 +23,7 @@ const createInvoice = async (
   if (!isOwner) {
     throw new AppError(
       HttpStatusCodes.NOT_FOUND,
-      "You do not belong to any business"
+      "You do not belong to any business",
     );
   }
 
@@ -61,6 +61,12 @@ const createInvoice = async (
 
   const total = subtotal + tax;
 
+  let totalItems = 0;
+
+  items.map((item) => {
+    totalItems += item.quantity;
+  });
+
   const result = await prisma.$transaction(async (tx) => {
     const invoice = await tx.invoice.create({
       data: {
@@ -70,6 +76,7 @@ const createInvoice = async (
         invoiceNumber: invNb,
         dueDate: dueDate,
         subtotal: subtotal,
+        totalItems: totalItems,
         tax: tax,
         total: total,
         notes: notes,
@@ -111,7 +118,7 @@ const getAllInvoices = async (userId: string) => {
   if (!isOwner) {
     throw new AppError(
       HttpStatusCodes.NOT_FOUND,
-      "Only Business Owner or Admin can view all clients."
+      "Only Business Owner or Admin can view all clients.",
     );
   }
 
@@ -139,7 +146,7 @@ const getSingleInvoice = async (userId: string, invId: string) => {
   if (!isOwner) {
     throw new AppError(
       HttpStatusCodes.NOT_FOUND,
-      "Only Business Owner or Admin can view all clients."
+      "Only Business Owner or Admin can view all clients.",
     );
   }
 

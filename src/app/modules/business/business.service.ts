@@ -17,6 +17,7 @@ import { sendEmail } from "../../utils/sendEmail";
 import { OfferingRole } from "../../interfaces/enums";
 import { envVars } from "../../config/env";
 import { generateToken, verifyToken } from "../../utils/jwt";
+import { formatDateTime } from "../../utils/formatDT";
 
 const addBusiness = async (
   req: Request,
@@ -388,13 +389,13 @@ const getKPICardDetails = async (userId: string) => {
     prisma.invoice.count({
       where: {
         businessId: business.businessId,
-        status: { notIn: ["PAID", "PENDING"] },
+        status: { notIn: ["PAID", "DRAFT"] },
       },
     }),
     prisma.invoice.count({
       where: {
         businessId: business.businessId,
-        status: "PENDING",
+        status: "DRAFT",
       },
     }),
     prisma.invoice.count({
@@ -403,7 +404,7 @@ const getKPICardDetails = async (userId: string) => {
     prisma.invoice.count({
       where: {
         businessId: business.businessId,
-        status: { notIn: ["PENDING", "PAID"] },
+        status: { notIn: ["DRAFT", "PAID"] },
         dueDate: { lt: new Date() },
       },
     }),
@@ -466,7 +467,7 @@ const getKPICardDetails = async (userId: string) => {
   const currentWeekCount = await prisma.invoice.count({
     where: {
       businessId: business.businessId,
-      status: { notIn: ["PENDING", "PAID"] },
+      status: { notIn: ["DRAFT", "PAID"] },
       issueDate: { gte: sevenDaysAgo },
       dueDate: { lt: new Date() },
     },
@@ -475,7 +476,7 @@ const getKPICardDetails = async (userId: string) => {
   const lastWeekCount = await prisma.invoice.count({
     where: {
       businessId: business.businessId,
-      status: { notIn: ["PENDING", "PAID"] },
+      status: { notIn: ["DRAFT", "PAID"] },
       issueDate: {
         gte: fourteenDaysAgo,
         lt: sevenDaysAgo,
@@ -595,9 +596,55 @@ const getTopClients = async (userId: string) => {
     status: "ACTIVE",
   }));
 
-  console.log(formattedClients);
-
   return formattedClients;
+};
+
+const getRecentTransactions = async (userId: string) => {
+  const business = await prisma.businessUser.findFirst({
+    where: { userId: userId, business: { isDeleted: false } },
+  });
+
+  if (!business) {
+    throw new AppError(
+      HttpStatusCodes.NOT_FOUND,
+      "You do not belong to any business",
+    );
+  }
+
+  const recentTransactions = await prisma.invoice.findMany({
+    where: {
+      status: { not: "DRAFT" },
+    },
+    orderBy: {
+      updatedAt: "desc",
+    },
+    take: 5,
+    select: {
+      client: {
+        select: {
+          name: true,
+        },
+      },
+      items: {
+        select: {
+          name: true,
+          quantity: true,
+        },
+      },
+      subtotal: true,
+      status: true,
+      totalItems: true,
+      updatedAt: true,
+    },
+  });
+
+  const formattedTransactions = recentTransactions.map((tx) => ({
+    ...tx,
+    formattedDate: formatDateTime(new Date(tx.updatedAt)),
+  }));
+
+  console.log(formattedTransactions);
+  return formattedTransactions;
 };
 
 export const BusinessServices = {
@@ -611,4 +658,5 @@ export const BusinessServices = {
   getKPICardDetails,
   getMonthlyRevenue,
   getTopClients,
+  getRecentTransactions,
 };
