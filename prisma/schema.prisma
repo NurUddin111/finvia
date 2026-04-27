@@ -165,13 +165,14 @@ model Invoice {
   clientId      String
   createdById   String
   invoiceNumber String        @unique
-  status        InvoiceStatus @default(PENDING)
+  status        InvoiceStatus @default(DRAFT)
   // todo:remove defaults from issue date
   issueDate     DateTime      @default(now())
   dueDate       DateTime
 
   items InvoiceItem[]
 
+  totalItems   Int       @default(0)
   subtotal     Float
   tax          Float
   total        Float
@@ -198,13 +199,12 @@ model InvoiceItem {
 }
 
 enum InvoiceStatus {
-  // todo:Replace PENDING with DRAFT
-  PENDING
+  DRAFT
   SENT
   PAID
   FAILED
   CANCELLED
-  // todo:remove overdue 
+  // todo:Update Invoice status to OVERDUE if due date is passed
   OVERDUE
 }
 

@@ -41,6 +41,12 @@ router.get(
   BusinessController.getTopClients,
 );
 
+router.get(
+  "/recent-transactions",
+  checkAuth(UserRole.BUSINESS_OWNER, UserRole.BUSINESS_ADMIN),
+  BusinessController.getRecentTransactions,
+);
+
 router.post(
   "/add-authority",
   checkAuth(UserRole.BUSINESS_OWNER),

@@ -177,6 +177,23 @@ const getTopClients = catchAsync(
   },
 );
 
+const getRecentTransactions = catchAsync(
+  async (req: Request, res: Response, next: NextFunction) => {
+    const decodedToken = req.user as JwtPayload;
+    const userId = decodedToken.userId;
+
+    const recentTransactions =
+      await BusinessServices.getRecentTransactions(userId);
+
+    sendResponse(res, {
+      success: true,
+      statusCode: HttpStatusCodes.OK,
+      message: "Recent tracnsactions retrieved successfully!",
+      data: recentTransactions,
+    });
+  },
+);
+
 export const BusinessController = {
   addBusiness,
   getSingleBusiness,
@@ -188,4 +205,5 @@ export const BusinessController = {
   getKPICardDetails,
   getMonthlyRevenue,
   getTopClients,
+  getRecentTransactions,
 };
