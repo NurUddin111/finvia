@@ -691,6 +691,57 @@ const getOverdueInvoices = async (userId: string) => {
   return formattedOverdueInvoices;
 };
 
+const getUpcomingOverdueInvoices = async (userId: string) => {
+  const business = await prisma.businessUser.findFirst({
+    where: { userId: userId, business: { isDeleted: false } },
+  });
+
+  if (!business) {
+    throw new AppError(
+      HttpStatusCodes.NOT_FOUND,
+      "You do not belong to any business",
+    );
+  }
+
+  const now = new Date();
+  const sevenDaysFromNow = new Date();
+  sevenDaysFromNow.setDate(now.getDate() + 7);
+
+  const upcomingOverDueInvoices = await prisma.invoice.findMany({
+    where: {
+      businessId: business.businessId,
+      status: { notIn: ["DRAFT", "PAID"] },
+      dueDate: {
+        gte: now,
+        lte: sevenDaysFromNow,
+      },
+    },
+    orderBy: {
+      dueDate: "asc",
+    },
+    select: {
+      client: {
+        select: {
+          name: true,
+        },
+      },
+      invoiceNumber: true,
+      status: true,
+      dueDate: true,
+      total: true,
+    },
+  });
+
+  const formattedUpcomingOverdueInvoices = upcomingOverDueInvoices.map(
+    (tx) => ({
+      ...tx,
+      formattedDueDate: formatDateTime(new Date(tx.dueDate)),
+    }),
+  );
+
+  return formattedUpcomingOverdueInvoices;
+};
+
 export const BusinessServices = {
   addBusiness,
   getSinglBusiness,
@@ -704,4 +755,5 @@ export const BusinessServices = {
   getTopClients,
   getRecentTransactions,
   getOverdueInvoices,
+  getUpcomingOverdueInvoices,
 };

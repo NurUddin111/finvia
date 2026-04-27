@@ -53,6 +53,12 @@ router.get(
   BusinessController.getOverdueInvoices,
 );
 
+router.get(
+  "/upcoming-overdue-invoices",
+  checkAuth(UserRole.BUSINESS_OWNER, UserRole.BUSINESS_ADMIN),
+  BusinessController.getUpcomingOverdueInvoices,
+);
+
 router.post(
   "/add-authority",
   checkAuth(UserRole.BUSINESS_OWNER),
