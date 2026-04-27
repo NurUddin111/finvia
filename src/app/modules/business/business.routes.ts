@@ -35,6 +35,12 @@ router.get(
   BusinessController.getMonthlyRevenue,
 );
 
+router.get(
+  "/top-clients",
+  checkAuth(UserRole.BUSINESS_OWNER, UserRole.BUSINESS_ADMIN),
+  BusinessController.getTopClients,
+);
+
 router.post(
   "/add-authority",
   checkAuth(UserRole.BUSINESS_OWNER),

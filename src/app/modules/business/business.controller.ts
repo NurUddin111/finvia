@@ -161,6 +161,22 @@ const getMonthlyRevenue = catchAsync(
   },
 );
 
+const getTopClients = catchAsync(
+  async (req: Request, res: Response, next: NextFunction) => {
+    const decodedToken = req.user as JwtPayload;
+    const userId = decodedToken.userId;
+
+    const topClients = await BusinessServices.getTopClients(userId);
+
+    sendResponse(res, {
+      success: true,
+      statusCode: HttpStatusCodes.OK,
+      message: "Top five clients retrieved successfully!",
+      data: topClients,
+    });
+  },
+);
+
 export const BusinessController = {
   addBusiness,
   getSingleBusiness,
@@ -171,4 +187,5 @@ export const BusinessController = {
   joinBusinessOwnerOrAdmin,
   getKPICardDetails,
   getMonthlyRevenue,
+  getTopClients,
 };

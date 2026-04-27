@@ -132,6 +132,7 @@ model Client {
   phone         String?
   address       String?
   totalInvoices Int     @default(0)
+  totalSpent    Int     @default(0)
 
   links     BusinessClient[]
   isDeleted Boolean          @default(false)
@@ -197,6 +198,7 @@ model InvoiceItem {
 }
 
 enum InvoiceStatus {
+  // todo:Replace PENDING with DRAFT
   PENDING
   SENT
   PAID
@@ -210,6 +212,7 @@ model Payment {
   id        String         @id @default(uuid())
   invoice   Invoice        @relation(fields: [invoiceId], references: [id])
   invoiceId String
+  // todo: add payment method(CASH/ONLINE)
   provider  PaymentGateway @default(SSLCOMMERZ)
   tran_id   String
   amount    Float

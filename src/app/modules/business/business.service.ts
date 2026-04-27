@@ -379,13 +379,23 @@ const getKPICardDetails = async (userId: string) => {
     allInvoices,
     totalInvoices,
     pendingInvoices,
+    draftedInvoices,
     paidInvoices,
     totalOverdueInvoices,
   ] = await prisma.$transaction([
     prisma.invoice.findMany({ where: { businessId: business.businessId } }),
     prisma.invoice.count({ where: { businessId: business.businessId } }),
     prisma.invoice.count({
-      where: { businessId: business.businessId, status: { not: "PAID" } },
+      where: {
+        businessId: business.businessId,
+        status: { notIn: ["PAID", "PENDING"] },
+      },
+    }),
+    prisma.invoice.count({
+      where: {
+        businessId: business.businessId,
+        status: "PENDING",
+      },
     }),
     prisma.invoice.count({
       where: { businessId: business.businessId, status: "PAID" },
@@ -437,7 +447,18 @@ const getKPICardDetails = async (userId: string) => {
     Number(((revenueDiff / lastMonthRevenue) * 100).toFixed(2)),
   );
 
-  const collectionRate = Math.ceil((paidInvoices / totalInvoices) * 100);
+  const collectionRate = Math.round(
+    (paidInvoices / (totalInvoices - draftedInvoices)) * 100,
+  );
+
+  const paidInvPer =
+    totalInvoices > 0 ? Math.round((paidInvoices / totalInvoices) * 100) : 0;
+
+  const pendingInvPer =
+    totalInvoices > 0 ? Math.round((pendingInvoices / totalInvoices) * 100) : 0;
+
+  const draftedInvPer =
+    totalInvoices > 0 ? Math.round((draftedInvoices / totalInvoices) * 100) : 0;
 
   const sevenDaysAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
   const fourteenDaysAgo = new Date(now.getTime() - 14 * 24 * 60 * 60 * 1000);
@@ -472,8 +493,12 @@ const getKPICardDetails = async (userId: string) => {
       revenueDiffInPercentage,
       totalInvoices,
       pendingInvoices,
+      pendingInvPer,
       paidInvoices,
       collectionRate,
+      paidInvPer,
+      draftedInvoices,
+      draftedInvPer,
       totalOverdueInvoices,
       overdueInvDiff,
     },
@@ -538,6 +563,43 @@ const getMonthlyRevenue = async (userId: string) => {
   return monthlyRevenue;
 };
 
+const getTopClients = async (userId: string) => {
+  const business = await prisma.businessUser.findFirst({
+    where: { userId: userId, business: { isDeleted: false } },
+  });
+
+  if (!business) {
+    throw new AppError(
+      HttpStatusCodes.NOT_FOUND,
+      "You do not belong to any business",
+    );
+  }
+
+  const topClients = await prisma.client.findMany({
+    where: {
+      isDeleted: false,
+    },
+    orderBy: {
+      totalSpent: "desc",
+    },
+    take: 5,
+    select: {
+      name: true,
+      totalSpent: true,
+      totalInvoices: true,
+    },
+  });
+
+  const formattedClients = topClients.map((client) => ({
+    ...client,
+    status: "ACTIVE",
+  }));
+
+  console.log(formattedClients);
+
+  return formattedClients;
+};
+
 export const BusinessServices = {
   addBusiness,
   getSinglBusiness,
@@ -548,4 +610,5 @@ export const BusinessServices = {
   joinBusinessOwnerOrAdmin,
   getKPICardDetails,
   getMonthlyRevenue,
+  getTopClients,
 };
