@@ -65,6 +65,12 @@ router.get(
   BusinessController.getClientPieChartData,
 );
 
+router.get(
+  "/clients-by-month",
+  checkAuth(UserRole.BUSINESS_OWNER, UserRole.BUSINESS_ADMIN),
+  BusinessController.getClientsNumByMonth,
+);
+
 router.post(
   "/add-authority",
   checkAuth(UserRole.BUSINESS_OWNER),

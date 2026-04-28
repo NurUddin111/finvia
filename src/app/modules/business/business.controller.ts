@@ -244,6 +244,23 @@ const getClientPieChartData = catchAsync(
   },
 );
 
+const getClientsNumByMonth = catchAsync(
+  async (req: Request, res: Response, next: NextFunction) => {
+    const decodedToken = req.user as JwtPayload;
+    const userId = decodedToken.userId;
+
+    const clientsNumByMonth =
+      await BusinessServices.getClientsNumByMonth(userId);
+
+    sendResponse(res, {
+      success: true,
+      statusCode: HttpStatusCodes.OK,
+      message: "Clients number retrieved successfully!",
+      data: clientsNumByMonth,
+    });
+  },
+);
+
 export const BusinessController = {
   addBusiness,
   getSingleBusiness,
@@ -258,5 +275,6 @@ export const BusinessController = {
   getRecentTransactions,
   getOverdueInvoices,
   getUpcomingOverdueInvoices,
-  getClientPieChartData
+  getClientPieChartData,
+  getClientsNumByMonth,
 };
