@@ -488,21 +488,19 @@ const getKPICardDetails = async (userId: string) => {
   const overdueInvDiff = currentWeekCount - lastWeekCount;
 
   return {
-    KPICardDetails: {
-      totalRevenue,
-      revenueDiff,
-      revenueDiffInPercentage,
-      totalInvoices,
-      pendingInvoices,
-      pendingInvPer,
-      paidInvoices,
-      collectionRate,
-      paidInvPer,
-      draftedInvoices,
-      draftedInvPer,
-      totalOverdueInvoices,
-      overdueInvDiff,
-    },
+    totalRevenue,
+    revenueDiff,
+    revenueDiffInPercentage,
+    totalInvoices,
+    pendingInvoices,
+    pendingInvPer,
+    paidInvoices,
+    collectionRate,
+    paidInvPer,
+    draftedInvoices,
+    draftedInvPer,
+    totalOverdueInvoices,
+    overdueInvDiff,
   };
 };
 
@@ -860,6 +858,74 @@ const getClientPieChartData = async (userId: string) => {
   };
 };
 
+const getClientsNumByMonth = async (userId: string) => {
+  const business = await prisma.businessUser.findFirst({
+    where: { userId: userId, business: { isDeleted: false } },
+  });
+
+  if (!business) {
+    throw new Error("Business not found");
+  }
+
+  const months = [
+    "Jan",
+    "Feb",
+    "Mar",
+    "Apr",
+    "May",
+    "Jun",
+    "Jul",
+    "Aug",
+    "Sep",
+    "Oct",
+    "Nov",
+    "Dec",
+  ];
+  const currentMonth = new Date().getMonth();
+  const currentYear = new Date().getFullYear();
+
+  // 1. Get the base count (clients added before this year)
+  const previousClientsCount = await prisma.businessClient.count({
+    where: {
+      businessId: business.businessId,
+      createdAt: { lt: new Date(`${currentYear}-01-01T00:00:00Z`) },
+    },
+  });
+
+  // 2. Get all clients added this year
+  const clientsThisYear = await prisma.businessClient.findMany({
+    where: {
+      businessId: business.businessId,
+      createdAt: {
+        gte: new Date(`${currentYear}-01-01T00:00:00Z`),
+        lte: new Date(),
+      },
+    },
+    select: { createdAt: true },
+  });
+
+  // 3. Group new clients by month
+  const monthlyNewClients: Record<string, number> = {};
+  months.forEach((m) => (monthlyNewClients[m] = 0));
+
+  clientsThisYear.forEach((client) => {
+    const monthName = months[client.createdAt.getMonth()];
+    monthlyNewClients[monthName]++;
+  });
+
+  // 4. Calculate cumulative total
+  const cumulativeData: Record<string, number> = {};
+  let runningTotal = previousClientsCount;
+
+  for (let i = 0; i <= currentMonth; i++) {
+    const monthName = months[i];
+    runningTotal += monthlyNewClients[monthName];
+    cumulativeData[monthName] = runningTotal;
+  }
+
+  return cumulativeData;
+};
+
 export const BusinessServices = {
   addBusiness,
   getSinglBusiness,
@@ -875,4 +941,5 @@ export const BusinessServices = {
   getOverdueInvoices,
   getUpcomingOverdueInvoices,
   getClientPieChartData,
+  getClientsNumByMonth,
 };
