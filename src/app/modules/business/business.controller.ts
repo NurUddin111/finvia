@@ -227,6 +227,23 @@ const getUpcomingOverdueInvoices = catchAsync(
   },
 );
 
+const getClientPieChartData = catchAsync(
+  async (req: Request, res: Response, next: NextFunction) => {
+    const decodedToken = req.user as JwtPayload;
+    const userId = decodedToken.userId;
+
+    const clientPieChartData =
+      await BusinessServices.getClientPieChartData(userId);
+
+    sendResponse(res, {
+      success: true,
+      statusCode: HttpStatusCodes.OK,
+      message: "Clients pie chart details retrieved successfully!",
+      data: clientPieChartData,
+    });
+  },
+);
+
 export const BusinessController = {
   addBusiness,
   getSingleBusiness,
@@ -241,4 +258,5 @@ export const BusinessController = {
   getRecentTransactions,
   getOverdueInvoices,
   getUpcomingOverdueInvoices,
+  getClientPieChartData
 };
