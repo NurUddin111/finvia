@@ -59,6 +59,12 @@ router.get(
   BusinessController.getUpcomingOverdueInvoices,
 );
 
+router.get(
+  "/clients-pie-chart",
+  checkAuth(UserRole.BUSINESS_OWNER, UserRole.BUSINESS_ADMIN),
+  BusinessController.getClientPieChartData,
+);
+
 router.post(
   "/add-authority",
   checkAuth(UserRole.BUSINESS_OWNER),

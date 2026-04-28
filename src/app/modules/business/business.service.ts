@@ -742,6 +742,124 @@ const getUpcomingOverdueInvoices = async (userId: string) => {
   return formattedUpcomingOverdueInvoices;
 };
 
+const getClientPieChartData = async (userId: string) => {
+  const business = await prisma.businessUser.findFirst({
+    where: { userId: userId, business: { isDeleted: false } },
+  });
+
+  if (!business) {
+    throw new AppError(
+      HttpStatusCodes.NOT_FOUND,
+      "You do not belong to any business",
+    );
+  }
+
+  const now = new Date();
+  const startOfThisMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+  const startOfLastMonth = new Date(now.getFullYear(), now.getMonth() - 1, 1);
+
+  const newClientsThisMonth = await prisma.businessClient.count({
+    where: {
+      businessId: business.businessId,
+      createdAt: {
+        gte: startOfThisMonth,
+      },
+      client: {
+        invoices: {
+          some: {
+            createdAt: {
+              gte: startOfThisMonth,
+            },
+            status: { not: "DRAFT" },
+          },
+        },
+      },
+    },
+  });
+
+  const newClientsLastMonth = await prisma.businessClient.count({
+    where: {
+      businessId: business.businessId,
+      createdAt: {
+        gte: startOfLastMonth,
+        lt: startOfThisMonth,
+      },
+      client: {
+        invoices: {
+          some: {
+            createdAt: {
+              gte: startOfLastMonth,
+              lt: startOfThisMonth,
+            },
+            status: { not: "DRAFT" },
+          },
+        },
+      },
+    },
+  });
+
+  const oldClientsThisMonth = await prisma.businessClient.count({
+    where: {
+      businessId: business.businessId,
+      createdAt: {
+        lt: startOfThisMonth,
+      },
+      client: {
+        invoices: {
+          some: {
+            createdAt: {
+              gte: startOfThisMonth,
+            },
+            status: { not: "DRAFT" },
+          },
+        },
+      },
+    },
+  });
+
+  const oldClientsLastMonth = await prisma.businessClient.count({
+    where: {
+      businessId: business.businessId,
+      createdAt: {
+        lt: startOfLastMonth,
+      },
+      client: {
+        invoices: {
+          some: {
+            createdAt: {
+              gte: startOfLastMonth,
+              lt: startOfThisMonth,
+            },
+            status: { not: "DRAFT" },
+          },
+        },
+      },
+    },
+  });
+
+  const totalClientsCurrentMonth = newClientsThisMonth + oldClientsThisMonth;
+
+  const newClientsPercentage = Math.round(
+    (newClientsThisMonth / totalClientsCurrentMonth) * 100,
+  );
+
+  const oldClientsPercentage = Math.round(
+    (oldClientsThisMonth / totalClientsCurrentMonth) * 100,
+  );
+
+  const newClientsDiff = newClientsThisMonth - newClientsLastMonth;
+  const oldClientsDiff = oldClientsThisMonth - oldClientsLastMonth;
+
+  return {
+    newClientsThisMonth,
+    newClientsDiff,
+    oldClientsThisMonth,
+    oldClientsDiff,
+    newClientsPercentage,
+    oldClientsPercentage,
+  };
+};
+
 export const BusinessServices = {
   addBusiness,
   getSinglBusiness,
@@ -756,4 +874,5 @@ export const BusinessServices = {
   getRecentTransactions,
   getOverdueInvoices,
   getUpcomingOverdueInvoices,
+  getClientPieChartData,
 };
