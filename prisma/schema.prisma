@@ -46,6 +46,7 @@ model AuthProvider {
 }
 
 enum UserRole {
+  SUPER_ADMIN
   ADMIN
   USER
   BUSINESS_OWNER
@@ -125,17 +126,22 @@ enum MemberStatus {
   REMOVED
 }
 
+enum ClientStatus {
+  ACTIVE
+  INACTIVE
+}
+
 model Client {
-  id            String  @id @default(uuid())
+  id            String           @id @default(uuid())
   name          String
   email         String
   phone         String?
   address       String?
-  totalInvoices Int     @default(0)
-  totalSpent    Int     @default(0)
-
-  links     BusinessClient[]
-  isDeleted Boolean          @default(false)
+  totalInvoices Int              @default(0)
+  totalSpent    Int              @default(0)
+  status        ClientStatus     @default(ACTIVE)
+  links         BusinessClient[]
+  isDeleted     Boolean          @default(false)
 
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt

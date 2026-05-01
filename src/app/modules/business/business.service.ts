@@ -366,7 +366,7 @@ const joinBusinessOwnerOrAdmin = async (
 
 const getKPICardDetails = async (userId: string) => {
   const business = await prisma.businessUser.findFirst({
-    where: { userId: userId, business: { isDeleted: false } },
+    where: { userId, business: { isDeleted: false } },
   });
 
   if (!business) {
@@ -376,6 +376,22 @@ const getKPICardDetails = async (userId: string) => {
     );
   }
 
+  const now = new Date();
+
+  const startOfThisMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+  const startOfLastMonth = new Date(now.getFullYear(), now.getMonth() - 1, 1);
+
+  const startOfThisWeek = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+  const startOfLastWeek = new Date(now.getTime() - 14 * 24 * 60 * 60 * 1000);
+
+  const baseWhere = { businessId: business.businessId };
+  const activeWhere = {
+    ...baseWhere,
+    status: {
+      notIn: [InvoiceStatus.PAID, InvoiceStatus.DRAFT] as InvoiceStatus[],
+    },
+  };
+
   const [
     allInvoices,
     totalInvoices,
@@ -383,107 +399,72 @@ const getKPICardDetails = async (userId: string) => {
     draftedInvoices,
     paidInvoices,
     totalOverdueInvoices,
-  ] = await prisma.$transaction([
-    prisma.invoice.findMany({ where: { businessId: business.businessId } }),
-    prisma.invoice.count({ where: { businessId: business.businessId } }),
+    currentWeekCount,
+    lastWeekCount,
+  ] = await Promise.all([
+    prisma.invoice.findMany({ where: baseWhere }),
+    prisma.invoice.count({ where: baseWhere }),
+    prisma.invoice.count({ where: activeWhere }),
+    prisma.invoice.count({
+      where: { ...baseWhere, status: InvoiceStatus.DRAFT },
+    }),
+    prisma.invoice.count({
+      where: { ...baseWhere, status: InvoiceStatus.PAID },
+    }),
+    prisma.invoice.count({
+      where: { ...activeWhere, dueDate: { lt: now } },
+    }),
     prisma.invoice.count({
       where: {
-        businessId: business.businessId,
-        status: { notIn: ["PAID", "DRAFT"] },
+        ...activeWhere,
+        issueDate: { gte: startOfThisWeek },
+        dueDate: { lt: now },
       },
     }),
     prisma.invoice.count({
       where: {
-        businessId: business.businessId,
-        status: "DRAFT",
-      },
-    }),
-    prisma.invoice.count({
-      where: { businessId: business.businessId, status: "PAID" },
-    }),
-    prisma.invoice.count({
-      where: {
-        businessId: business.businessId,
-        status: { notIn: ["DRAFT", "PAID"] },
-        dueDate: { lt: new Date() },
+        ...activeWhere,
+        issueDate: { gte: startOfLastWeek, lt: startOfThisWeek },
+        dueDate: { lt: now },
       },
     }),
   ]);
 
-  // Revenue Calculations
-
+  // Single pass revenue calculation
   let totalRevenue = 0;
   let thisMonthRevenue = 0;
   let lastMonthRevenue = 0;
 
-  allInvoices.map((inv) => {
-    if (inv.status === InvoiceStatus.PAID) {
-      totalRevenue = totalRevenue + inv.subtotal;
-    }
-  });
+  for (const inv of allInvoices) {
+    if (inv.status !== InvoiceStatus.PAID) continue;
 
-  const now = new Date();
-  const thirtyDaysAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
-  const sixtyDaysAgo = new Date(now.getTime() - 60 * 24 * 60 * 60 * 1000);
+    totalRevenue += inv.subtotal;
 
-  allInvoices.map((inv) => {
-    if (inv.status === InvoiceStatus.PAID && inv.issueDate >= thirtyDaysAgo) {
-      thisMonthRevenue = thisMonthRevenue + inv.subtotal;
+    if (inv.issueDate >= startOfThisMonth) {
+      thisMonthRevenue += inv.subtotal;
+    } else if (inv.issueDate >= startOfLastMonth) {
+      lastMonthRevenue += inv.subtotal;
     }
-  });
-
-  allInvoices.map((inv) => {
-    if (
-      inv.status === InvoiceStatus.PAID &&
-      inv.issueDate >= sixtyDaysAgo &&
-      inv.issueDate < thirtyDaysAgo
-    ) {
-      lastMonthRevenue = lastMonthRevenue + inv.subtotal;
-    }
-  });
+  }
 
   const revenueDiff = thisMonthRevenue - lastMonthRevenue;
+  const revenueDiffInPercentage =
+    lastMonthRevenue > 0
+      ? Math.abs(Number(((revenueDiff / lastMonthRevenue) * 100).toFixed(2)))
+      : 0;
 
-  const revenueDiffInPercentage = Math.abs(
-    Number(((revenueDiff / lastMonthRevenue) * 100).toFixed(2)),
-  );
-
-  const collectionRate = Math.round(
-    (paidInvoices / (totalInvoices - draftedInvoices)) * 100,
-  );
+  const billableInvoices = totalInvoices - draftedInvoices;
+  const collectionRate =
+    billableInvoices > 0
+      ? Math.round((paidInvoices / billableInvoices) * 100)
+      : 0;
 
   const paidInvPer =
     totalInvoices > 0 ? Math.round((paidInvoices / totalInvoices) * 100) : 0;
-
   const pendingInvPer =
     totalInvoices > 0 ? Math.round((pendingInvoices / totalInvoices) * 100) : 0;
-
   const draftedInvPer =
     totalInvoices > 0 ? Math.round((draftedInvoices / totalInvoices) * 100) : 0;
-
-  const sevenDaysAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
-  const fourteenDaysAgo = new Date(now.getTime() - 14 * 24 * 60 * 60 * 1000);
-
-  const currentWeekCount = await prisma.invoice.count({
-    where: {
-      businessId: business.businessId,
-      status: { notIn: ["DRAFT", "PAID"] },
-      issueDate: { gte: sevenDaysAgo },
-      dueDate: { lt: new Date() },
-    },
-  });
-
-  const lastWeekCount = await prisma.invoice.count({
-    where: {
-      businessId: business.businessId,
-      status: { notIn: ["DRAFT", "PAID"] },
-      issueDate: {
-        gte: fourteenDaysAgo,
-        lt: sevenDaysAgo,
-      },
-      dueDate: { lt: new Date() },
-    },
-  });
 
   const overdueInvDiff = currentWeekCount - lastWeekCount;
 
@@ -837,13 +818,15 @@ const getClientPieChartData = async (userId: string) => {
 
   const totalClientsCurrentMonth = newClientsThisMonth + oldClientsThisMonth;
 
-  const newClientsPercentage = Math.round(
-    (newClientsThisMonth / totalClientsCurrentMonth) * 100,
-  );
+  const newClientsPercentage =
+    totalClientsCurrentMonth > 0
+      ? Math.round((newClientsThisMonth / totalClientsCurrentMonth) * 100)
+      : 0;
 
-  const oldClientsPercentage = Math.round(
-    (oldClientsThisMonth / totalClientsCurrentMonth) * 100,
-  );
+  const oldClientsPercentage =
+    totalClientsCurrentMonth > 0
+      ? Math.round((oldClientsThisMonth / totalClientsCurrentMonth) * 100)
+      : 0;
 
   const newClientsDiff = newClientsThisMonth - newClientsLastMonth;
   const oldClientsDiff = oldClientsThisMonth - oldClientsLastMonth;
