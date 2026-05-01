@@ -5,8 +5,6 @@ import { JwtPayload } from "jsonwebtoken";
 import { sendResponse } from "../../utils/sendResponse";
 import { HttpStatusCodes } from "../../utils/httpStatusCodes";
 import { ClientServices } from "./client.service";
-import pick from "../../utils/pick";
-import { clientFilterableFields } from "./client.constants";
 
 const addClient = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
@@ -22,24 +20,22 @@ const addClient = catchAsync(
       message: "Client added successfully",
       data: business,
     });
-  }
+  },
 );
 
 const getAllClients = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
     const user = req.user as JwtPayload;
     const userId = user.userId;
-    const filters = pick(req.query, clientFilterableFields);
-    const options = pick(req.query, ["page", "limit", "sortBy", "sortOrder"]);
 
-    const business = await ClientServices.getAllClients(userId);
+    const clients = await ClientServices.getAllClients(userId);
     sendResponse(res, {
       success: true,
       statusCode: HttpStatusCodes.OK,
       message: "All Clients details retrieved successfully",
-      data: business,
+      data: clients,
     });
-  }
+  },
 );
 
 const getSingleClient = catchAsync(
@@ -52,7 +48,7 @@ const getSingleClient = catchAsync(
       message: "Client details retrieved successfully",
       data: business,
     });
-  }
+  },
 );
 
 const getMyClient = catchAsync(
@@ -68,7 +64,23 @@ const getMyClient = catchAsync(
       message: "Your Client Details Retrieved Successfully",
       data: result.data,
     });
-  }
+  },
+);
+
+const getClietnsStats = catchAsync(
+  async (req: Request, res: Response, next: NextFunction) => {
+    const decodedToken = req.user as JwtPayload;
+    const userId = decodedToken.userId;
+
+    const result = await ClientServices.getClientsStats(userId);
+
+    sendResponse(res, {
+      success: true,
+      statusCode: HttpStatusCodes.OK,
+      message: "Your Clients Stats Retrieved Successfully",
+      data: result,
+    });
+  },
 );
 
 const updateClient = catchAsync(
@@ -79,7 +91,7 @@ const updateClient = catchAsync(
     const client = await ClientServices.updateClient(
       clientId,
       payload,
-      verifiedToken
+      verifiedToken,
     );
     sendResponse(res, {
       success: true,
@@ -87,7 +99,21 @@ const updateClient = catchAsync(
       message: "Client details updated successfully",
       data: client,
     });
-  }
+  },
+);
+
+const updateClientStatus = catchAsync(
+  async (req: Request, res: Response, next: NextFunction) => {
+    const decodedToken = req.user as JwtPayload;
+    const userId = decodedToken.userId;
+    const client = await ClientServices.updateClientStatus(userId);
+    sendResponse(res, {
+      success: true,
+      statusCode: HttpStatusCodes.OK,
+      message: "Client status updated successfully",
+      data: client,
+    });
+  },
 );
 
 const deleteClient = catchAsync(
@@ -101,7 +127,7 @@ const deleteClient = catchAsync(
       message: "Client deleted successfully",
       data: null,
     });
-  }
+  },
 );
 
 export const ClientController = {
@@ -109,6 +135,8 @@ export const ClientController = {
   getAllClients,
   getSingleClient,
   getMyClient,
+  getClietnsStats,
   updateClient,
+  updateClientStatus,
   deleteClient,
 };

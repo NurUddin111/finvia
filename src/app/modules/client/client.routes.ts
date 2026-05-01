@@ -14,19 +14,31 @@ router.post(
   "/add",
   checkAuth(UserRole.BUSINESS_OWNER, UserRole.BUSINESS_ADMIN),
   validateRequest(AddClientZodSchemaValidation),
-  ClientController.addClient
+  ClientController.addClient,
 );
 
 router.get(
   "/all",
   checkAuth(UserRole.BUSINESS_OWNER, UserRole.BUSINESS_ADMIN),
-  ClientController.getAllClients
+  ClientController.getAllClients,
+);
+
+router.get(
+  "/stats",
+  checkAuth(UserRole.BUSINESS_OWNER, UserRole.BUSINESS_ADMIN),
+  ClientController.getClietnsStats,
+);
+
+router.patch(
+  "/update-status",
+  checkAuth(UserRole.BUSINESS_OWNER, UserRole.BUSINESS_ADMIN),
+  ClientController.updateClientStatus,
 );
 
 router.get(
   "/:id",
   checkAuth(UserRole.BUSINESS_OWNER, UserRole.BUSINESS_ADMIN),
-  ClientController.getMyClient
+  ClientController.getMyClient,
 );
 
 // router.get(
@@ -39,13 +51,13 @@ router.patch(
   "/edit/:id",
   validateRequest(UpdateClientZodSchemaValidation),
   checkAuth(UserRole.BUSINESS_OWNER, UserRole.BUSINESS_ADMIN),
-  ClientController.updateClient
+  ClientController.updateClient,
 );
 
 router.patch(
   "/delete/:id",
   checkAuth(UserRole.BUSINESS_OWNER, UserRole.BUSINESS_ADMIN),
-  ClientController.deleteClient
+  ClientController.deleteClient,
 );
 
 export const ClientRoutes = router;
