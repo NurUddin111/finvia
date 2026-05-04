@@ -1,0 +1,4 @@
+-- AlterTable
+ALTER TABLE "Product" ALTER COLUMN "totalSold" SET DEFAULT 0,
+ALTER COLUMN "totalEarning" SET DEFAULT 0,
+ALTER COLUMN "pendingOrder" SET DEFAULT 0;
