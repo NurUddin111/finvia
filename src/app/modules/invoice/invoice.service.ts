@@ -5,6 +5,7 @@ import { HttpStatusCodes } from "../../utils/httpStatusCodes";
 import { generateInvoiceNumber } from "../../utils/generateInvRcNb";
 import { IItems } from "./invoice.interface";
 import { randomUUID } from "crypto";
+import { InvoiceStatus } from "@prisma/client";
 
 const createInvoice = async (
   decodedToken: JwtPayload,
@@ -49,13 +50,11 @@ const createInvoice = async (
 
   dueDays = Number.isNaN(dueDays) ? 3 : dueDays;
 
-  const dueDate = new Date(Date.now() + dueDays * 24 * 60 * 60 * 1000);
-
   const subtotal = items.reduce((sum, item) => {
     return sum + Number(item.pricePerUnit) * Number(item.quantity);
   }, 0);
 
-  taxRate = Number.isNaN(taxRate) ? 0.15 : taxRate / 100;
+  taxRate = Number.isNaN(taxRate) ? 0 : taxRate / 100;
 
   const tax = subtotal * taxRate;
 
@@ -74,7 +73,7 @@ const createInvoice = async (
         clientId: client.clientId,
         createdById: isOwner.userId,
         invoiceNumber: invNb,
-        dueDate: dueDate,
+        dueDays: dueDays,
         subtotal: subtotal,
         totalItems: totalItems,
         tax: tax,
@@ -132,6 +131,10 @@ const getAllInvoices = async (userId: string) => {
           email: true,
         },
       },
+      items: true,
+    },
+    orderBy: {
+      dueDate: "desc",
     },
   });
 
@@ -168,8 +171,136 @@ const getSingleInvoice = async (userId: string, invId: string) => {
   return invoice;
 };
 
+const getInvoicesStats = async (userId: string) => {
+  const isOwner = await prisma.businessUser.findFirst({
+    where: { userId: userId, business: { isDeleted: false } },
+  });
+
+  if (!isOwner) {
+    throw new AppError(
+      HttpStatusCodes.NOT_FOUND,
+      "Only Business Owner or Admin can view invoices stats!",
+    );
+  }
+
+  const now = new Date();
+  const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+  const endOfMonth = new Date(
+    now.getFullYear(),
+    now.getMonth() + 1,
+    0,
+    23,
+    59,
+    59,
+    999,
+  );
+
+  const invoices = await prisma.invoice.findMany({
+    where: { businessId: isOwner.businessId },
+    select: {
+      status: true,
+      total: true,
+      subtotal: true,
+      tax: true,
+      createdAt: true,
+    },
+  });
+
+  // ── Totals ──────────────────────────────────────────────────────────────────
+
+  const totalInvoices = invoices.length;
+
+  const draftedInvoices = invoices.filter(
+    (inv) => inv.status === InvoiceStatus.DRAFT,
+  ).length;
+
+  const totalRevenue = invoices.reduce((sum, inv) => sum + (inv.total ?? 0), 0);
+
+  // ── This month (PAID invoices within current month) ─────────────────────────
+
+  const paidThisMonth = invoices.filter(
+    (inv) =>
+      inv.status === InvoiceStatus.PAID &&
+      inv.createdAt >= startOfMonth &&
+      inv.createdAt <= endOfMonth,
+  );
+
+  const thisMonthEarnings = paidThisMonth.reduce(
+    (sum, inv) => sum + (inv.total ?? 0),
+    0,
+  );
+
+  const thisMonthPaidCount = paidThisMonth.length;
+
+  // ── Outstanding (everything except PAID and DRAFT) ──────────────────────────
+
+  const EXCLUDED: InvoiceStatus[] = [
+    InvoiceStatus.PAID,
+    InvoiceStatus.DRAFT,
+    InvoiceStatus.CANCELLED,
+    InvoiceStatus.FAILED,
+  ];
+
+  const outstandingInvoices = invoices.filter(
+    (inv) => !EXCLUDED.includes(inv.status as InvoiceStatus),
+  );
+
+  const outstandingAmount = outstandingInvoices.reduce(
+    (sum, inv) => sum + (inv.total ?? 0),
+    0,
+  );
+
+  const outstandingCount = outstandingInvoices.length;
+
+  return {
+    data: {
+      totalInvoices,
+      draftedInvoices,
+      totalRevenue,
+      thisMonth: {
+        earnings: thisMonthEarnings,
+        paidCount: thisMonthPaidCount,
+      },
+      outstanding: {
+        amount: outstandingAmount,
+        count: outstandingCount,
+      },
+    },
+  };
+};
+
+const setOverdueStatus = async (userId: string) => {
+  const isOwner = await prisma.businessUser.findFirst({
+    where: { userId: userId, business: { isDeleted: false } },
+  });
+
+  if (!isOwner) {
+    throw new AppError(
+      HttpStatusCodes.NOT_FOUND,
+      "Only Business Owner or Admin can set ivoices status!",
+    );
+  }
+
+  const invoices = await prisma.invoice.updateMany({
+    where: {
+      businessId: isOwner.businessId,
+      status: { notIn: ["DRAFT", "PAID", "OVERDUE"] },
+      dueDate: {
+        lt: new Date(),
+      },
+    },
+    data: {
+      status: InvoiceStatus.OVERDUE,
+    },
+  });
+
+  return invoices;
+};
+
 export const InvoiceServices = {
   createInvoice,
   getAllInvoices,
   getSingleInvoice,
+  getInvoicesStats,
+  setOverdueStatus,
 };

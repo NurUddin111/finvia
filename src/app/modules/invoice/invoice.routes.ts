@@ -19,6 +19,18 @@ router.get(
 );
 
 router.get(
+  "/stats",
+  checkAuth(UserRole.BUSINESS_OWNER, UserRole.BUSINESS_ADMIN),
+  InvoiceController.getInvoicesStats,
+);
+
+router.patch(
+  "/update-status",
+  checkAuth(UserRole.BUSINESS_OWNER, UserRole.BUSINESS_ADMIN),
+  InvoiceController.setOverdueStatus,
+);
+
+router.get(
   "/:id",
   checkAuth(UserRole.BUSINESS_OWNER, UserRole.BUSINESS_ADMIN),
   InvoiceController.getSingleInvoice,

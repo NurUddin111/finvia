@@ -25,7 +25,9 @@ const initPayment = async (invId: string) => {
       throw new AppError(HttpStatusCodes.BAD_REQUEST, "This invoice is PAID!");
     }
 
-    const delay = Date.now() - new Date(invoice.issueDate).getTime();
+    const dueDate = new Date(
+      Date.now() + invoice.dueDays * 24 * 60 * 60 * 1000,
+    );
 
     invoice = await tx.invoice.update({
       where: {
@@ -34,7 +36,7 @@ const initPayment = async (invId: string) => {
       data: {
         status: "SENT",
         issueDate: new Date(Date.now()),
-        dueDate: new Date(new Date(invoice.dueDate).getTime() + delay),
+        dueDate: dueDate,
       },
     });
 

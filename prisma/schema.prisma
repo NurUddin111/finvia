@@ -172,15 +172,15 @@ model Invoice {
   createdById   String
   invoiceNumber String        @unique
   status        InvoiceStatus @default(DRAFT)
-  // todo:remove defaults from issue date
-  issueDate     DateTime      @default(now())
-  dueDate       DateTime
+  issueDate     DateTime?
+  dueDays       Float         @default(0)
+  dueDate       DateTime?
 
   items InvoiceItem[]
 
   totalItems   Int       @default(0)
   subtotal     Float
-  tax          Float
+  tax          Float?
   total        Float
   currency     String    @default("BDT")
   notes        String?
@@ -210,7 +210,6 @@ enum InvoiceStatus {
   PAID
   FAILED
   CANCELLED
-  // todo:Update Invoice status to OVERDUE if due date is passed
   OVERDUE
 }
 
@@ -218,7 +217,6 @@ model Payment {
   id        String         @id @default(uuid())
   invoice   Invoice        @relation(fields: [invoiceId], references: [id])
   invoiceId String
-  // todo: add payment method(CASH/ONLINE)
   provider  PaymentGateway @default(SSLCOMMERZ)
   tran_id   String
   amount    Float
