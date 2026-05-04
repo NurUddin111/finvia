@@ -17,7 +17,7 @@ const createInvoice = catchAsync(
       Number(dueDays),
       items,
       Number(taxRate),
-      notes
+      notes,
     );
 
     sendResponse(res, {
@@ -26,7 +26,7 @@ const createInvoice = catchAsync(
       message: "Invoice created successfully",
       data: invoice,
     });
-  }
+  },
 );
 
 const getAllInvoices = catchAsync(
@@ -42,16 +42,16 @@ const getAllInvoices = catchAsync(
       message: "All Invoices retrieved successfully",
       data: invoices,
     });
-  }
+  },
 );
 
 const getSingleInvoice = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
     const user = req.user as JwtPayload;
     const userId = user.userId;
-    const invId = req.params.id
+    const invId = req.params.id;
 
-    const invoice = await InvoiceServices.getSingleInvoice(userId,invId);
+    const invoice = await InvoiceServices.getSingleInvoice(userId, invId);
 
     sendResponse(res, {
       success: true,
@@ -59,7 +59,45 @@ const getSingleInvoice = catchAsync(
       message: "Invoice retrieved successfully",
       data: invoice,
     });
-  }
+  },
 );
 
-export const InvoiceController = { createInvoice, getAllInvoices,getSingleInvoice };
+const getInvoicesStats = catchAsync(
+  async (req: Request, res: Response, next: NextFunction) => {
+    const user = req.user as JwtPayload;
+    const userId = user.userId;
+
+    const InvoicesStats = await InvoiceServices.getInvoicesStats(userId);
+
+    sendResponse(res, {
+      success: true,
+      statusCode: HttpStatusCodes.CREATED,
+      message: "Invoices stats retrieved successfully",
+      data: InvoicesStats.data,
+    });
+  },
+);
+
+const setOverdueStatus = catchAsync(
+  async (req: Request, res: Response, next: NextFunction) => {
+    const user = req.user as JwtPayload;
+    const userId = user.userId;
+
+    const overdueInvoices = await InvoiceServices.setOverdueStatus(userId);
+
+    sendResponse(res, {
+      success: true,
+      statusCode: HttpStatusCodes.CREATED,
+      message: "Invoices stats retrieved successfully",
+      data: overdueInvoices,
+    });
+  },
+);
+
+export const InvoiceController = {
+  createInvoice,
+  getAllInvoices,
+  getSingleInvoice,
+  getInvoicesStats,
+  setOverdueStatus,
+};
