@@ -5,6 +5,7 @@ import { BusinessRoutes } from "../modules/business/business.routes";
 import { ClientRoutes } from "../modules/client/client.routes";
 import { InvoiceRoutes } from "../modules/invoice/invoice.routes";
 import { PaymentRoutes } from "../modules/payment/payment.routes";
+import { ProductRoutes } from "../modules/product/product.routes";
 
 export const router = Router();
 
@@ -32,6 +33,10 @@ const apiRoutes = [
   {
     path: "/payment",
     route: PaymentRoutes,
+  },
+  {
+    path: "/product",
+    route: ProductRoutes,
   },
 ];
 
