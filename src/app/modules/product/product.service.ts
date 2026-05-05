@@ -196,7 +196,12 @@ const getProductsStats = async (userId: string) => {
   const [products, currentMonthProducts] = await Promise.all([
     prisma.product.findMany({
       where: { businessId: isOwner.businessId, isDeleted: false },
-      select: { totalEarning: true, totalSold: true, pendingOrder: true },
+      select: {
+        name: true,
+        totalEarning: true,
+        totalSold: true,
+        pendingOrder: true,
+      },
     }),
     prisma.product.count({
       where: {
@@ -208,17 +213,22 @@ const getProductsStats = async (userId: string) => {
   ]);
 
   const totalEarning = products.reduce((sum, p) => sum + p.totalEarning, 0);
-  const totalSold = products.reduce((sum, p) => sum + p.totalSold, 0);
   const pendingOrdersValue = products.reduce(
     (sum, p) => sum + p.pendingOrder,
     0,
   );
 
+  const topSellingProduct = products.length
+    ? products.reduce((top, p) => (p.totalSold > top.totalSold ? p : top))
+    : null;
+
   return {
     totalProducts: products.length,
     currentMonthProducts,
     totalEarning,
-    totalSold,
+    topSellingProduct: topSellingProduct
+      ? { name: topSellingProduct.name, totalSold: topSellingProduct.totalSold }
+      : null,
     pendingOrders: products.filter((p) => p.pendingOrder > 0).length,
     pendingOrdersValue,
   };

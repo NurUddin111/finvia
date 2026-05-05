@@ -21,10 +21,25 @@ export const AddProductZodSchemaValidation = z.object({
     ),
 });
 
-export const updateProductSchema = z.object({
+export const UpdateProductZodSchemaValidation = z.object({
   name: z
-    .string({ error: "Product name must be a string." })
+    .string({
+      error: (issue) =>
+        issue.input === undefined ? "Name is required" : "Invalid Name",
+    })
     .trim()
-    .min(1, "Product name cannot be empty.")
-    .max(100, "Product name cannot exceed 100 characters."),
+    .min(2, {
+      error: (issue) => {
+        if (issue.code === "too_small") {
+          return `Name must be ${issue.minimum} characters long!`;
+        }
+      },
+    })
+    .max(100, {
+      error: (issue) => {
+        if (issue.code === "too_big") {
+          return `Name cannot exceed ${issue.minimum} characters!`;
+        }
+      },
+    }),
 });

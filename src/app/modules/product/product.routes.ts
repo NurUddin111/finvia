@@ -4,7 +4,7 @@ import { UserRole } from "@prisma/client";
 import { validateRequest } from "../../middlewares/validateRequest";
 import {
   AddProductZodSchemaValidation,
-  updateProductSchema,
+  UpdateProductZodSchemaValidation,
 } from "./product.validation";
 import { ProductController } from "./product.controller";
 
@@ -38,7 +38,7 @@ router.get(
 router.patch(
   "/:productId",
   checkAuth(UserRole.BUSINESS_OWNER, UserRole.BUSINESS_ADMIN),
-  validateRequest(updateProductSchema),
+  validateRequest(UpdateProductZodSchemaValidation),
   ProductController.updateProduct,
 );
 
