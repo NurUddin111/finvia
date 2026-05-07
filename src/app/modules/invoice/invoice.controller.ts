@@ -47,11 +47,20 @@ const getAllInvoices = catchAsync(
     const user = req.user as JwtPayload;
     const userId = user.userId;
 
-    const invoices = await InvoiceServices.getAllInvoices(userId);
+    const query = {
+      page: req.query.page as string | undefined,
+      search: req.query.search as string | undefined,
+      status: req.query.status as string | undefined,
+      sortBy: req.query.sortBy as string | undefined,
+      order: req.query.order as string | undefined,
+      year: req.query.year as string | undefined, // ← new
+    };
+
+    const invoices = await InvoiceServices.getAllInvoices(userId, query);
 
     sendResponse(res, {
       success: true,
-      statusCode: HttpStatusCodes.CREATED,
+      statusCode: HttpStatusCodes.OK,
       message: "All Invoices retrieved successfully",
       data: invoices,
     });

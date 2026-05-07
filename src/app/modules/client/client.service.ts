@@ -1,5 +1,5 @@
 import { JwtPayload } from "jsonwebtoken";
-import { Client, ClientStatus } from "@prisma/client";
+import { Client, ClientStatus, Prisma } from "@prisma/client";
 import { prisma } from "../../../lib/prisma";
 import AppError from "../../errorHelpers/AppError";
 import { HttpStatusCodes } from "../../utils/httpStatusCodes";
@@ -63,7 +63,17 @@ const addClient = async (userId: string, payload: Client) => {
   return result;
 };
 
-const getAllClients = async (userId: string) => {
+const getAllClients = async (
+  userId: string,
+  query: {
+    page?: string;
+    limit?: string;
+    search?: string;
+    status?: string;
+    sortBy?: string;
+    order?: string;
+  },
+) => {
   const isOwner = await prisma.businessUser.findFirst({
     where: { userId: userId, business: { isDeleted: false } },
   });
@@ -75,26 +85,84 @@ const getAllClients = async (userId: string) => {
     );
   }
 
-  const clients = await prisma.client.findMany({
-    where: {
-      links: {
-        some: {
-          businessId: isOwner.businessId,
-        },
-      },
+  const page = Math.max(1, parseInt(query.page || "1"));
+
+  const limit = Math.min(100, parseInt(query.limit || "10"));
+
+  const skip = (page - 1) * limit;
+
+  const search = query.search?.trim() || undefined;
+
+  const status =
+    query.status === "ACTIVE" || query.status === "INACTIVE"
+      ? (query.status as ClientStatus)
+      : undefined;
+
+  const ALLOWED_SORT = ["name", "createdAt"];
+  const rawSortBy = query.sortBy || "createdAt";
+
+  const sortBy = ALLOWED_SORT.includes(rawSortBy) ? rawSortBy : "createdAt";
+
+  const order = query.order === "desc" ? "desc" : "asc";
+
+  const where: Prisma.ClientWhereInput = {
+    links: {
+      some: { businessId: isOwner.businessId },
     },
-  });
 
-  if (!clients) {
-    throw new AppError(HttpStatusCodes.NOT_FOUND, "No clients found.");
-  }
+    isDeleted: false,
 
-  const formattedClients = clients.map((tx) => ({
-    ...tx,
-    formattedDate: formatDateTime(new Date(tx.createdAt)),
+    ...(status && { status }),
+
+    ...(search && {
+      OR: [
+        { name: { contains: search, mode: "insensitive" } },
+        { email: { contains: search, mode: "insensitive" } },
+        { phone: { contains: search, mode: "insensitive" } },
+      ],
+    }),
+  };
+
+  const [total, clients] = await Promise.all([
+    prisma.client.count({ where }),
+
+    prisma.client.findMany({
+      where,
+      skip,
+      take: limit,
+      orderBy: { [sortBy]: order },
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        phone: true,
+        address: true,
+        totalInvoices: true,
+        totalSpent: true,
+        status: true,
+        isDeleted: true,
+        createdAt: true,
+        updatedAt: true,
+      },
+    }),
+  ]);
+
+  const formattedClients = clients.map((client) => ({
+    ...client,
+    formattedDate: formatDateTime(new Date(client.createdAt)),
   }));
 
-  return formattedClients;
+  return {
+    data: formattedClients,
+    meta: {
+      total,
+      page,
+      limit,
+      totalPages: Math.ceil(total / limit),
+      hasNextPage: page < Math.ceil(total / limit),
+      hasPrevPage: page > 1,
+    },
+  };
 };
 
 const getSingleClient = async (clientId: string) => {

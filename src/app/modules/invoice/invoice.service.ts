@@ -5,7 +5,7 @@ import { HttpStatusCodes } from "../../utils/httpStatusCodes";
 import { generateInvoiceNumber } from "../../utils/generateInvRcNb";
 import { IItems } from "./invoice.interface";
 import { randomUUID } from "crypto";
-import { InvoiceStatus } from "@prisma/client";
+import { InvoiceStatus, Prisma } from "@prisma/client";
 
 const createInvoice = async (
   decodedToken: JwtPayload,
@@ -109,7 +109,17 @@ const createInvoice = async (
   return result;
 };
 
-const getAllInvoices = async (userId: string) => {
+const getAllInvoices = async (
+  userId: string,
+  query: {
+    page?: string;
+    search?: string;
+    status?: string;
+    sortBy?: string;
+    order?: string;
+    year?: string; // ← new
+  },
+) => {
   const isOwner = await prisma.businessUser.findFirst({
     where: { userId: userId, business: { isDeleted: false } },
   });
@@ -117,28 +127,110 @@ const getAllInvoices = async (userId: string) => {
   if (!isOwner) {
     throw new AppError(
       HttpStatusCodes.NOT_FOUND,
-      "Only Business Owner or Admin can view all clients.",
+      "Only Business Owner or Admin can view all invoices.",
     );
   }
 
-  const invoices = await prisma.invoice.findMany({
-    where: {
-      businessId: isOwner.businessId,
-    },
-    include: {
-      client: {
-        select: {
-          email: true,
-        },
-      },
-      items: true,
-    },
-    orderBy: {
-      dueDate: "desc",
-    },
-  });
+  // ── STEP 1: Parse ─────────────────────────────────────────────────────────
+  const page = Math.max(1, parseInt(query.page || "1"));
+  const limit = 10;
+  const skip = (page - 1) * limit;
 
-  return invoices;
+  const search = query.search?.trim() || undefined;
+
+  const VALID_STATUSES = [
+    "DRAFT",
+    "SENT",
+    "PAID",
+    "FAILED",
+    "CANCELLED",
+    "OVERDUE",
+  ];
+  const rawStatus = query.status || "";
+  const status = VALID_STATUSES.includes(rawStatus)
+    ? (rawStatus as InvoiceStatus)
+    : undefined;
+
+  const ALLOWED_SORT = ["createdAt", "dueDate", "total"];
+  const rawSortBy = query.sortBy || "createdAt";
+  const sortBy = ALLOWED_SORT.includes(rawSortBy) ? rawSortBy : "createdAt";
+  const order = query.order === "asc" ? "asc" : "desc";
+
+  // Parse year — must be a valid 4-digit number, otherwise ignore it
+  const rawYear = parseInt(query.year || "");
+  const year = !isNaN(rawYear) && rawYear > 2000 ? rawYear : undefined;
+
+  // ── STEP 2: Build WHERE ───────────────────────────────────────────────────
+  const where: Prisma.InvoiceWhereInput = {
+    businessId: isOwner.businessId,
+    ...(status && { status }),
+    ...(search && {
+      OR: [
+        { invoiceNumber: { contains: search, mode: "insensitive" } },
+        { client: { email: { contains: search, mode: "insensitive" } } },
+      ],
+    }),
+
+    // Year filter — if year=2025, fetch invoices where:
+    // createdAt >= 2025-01-01 00:00:00  AND  createdAt < 2026-01-01 00:00:00
+    ...(year && {
+      createdAt: {
+        gte: new Date(`${year}-01-01`), // Jan 1st of selected year
+        lt: new Date(`${year + 1}-01-01`), // Jan 1st of NEXT year (not Dec 31!)
+        // We use `lt` (less than) instead of `lte` Dec 31
+        // because Dec 31 23:59:59 would still be missed with lte on a date
+      },
+    }),
+  };
+
+  // ── STEP 3: Get available years for this business ─────────────────────────
+  // We need to know which years actually have invoices
+  // so the frontend can build the dropdown dynamically
+  //
+  // This raw query asks PostgreSQL:
+  // "Give me each unique year that appears in createdAt for this business"
+  const yearRows = await prisma.$queryRaw<{ year: number }[]>`
+    SELECT DISTINCT EXTRACT(YEAR FROM "createdAt")::int AS year
+    FROM "Invoice"
+    WHERE "businessId" = ${isOwner.businessId}
+    ORDER BY year DESC
+  `;
+  // EXTRACT(YEAR FROM "createdAt") → pulls just the year number e.g. 2024, 2025
+  // ::int → casts it from decimal to integer
+  // DISTINCT → removes duplicates (many invoices in 2025 → appears once)
+  // ORDER BY year DESC → newest year first in dropdown
+
+  // Convert the raw rows into a plain number array e.g. [2026, 2025, 2024]
+  const availableYears = yearRows.map((row) => row.year);
+
+  // ── STEP 4: Count + Find in parallel ─────────────────────────────────────
+  const [total, invoices] = await Promise.all([
+    prisma.invoice.count({ where }),
+    prisma.invoice.findMany({
+      where,
+      skip,
+      take: limit,
+      orderBy: { [sortBy]: order },
+      include: {
+        client: { select: { name: true, email: true } },
+        items: true,
+      },
+    }),
+  ]);
+
+  // ── STEP 5: Return ────────────────────────────────────────────────────────
+  return {
+    data: invoices,
+    meta: {
+      total,
+      page,
+      limit,
+      totalPages: Math.ceil(total / limit),
+      hasNextPage: page < Math.ceil(total / limit),
+      hasPrevPage: page > 1,
+      availableYears, // ← [2026, 2025, 2024] — sent to frontend for dropdown
+    },
+  };
 };
 
 const getSingleInvoice = async (userId: string, invId: string) => {
