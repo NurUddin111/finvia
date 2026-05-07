@@ -28,7 +28,19 @@ const getAllClients = catchAsync(
     const user = req.user as JwtPayload;
     const userId = user.userId;
 
-    const clients = await ClientServices.getAllClients(userId);
+    // Pull everything from query string
+    // e.g. GET /clients?page=2&search=john&status=ACTIVE&sortBy=name&order=asc
+    const query = {
+      page:    req.query.page    as string | undefined,
+      limit:   req.query.limit   as string | undefined,
+      search:  req.query.search  as string | undefined,
+      status:  req.query.status  as string | undefined,
+      sortBy:  req.query.sortBy  as string | undefined,
+      order:   req.query.order   as string | undefined,
+    };
+
+    const clients = await ClientServices.getAllClients(userId, query);
+
     sendResponse(res, {
       success: true,
       statusCode: HttpStatusCodes.OK,

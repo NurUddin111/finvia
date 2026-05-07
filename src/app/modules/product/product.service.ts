@@ -1,3 +1,4 @@
+import { Prisma } from "@prisma/client";
 import { prisma } from "../../../lib/prisma";
 import AppError from "../../errorHelpers/AppError";
 import { HttpStatusCodes } from "../../utils/httpStatusCodes";
@@ -43,7 +44,15 @@ const addProduct = async (userId: string, productsName: { name: string }[]) => {
   return products;
 };
 
-const getAllProducts = async (userId: string) => {
+const getAllProducts = async (
+  userId: string,
+  query: {
+    page?: string;
+    search?: string;
+    sortBy?: string;
+    order?: string;
+  },
+) => {
   const isOwner = await prisma.businessUser.findFirst({
     where: { userId: userId, business: { isDeleted: false } },
   });
@@ -55,15 +64,53 @@ const getAllProducts = async (userId: string) => {
     );
   }
 
-  const products = await prisma.product.findMany({
-    where: {
-      businessId: isOwner.businessId,
-      isDeleted: false,
-    },
-    orderBy: { createdAt: "desc" },
-  });
+  // ── Parse ─────────────────────────────────────────────────────────────────
+  const page = Math.max(1, parseInt(query.page || "1"));
+  const limit = 10;
+  const skip = (page - 1) * limit;
 
-  return products;
+  const search = query.search?.trim() || undefined;
+
+  // Products can be sorted by name, earnings, sold count, or date
+  const ALLOWED_SORT = ["name", "totalEarning", "totalSold", "createdAt"];
+  const rawSortBy = query.sortBy || "createdAt";
+  const sortBy = ALLOWED_SORT.includes(rawSortBy) ? rawSortBy : "createdAt";
+  const order = query.order === "asc" ? "asc" : "desc";
+
+  // ── WHERE ─────────────────────────────────────────────────────────────────
+  const where: Prisma.ProductWhereInput = {
+    businessId: isOwner.businessId,
+    isDeleted: false,
+
+    // Search by name only — that's the only text field on this model
+    ...(search && {
+      name: { contains: search, mode: "insensitive" },
+    }),
+  };
+
+  // ── Count + Find ──────────────────────────────────────────────────────────
+  const [total, products] = await Promise.all([
+    prisma.product.count({ where }),
+    prisma.product.findMany({
+      where,
+      skip,
+      take: limit,
+      orderBy: { [sortBy]: order },
+    }),
+  ]);
+
+  // ── Return ────────────────────────────────────────────────────────────────
+  return {
+    data: products,
+    meta: {
+      total,
+      page,
+      limit,
+      totalPages: Math.ceil(total / limit),
+      hasNextPage: page < Math.ceil(total / limit),
+      hasPrevPage: page > 1,
+    },
+  };
 };
 
 const getProductById = async (userId: string, productId: string) => {

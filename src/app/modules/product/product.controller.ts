@@ -27,7 +27,14 @@ const getAllProducts = catchAsync(
     const user = req.user as JwtPayload;
     const userId = user.userId;
 
-    const result = await ProductServices.getAllProducts(userId);
+    const query = {
+      page: req.query.page as string | undefined,
+      search: req.query.search as string | undefined,
+      sortBy: req.query.sortBy as string | undefined,
+      order: req.query.order as string | undefined,
+    };
+
+    const result = await ProductServices.getAllProducts(userId, query);
 
     sendResponse(res, {
       statusCode: 200,
