@@ -158,6 +158,8 @@ const initPayment = async (invId: string) => {
     ],
   });
 
+  console.log(sslPayment);
+
   return {
     CloudinaryResult: cloudinaryResult.secure_url,
     SSLCOMMERZ: sslPayment.GatewayPageURL,
@@ -165,103 +167,95 @@ const initPayment = async (invId: string) => {
 };
 
 const successPayment = async (query: Record<string, string>) => {
-  const transactionId = query.transactionId;
+  const { transactionId } = query;
 
+  // ── 1. Atomic DB writes (payment, invoice, products) ──────────────────────
   const result = await prisma.$transaction(async (tx) => {
-    let payment = await tx.payment.findFirst({
-      where: {
-        tran_id: transactionId,
-      },
+    const payment = await tx.payment.findFirst({
+      where: { tran_id: transactionId },
     });
-
-    if (!payment) {
+    if (!payment)
       throw new AppError(HttpStatusCodes.NOT_FOUND, "Payment not found");
-    }
 
-    let invoice = await tx.invoice.findFirst({
-      where: {
-        id: payment.invoiceId,
-      },
+    const invoice = await tx.invoice.findFirst({
+      where: { id: payment.invoiceId },
+      include: { items: true }, // ← fetch line items to match products
     });
-
-    if (!invoice) {
+    if (!invoice)
       throw new AppError(HttpStatusCodes.NOT_FOUND, "Invoice not found");
-    }
 
-    const business = await tx.business.findUnique({
-      where: {
-        id: invoice.businessId,
-      },
-    });
+    // Run independent lookups in parallel
+    const [business, client] = await Promise.all([
+      tx.business.findUnique({ where: { id: invoice.businessId } }),
+      tx.client.findUnique({ where: { id: invoice.clientId } }),
+    ]);
 
-    if (!business) {
-      throw new AppError(
-        HttpStatusCodes.NOT_FOUND,
-        "Business details not found",
-      );
-    }
-
-    const client = await tx.client.findUnique({
-      where: { id: invoice.clientId },
-    });
-
-    if (!client) {
+    if (!business)
+      throw new AppError(HttpStatusCodes.NOT_FOUND, "Business not found");
+    if (!client)
       throw new AppError(HttpStatusCodes.NOT_FOUND, "Client not found");
-    }
 
     const rcpNb = await generateReceiptNumber(business.id);
 
-    payment = await tx.payment.update({
-      where: {
-        id: payment.id,
-      },
-      data: {
-        status: "SUCCESS",
-        rcpNumber: rcpNb,
-      },
-    });
+    // Update payment + invoice in parallel
+    const [updatedPayment, updatedInvoice] = await Promise.all([
+      tx.payment.update({
+        where: { id: payment.id },
+        data: { status: "SUCCESS", rcpNumber: rcpNb },
+      }),
+      tx.invoice.update({
+        where: { id: invoice.id },
+        data: { status: "PAID" },
+      }),
+    ]);
 
-    invoice = await tx.invoice.update({
-      where: {
-        id: invoice.id,
-      },
-      data: {
-        status: "PAID",
-      },
-    });
+    // ── Update products by name ────────────────────────────────────────────
+    await Promise.all(
+      invoice.items.map((item) =>
+        tx.product.update({
+          where: { id: item.productId },
+          data: {
+            totalSold: { increment: item.quantity },
+            totalEarning: { increment: item.total },
+          },
+        }),
+      ),
+    );
 
-    return { payment, invoice, client, business };
+    return {
+      payment: updatedPayment,
+      invoice: updatedInvoice,
+      client,
+      business,
+    };
   });
 
   const { invoice, payment, client, business } = result;
 
+  // ── 2. Generate & upload receipt PDF ──────────────────────────────────────
   const rcpPdf = await generateRcpPdf(invoice);
-
   if (!rcpPdf) {
     throw new AppError(
       HttpStatusCodes.BAD_REQUEST,
-      "Failed to create Invoice PDF",
+      "Failed to create receipt PDF",
     );
   }
 
   const cloudinaryResult = await uploadBufferToCloudinary(rcpPdf, "receipt");
-
   if (!cloudinaryResult) {
     throw new AppError(
       HttpStatusCodes.BAD_REQUEST,
-      "Failed to upload receipt pdf at cloudinary",
+      "Failed to upload receipt PDF to Cloudinary",
     );
   }
 
+  // Persist the PDF URL (non-critical, outside main transaction intentionally)
   await prisma.payment.update({
-    where: {
-      id: payment.id,
-    },
-    data: {
-      rcpPdfUrl: cloudinaryResult.secure_url,
-    },
+    where: { id: payment.id },
+    data: { rcpPdfUrl: cloudinaryResult.secure_url },
   });
 
+  // ── 3. Send receipt email ──────────────────────────────────────────────────
   await sendEmail({
     to: client.email,
     subject: "Receipt",
@@ -270,7 +264,7 @@ const successPayment = async (query: Record<string, string>) => {
       clientName: client.name,
       receiptNumber: payment.rcpNumber,
       invoiceNumber: invoice.invoiceNumber,
-      paymentDate: formatDateTime(new Date(Date.now())),
+      paymentDate: formatDateTime(new Date()),
       paymentMethod: payment.provider,
       transactionId: payment.tran_id,
       currency: payment.currency,
@@ -288,7 +282,7 @@ const successPayment = async (query: Record<string, string>) => {
     ],
   });
 
-  return { success: true, message: "Payment Completed Successfully" };
+  return { success: true, message: "Payment completed successfully" };
 };
 
 const failPayment = async (query: Record<string, string>) => {

@@ -86,6 +86,7 @@ const createInvoice = async (
       data: items.map((item) => ({
         invoiceId: invoice.id,
         name: item.name,
+        productId: item.productId,
         quantity: item.quantity,
         pricePerUnit: item.pricePerUnit,
         total: item.pricePerUnit * item.quantity,

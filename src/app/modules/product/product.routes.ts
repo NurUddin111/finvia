@@ -30,6 +30,12 @@ router.get(
 );
 
 router.get(
+  "/top",
+  checkAuth(UserRole.BUSINESS_OWNER, UserRole.BUSINESS_ADMIN),
+  ProductController.getTopProducts,
+);
+
+router.get(
   "/:productId",
   checkAuth(UserRole.BUSINESS_OWNER, UserRole.BUSINESS_ADMIN),
   ProductController.getProductById,
