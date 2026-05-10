@@ -3,8 +3,9 @@ import { prisma } from "../../lib/prisma";
 export const generateInvoiceNumber = async (businessId: string) => {
   const year = new Date().getFullYear();
   const count = await prisma.invoice.count({
-    where: { businessId, issueDate: { gte: new Date(`${year}-01-01`) } },
+    where: { businessId, createdAt: { gte: new Date(`${year}-01-01`) } },
   });
+  console.log(count);
   return `INV-${year}-${String(count + 1).padStart(5, "0")}`;
 };
 

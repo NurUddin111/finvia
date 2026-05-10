@@ -281,6 +281,28 @@ const getProductsStats = async (userId: string) => {
   };
 };
 
+const getTopProducts = async (userId: string) => {
+  const isOwner = await prisma.businessUser.findFirst({
+    where: { userId, business: { isDeleted: false } },
+  });
+
+  if (!isOwner) {
+    throw new AppError(
+      HttpStatusCodes.NOT_FOUND,
+      "You do not belong to any business",
+    );
+  }
+
+  const products = await prisma.product.findMany({
+    where: { businessId: isOwner.businessId, isDeleted: false },
+    orderBy: { totalSold: "desc" },
+    take: 5,
+    select: { name: true, totalSold: true },
+  });
+
+  return products;
+};
+
 export const ProductServices = {
   addProduct,
   getAllProducts,
@@ -288,4 +310,5 @@ export const ProductServices = {
   updateProduct,
   deleteProduct,
   getProductsStats,
+  getTopProducts,
 };

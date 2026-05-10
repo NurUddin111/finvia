@@ -113,6 +113,20 @@ const getProductsStats = catchAsync(
   },
 );
 
+const getTopProducts = catchAsync(
+  async (req: Request, res: Response, next: NextFunction) => {
+    const user = req.user as JwtPayload;
+    const result = await ProductServices.getTopProducts(user.userId);
+
+    sendResponse(res, {
+      statusCode: 200,
+      success: true,
+      message: "Top products fetched successfully!",
+      data: result,
+    });
+  },
+);
+
 export const ProductController = {
   addProduct,
   getAllProducts,
@@ -120,4 +134,5 @@ export const ProductController = {
   updateProduct,
   deleteProduct,
   getProductsStats,
+  getTopProducts,
 };

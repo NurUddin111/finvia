@@ -179,23 +179,26 @@ model Invoice {
 
   items InvoiceItem[]
 
-  totalItems   Int       @default(0)
-  subtotal     Float
-  tax          Float?
-  total        Float
-  currency     String    @default("BDT")
-  notes        String?
-  invPdfUrl    String?
-  paymentToken String?
-  payments     Payment[]
-  createdAt    DateTime  @default(now())
-  updatedAt    DateTime  @updatedAt
+  totalItems Int       @default(0)
+  subtotal   Float
+  tax        Float?
+  total      Float
+  currency   String    @default("BDT")
+  notes      String?
+  invPdfUrl  String?
+  payments   Payment[]
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
 }
 
 model InvoiceItem {
-  id        String  @id @default(cuid())
+  id String @id @default(cuid())
+
   invoice   Invoice @relation(fields: [invoiceId], references: [id])
   invoiceId String
+
+  product   Product @relation(fields: [productId], references: [id])
+  productId String
 
   name         String
   quantity     Float
@@ -215,19 +218,20 @@ enum InvoiceStatus {
 }
 
 model Payment {
-  id        String         @id @default(uuid())
-  invoice   Invoice        @relation(fields: [invoiceId], references: [id])
+  id        String          @id @default(uuid())
+  invoice   Invoice         @relation(fields: [invoiceId], references: [id])
   invoiceId String
-  provider  PaymentGateway @default(SSLCOMMERZ)
+  method    PaymentMethod?
+  provider  PaymentGateway? @default(SSLCOMMERZ)
   tran_id   String
   amount    Float
   currency  String
-  status    PaymentStatus  @default(PENDING)
+  status    PaymentStatus   @default(PENDING)
   rcpNumber String?
   rcpPdfUrl String?
   metadata  Json?
-  createdAt DateTime       @default(now())
-  updatedAt DateTime       @updatedAt
+  createdAt DateTime        @default(now())
+  updatedAt DateTime        @updatedAt
 }
 
 enum PaymentGateway {
@@ -246,17 +250,23 @@ enum PaymentStatus {
   CANCELLED
 }
 
+enum PaymentMethod {
+  ONLINE
+  CASH
+}
+
 model Product {
-  id           String   @id @default(uuid())
+  id           String        @id @default(uuid())
   businessId   String
-  business     Business @relation(fields: [businessId], references: [id])
+  business     Business      @relation(fields: [businessId], references: [id])
   name         String
-  totalSold    Float    @default(0)
-  totalEarning Float    @default(0)
-  pendingOrder Float    @default(0)
-  isDeleted    Boolean  @default(false)
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
+  totalSold    Float         @default(0)
+  totalEarning Float         @default(0)
+  pendingOrder Float         @default(0)
+  isDeleted    Boolean       @default(false)
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+  invoiceItems InvoiceItem[]
 
   @@unique([businessId, name])
 }
