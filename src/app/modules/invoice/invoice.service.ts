@@ -2,25 +2,33 @@ import { JwtPayload } from "jsonwebtoken";
 import { prisma } from "../../../lib/prisma";
 import AppError from "../../errorHelpers/AppError";
 import { HttpStatusCodes } from "../../utils/httpStatusCodes";
-import { generateInvoiceNumber } from "../../utils/generateInvRcNb";
+import {
+  generateInvoiceNumber,
+  generateReceiptNumber,
+} from "../../utils/generateInvRcNb";
 import { IItems } from "./invoice.interface";
 import { randomUUID } from "crypto";
 import { InvoiceStatus, Prisma } from "@prisma/client";
+import { generateRcpPdf } from "../../utils/rcpPdf";
+import { uploadBufferToCloudinary } from "../../config/cloudinary.config";
+import { sendEmail } from "../../utils/sendEmail";
+import { formatDateTime } from "../../utils/formatDT";
 
 const createInvoice = async (
   decodedToken: JwtPayload,
   email: string,
   dueDays: number,
+  method: "ONLINE" | "CASH",
   items: IItems[],
   taxRate: number,
   notes?: string,
 ) => {
   const userId = decodedToken.userId;
 
+  // ── Common setup ───────────────────────────────────────────────────────────
   const isOwner = await prisma.businessUser.findFirst({
     where: { userId, business: { isDeleted: false } },
   });
-
   if (!isOwner) {
     throw new AppError(
       HttpStatusCodes.NOT_FOUND,
@@ -28,86 +36,201 @@ const createInvoice = async (
     );
   }
 
-  const client = await prisma.businessClient.findFirst({
+  const businessClient = await prisma.businessClient.findFirst({
     where: {
-      business: {
-        id: isOwner.businessId,
-      },
-      client: {
-        email: email,
-      },
+      business: { id: isOwner.businessId },
+      client: { email },
     },
-    select: {
-      clientId: true,
-    },
+    select: { clientId: true },
   });
-
-  if (!client) {
+  if (!businessClient) {
     throw new AppError(HttpStatusCodes.NOT_FOUND, "Client not found");
   }
 
   const invNb = await generateInvoiceNumber(isOwner.businessId);
-
   dueDays = Number.isNaN(dueDays) ? 3 : dueDays;
-
-  const subtotal = items.reduce((sum, item) => {
-    return sum + Number(item.pricePerUnit) * Number(item.quantity);
-  }, 0);
-
+  const subtotal = items.reduce(
+    (sum, item) => sum + Number(item.pricePerUnit) * Number(item.quantity),
+    0,
+  );
   taxRate = Number.isNaN(taxRate) ? 0 : taxRate / 100;
-
   const tax = subtotal * taxRate;
-
   const total = subtotal + tax;
+  const totalItems = items.reduce((sum, item) => sum + item.quantity, 0);
 
-  let totalItems = 0;
+  // ── ONLINE: existing flow, return early ───────────────────────────────────
+  if (method === "ONLINE") {
+    const invoice = await prisma.$transaction(async (tx) => {
+      const invoice = await tx.invoice.create({
+        data: {
+          businessId: isOwner.businessId,
+          clientId: businessClient.clientId,
+          createdById: isOwner.userId,
+          invoiceNumber: invNb,
+          dueDays,
+          subtotal,
+          totalItems,
+          tax,
+          total,
+          notes,
+        },
+      });
 
-  items.map((item) => {
-    totalItems += item.quantity;
-  });
+      await tx.invoiceItem.createMany({
+        data: items.map((item) => ({
+          invoiceId: invoice.id,
+          name: item.name,
+          productId: item.productId,
+          quantity: item.quantity,
+          pricePerUnit: item.pricePerUnit,
+          total: item.pricePerUnit * item.quantity,
+        })),
+      });
 
-  const result = await prisma.$transaction(async (tx) => {
-    const invoice = await tx.invoice.create({
-      data: {
-        businessId: isOwner.businessId,
-        clientId: client.clientId,
-        createdById: isOwner.userId,
-        invoiceNumber: invNb,
-        dueDays: dueDays,
-        subtotal: subtotal,
-        totalItems: totalItems,
-        tax: tax,
-        total: total,
-        notes: notes,
-      },
-    });
+      await tx.payment.create({
+        data: {
+          invoiceId: invoice.id,
+          tran_id: `TXN_${randomUUID()}`,
+          amount: total,
+          currency: invoice.currency,
+          method: "ONLINE",
+          status: "PENDING",
+        },
+      });
 
-    await tx.invoiceItem.createMany({
-      data: items.map((item) => ({
-        invoiceId: invoice.id,
-        name: item.name,
-        productId: item.productId,
-        quantity: item.quantity,
-        pricePerUnit: item.pricePerUnit,
-        total: item.pricePerUnit * item.quantity,
-      })),
-    });
-
-    const transactionId = `TXN_${randomUUID()}`;
-
-    await tx.payment.create({
-      data: {
-        invoiceId: invoice.id,
-        tran_id: transactionId,
-        amount: invoice.total,
-        currency: invoice.currency,
-      },
+      return invoice;
     });
 
     return invoice;
+  }
+
+  // ── CASH: mark paid, skip invoice PDF, send receipt directly ──────────────
+  const { invoice, payment, client, business } = await prisma.$transaction(
+    async (tx) => {
+      const rcpNb = await generateReceiptNumber(isOwner.businessId);
+
+      const invoice = await tx.invoice.create({
+        data: {
+          businessId: isOwner.businessId,
+          clientId: businessClient.clientId,
+          createdById: isOwner.userId,
+          invoiceNumber: invNb,
+          dueDays,
+          subtotal,
+          totalItems,
+          tax,
+          total,
+          notes,
+          status: "PAID",
+          issueDate: new Date(),
+          dueDate: new Date(Date.now() + dueDays * 24 * 60 * 60 * 1000),
+        },
+      });
+
+      await tx.invoiceItem.createMany({
+        data: items.map((item) => ({
+          invoiceId: invoice.id,
+          name: item.name,
+          productId: item.productId,
+          quantity: item.quantity,
+          pricePerUnit: item.pricePerUnit,
+          total: item.pricePerUnit * item.quantity,
+        })),
+      });
+
+      const payment = await tx.payment.create({
+        data: {
+          invoiceId: invoice.id,
+          tran_id: `TXN_${randomUUID()}`,
+          amount: total,
+          currency: invoice.currency,
+          method: "CASH",
+          status: "SUCCESS",
+          rcpNumber: rcpNb,
+        },
+      });
+
+      // Update product totals
+      await Promise.all(
+        items.map((item) =>
+          tx.product.update({
+            where: { id: item.productId },
+            data: {
+              totalSold: { increment: item.quantity },
+              totalEarning: { increment: item.pricePerUnit * item.quantity },
+            },
+          }),
+        ),
+      );
+
+      await tx.client.update({
+        where: { id: businessClient.clientId },
+        data: { totalInvoices: { increment: 1 } },
+      });
+
+      const [client, business] = await Promise.all([
+        tx.client.findUnique({ where: { id: businessClient.clientId } }),
+        tx.business.findUnique({ where: { id: isOwner.businessId } }),
+      ]);
+
+      if (!client)
+        throw new AppError(HttpStatusCodes.NOT_FOUND, "Client not found");
+      if (!business)
+        throw new AppError(HttpStatusCodes.NOT_FOUND, "Business not found");
+
+      return { invoice, payment, client, business };
+    },
+  );
+
+  // No invoice PDF — go straight to receipt
+  const rcpPdf = await generateRcpPdf(invoice);
+  if (!rcpPdf) {
+    throw new AppError(
+      HttpStatusCodes.BAD_REQUEST,
+      "Failed to create receipt PDF",
+    );
+  }
+
+  const cloudinaryResult = await uploadBufferToCloudinary(rcpPdf, "receipt");
+  if (!cloudinaryResult) {
+    throw new AppError(
+      HttpStatusCodes.BAD_REQUEST,
+      "Failed to upload receipt PDF to Cloudinary",
+    );
+  }
+
+  await prisma.payment.update({
+    where: { id: payment.id },
+    data: { rcpPdfUrl: cloudinaryResult.secure_url },
   });
 
-  return result;
+  await sendEmail({
+    to: client.email,
+    subject: "Receipt",
+    templateName: "receipt",
+    templateData: {
+      clientName: client.name,
+      receiptNumber: payment.rcpNumber,
+      invoiceNumber: invoice.invoiceNumber,
+      paymentDate: formatDateTime(new Date()),
+      paymentMethod: "Cash",
+      transactionId: payment.tran_id,
+      currency: payment.currency,
+      amount: payment.amount,
+      receiptPdfLink: cloudinaryResult.secure_url,
+      businessEmail: business.email,
+      businessName: business.name,
+    },
+    attachments: [
+      {
+        fileName: `Receipt-${payment.rcpNumber}`,
+        content: rcpPdf,
+        contentType: "application/pdf",
+      },
+    ],
+  });
+
+  return invoice;
 };
 
 const getAllInvoices = async (

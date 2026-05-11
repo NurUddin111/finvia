@@ -11,71 +11,58 @@ import { ISSLCommerz } from "../sslCommerz/ssl.interface";
 import { SSLService } from "../sslCommerz/ssl.service";
 
 const initPayment = async (invId: string) => {
+  // ── 1. Atomic DB writes ────────────────────────────────────────────────────
   const result = await prisma.$transaction(async (tx) => {
-    let invoice = await tx.invoice.findFirst({
-      where: {
-        id: invId,
-        status: {
-          not: "PAID",
-        },
-      },
+    const invoice = await tx.invoice.findFirst({
+      where: { id: invId },
     });
 
     if (!invoice) {
-      throw new AppError(HttpStatusCodes.BAD_REQUEST, "This invoice is PAID!");
+      throw new AppError(HttpStatusCodes.NOT_FOUND, "Invoice not found");
+    }
+
+    // More precise status guard — not just "not PAID"
+    if (invoice.status === "PAID") {
+      throw new AppError(
+        HttpStatusCodes.BAD_REQUEST,
+        "This invoice is already paid",
+      );
+    }
+    if (invoice.status === "CANCELLED") {
+      throw new AppError(
+        HttpStatusCodes.BAD_REQUEST,
+        "This invoice has been cancelled",
+      );
     }
 
     const dueDate = new Date(
       Date.now() + invoice.dueDays * 24 * 60 * 60 * 1000,
     );
 
-    invoice = await tx.invoice.update({
-      where: {
-        id: invId,
-      },
-      data: {
-        status: "SENT",
-        issueDate: new Date(Date.now()),
-        dueDate: dueDate,
-      },
-    });
-
-    let client = await tx.client.findUnique({
-      where: { id: invoice.clientId },
-    });
+    // Run independent lookups in parallel
+    const [updatedInvoice, client, business, payment] = await Promise.all([
+      tx.invoice.update({
+        where: { id: invId },
+        data: {
+          status: "SENT",
+          issueDate: new Date(),
+          dueDate,
+        },
+      }),
+      tx.client.findUnique({ where: { id: invoice.clientId } }),
+      tx.business.findUnique({ where: { id: invoice.businessId } }),
+      tx.payment.findFirst({ where: { invoiceId: invoice.id } }),
+    ]);
 
     if (!client) {
       throw new AppError(HttpStatusCodes.NOT_FOUND, "Client not found");
     }
-
-    client = await tx.client.update({
-      where: {
-        id: client.id,
-      },
-      data: {
-        totalInvoices: client.totalInvoices + 1,
-      },
-    });
-
-    const business = await tx.business.findUnique({
-      where: {
-        id: invoice.businessId,
-      },
-    });
-
     if (!business) {
       throw new AppError(
         HttpStatusCodes.NOT_FOUND,
         "Business details not found",
       );
     }
-
-    let payment = await tx.payment.findFirst({
-      where: {
-        invoiceId: invoice.id,
-      },
-    });
-
     if (!payment) {
       throw new AppError(
         HttpStatusCodes.NOT_FOUND,
@@ -83,44 +70,50 @@ const initPayment = async (invId: string) => {
       );
     }
 
-    payment = await tx.payment.update({
-      where: { id: payment.id },
-      data: {
-        status: "INITIATED",
-      },
-    });
+    // Run independent writes in parallel
+    const [updatedClient, updatedPayment] = await Promise.all([
+      tx.client.update({
+        where: { id: client.id },
+        data: { totalInvoices: { increment: 1 } }, // safer than client.totalInvoices + 1
+      }),
+      tx.payment.update({
+        where: { id: payment.id },
+        data: {
+          status: "INITIATED",
+          method: "ONLINE", // ← new field
+          provider: "SSLCOMMERZ", // ← now set here, not at creation
+        },
+      }),
+    ]);
 
-    return { invoice, client, business, payment };
+    return {
+      invoice: updatedInvoice,
+      client: updatedClient,
+      business,
+      payment: updatedPayment,
+    };
   });
 
   const { invoice, client, business, payment } = result;
 
+  // ── 2. Generate & upload invoice PDF ──────────────────────────────────────
   const invPdf = await generateInvPdf(invoice);
-
   if (!invPdf) {
     throw new AppError(
       HttpStatusCodes.BAD_REQUEST,
-      "Failed to create Invoice PDF",
+      "Failed to create invoice PDF",
     );
   }
 
   const cloudinaryResult = await uploadBufferToCloudinary(invPdf, "invoice");
-
   if (!cloudinaryResult) {
     throw new AppError(
       HttpStatusCodes.BAD_REQUEST,
-      "Failed to upload invoice pdf at cloudinary",
+      "Failed to upload invoice PDF to Cloudinary",
     );
   }
 
-  await prisma.invoice.update({
-    where: {
-      id: invId,
-    },
-    data: {
-      invPdfUrl: cloudinaryResult.secure_url,
-    },
-  });
+  // ── 3. Initiate SSL payment ────────────────────────────────────────────────
 
   const sslPayload: ISSLCommerz = {
     address: client.address || "Bangladesh",
@@ -133,6 +126,23 @@ const initPayment = async (invId: string) => {
 
   const sslPayment = await SSLService.sslPaymentInit(sslPayload);
 
+  // ── 4. Persist URLs (non-critical, outside transaction) ───────────────────
+  await Promise.all([
+    prisma.invoice.update({
+      where: { id: invId },
+      data: { invPdfUrl: cloudinaryResult.secure_url },
+    }),
+    prisma.payment.update({
+      where: { id: payment.id },
+      data: {
+        metadata: {
+          gatewayPageURL: sslPayment.GatewayPageURL,
+        },
+      },
+    }),
+  ]);
+
+  // ── 5. Send invoice email ──────────────────────────────────────────────────
   await sendEmail({
     to: client.email,
     subject: "Invoice",
@@ -158,11 +168,9 @@ const initPayment = async (invId: string) => {
     ],
   });
 
-  console.log(sslPayment);
-
   return {
-    CloudinaryResult: cloudinaryResult.secure_url,
-    SSLCOMMERZ: sslPayment.GatewayPageURL,
+    invPdfUrl: cloudinaryResult.secure_url,
+    gatewayPageURL: sslPayment.GatewayPageURL,
   };
 };
 
@@ -389,9 +397,46 @@ const cancelPayment = async (query: Record<string, string>) => {
   return { success: false, message: "Payment Failed" };
 };
 
+const getPaymentMethodStats = async (userId: string) => {
+  const isOwner = await prisma.businessUser.findFirst({
+    where: { userId, business: { isDeleted: false } },
+  });
+
+  if (!isOwner) {
+    throw new AppError(
+      HttpStatusCodes.NOT_FOUND,
+      "You do not belong to any business",
+    );
+  }
+
+  const where = {
+    invoice: { businessId: isOwner.businessId },
+    status: "SUCCESS" as const,
+  };
+
+  const [online, cash] = await Promise.all([
+    prisma.payment.count({ where: { ...where, method: "ONLINE" } }),
+    prisma.payment.count({ where: { ...where, method: "CASH" } }),
+  ]);
+
+  const total = online + cash;
+
+  return {
+    online: total ? Math.round((online / total) * 100) : 0,
+    cash: total ? Math.round((cash / total) * 100) : 0,
+    total,
+  };
+};
+
+const updatePaymentMethod = async () => {
+  await prisma.payment.updateMany({ data: { method: "ONLINE" } });
+};
+
 export const PaymentServices = {
   initPayment,
   successPayment,
   failPayment,
   cancelPayment,
+  updatePaymentMethod,
+  getPaymentMethodStats,
 };
