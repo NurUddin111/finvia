@@ -5,6 +5,7 @@ import { sendResponse } from "../../utils/sendResponse";
 import { HttpStatusCodes } from "../../utils/httpStatusCodes";
 import { PaymentServices } from "./payment.service";
 import { envVars } from "../../config/env";
+import { JwtPayload } from "jsonwebtoken";
 
 const initPayment = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
@@ -63,9 +64,25 @@ const cancelPayment = catchAsync(async (req: Request, res: Response) => {
   }
 });
 
+const getPaymentMethodStats = catchAsync(
+  async (req: Request, res: Response, next: NextFunction) => {
+    const user = req.user as JwtPayload;
+    const userId = user.userId;
+    const result = await PaymentServices.getPaymentMethodStats(userId);
+
+    sendResponse(res, {
+      statusCode: 200,
+      success: true,
+      message: "Payment method stats fetched successfully!",
+      data: result,
+    });
+  },
+);
+
 export const PaymentController = {
   initPayment,
   successPayment,
   failPayment,
   cancelPayment,
+  getPaymentMethodStats,
 };

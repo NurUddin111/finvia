@@ -221,8 +221,8 @@ model Payment {
   id        String          @id @default(uuid())
   invoice   Invoice         @relation(fields: [invoiceId], references: [id])
   invoiceId String
-  method    PaymentMethod?
-  provider  PaymentGateway? @default(SSLCOMMERZ)
+  method    PaymentMethod
+  provider  PaymentGateway?
   tran_id   String
   amount    Float
   currency  String

@@ -13,12 +13,14 @@ const createInvoice = catchAsync(
     const {
       email,
       dueDays,
+      method,
       items,
       taxRate,
       notes,
     }: {
       email: string;
       dueDays: number;
+      method: "ONLINE" | "CASH";
       items: IItems[];
       taxRate: number;
       notes?: string;
@@ -28,6 +30,7 @@ const createInvoice = catchAsync(
       decodedToken,
       email,
       Number(dueDays),
+      method,
       items,
       Number(taxRate),
       notes,
