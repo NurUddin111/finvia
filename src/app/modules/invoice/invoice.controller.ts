@@ -56,7 +56,7 @@ const getAllInvoices = catchAsync(
       status: req.query.status as string | undefined,
       sortBy: req.query.sortBy as string | undefined,
       order: req.query.order as string | undefined,
-      year: req.query.year as string | undefined, // ← new
+      year: req.query.year as string | undefined,
     };
 
     const invoices = await InvoiceServices.getAllInvoices(userId, query);

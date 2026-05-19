@@ -8,7 +8,7 @@ import { HttpStatusCodes } from "./httpStatusCodes";
 import { formatDateTime } from "./formatDT";
 
 export const generateInvPdf = async (
-  invoice: Invoice
+  invoice: Invoice,
 ): Promise<Buffer<ArrayBufferLike>> => {
   const business = await prisma.business.findFirst({
     where: { id: invoice.businessId },
@@ -17,7 +17,7 @@ export const generateInvPdf = async (
   if (!business) {
     throw new AppError(
       HttpStatusCodes.NOT_FOUND,
-      "Business details not found!"
+      "Business details not found!",
     );
   }
 
@@ -110,17 +110,17 @@ export const generateInvPdf = async (
           .font("Helvetica")
           .fontSize(10)
           .text(
-            `Issue Date: ${new Date(invoice.issueDate).toLocaleDateString(
-              "en-GB"
-            )}`,
+            `Issue Date: ${new Date(
+              invoice.issueDate as Date,
+            ).toLocaleDateString("en-GB")}`,
             456,
-            70
+            70,
           );
 
         doc.text(
-          `Due Date: ${new Date(invoice.dueDate).toLocaleDateString("en-GB")}`,
+          `Due Date: ${new Date(invoice.dueDate as Date).toLocaleDateString("en-GB")}`,
           456,
-          85
+          85,
         );
       }
 
@@ -185,7 +185,7 @@ export const generateInvPdf = async (
       headerY = doc.y;
 
       doc.text(`Tax:`, summaryX, headerY);
-      doc.text(formatBDT(invoice.tax), 450, headerY);
+      doc.text(formatBDT(invoice.tax as number), 450, headerY);
 
       doc.moveDown(0.5);
       headerY = doc.y;

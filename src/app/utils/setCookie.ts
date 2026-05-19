@@ -1,4 +1,4 @@
-import { Request, Response } from "express";
+import { CookieOptions, Request, Response } from "express";
 import { envVars } from "../config/env";
 
 export interface IAuthTokens {
@@ -11,76 +11,95 @@ export interface IAuthTokens {
   blockedToken?: string;
 }
 
-export const clearAllCookies = (req: Request, res: Response, options = {}) => {
-  const defaultOptions = {
-    httpOnly: true,
-    secure: false,
-  };
+const baseCookieOptions: CookieOptions = {
+  httpOnly: true,
+  secure: envVars.NODE_ENV === "production",
+  sameSite: envVars.NODE_ENV === "production" ? "none" : "lax",
+  path: "/",
+};
 
-  const finalOptions = { ...defaultOptions, ...options };
+export const authCookies = [
+  "creationToken",
+  "verifiedCreationToken",
+  "accessToken",
+  "refreshToken",
+  "forgotPassToken",
+  "inActiveToken",
+  "blockedToken",
+];
 
-  Object.keys(req.cookies || {}).forEach((cookieName) => {
-    res.clearCookie(cookieName, { ...finalOptions, sameSite: "lax" });
+export const clearAuthCookies = (
+  res: Response,
+  cookies: string[] = authCookies,
+) => {
+  cookies.forEach((cookieName) => {
+    res.clearCookie(cookieName, baseCookieOptions);
   });
 };
 
 export const setAuthCookie = (
   req: Request,
   res: Response,
-  tokenInfo: IAuthTokens
+  tokenInfo: IAuthTokens,
 ) => {
   if (tokenInfo.creationToken) {
-    clearAllCookies(req, res);
+    clearAuthCookies(res, ["creationToken"]);
+
     res.cookie("creationToken", tokenInfo.creationToken, {
-      httpOnly: true,
-      secure: envVars.NODE_ENV === "production" ? true : false,
-      sameSite: envVars.NODE_ENV === "production" ? "none" : "lax",
+      ...baseCookieOptions,
       maxAge: 2 * 60 * 1000,
     });
   }
 
   if (tokenInfo.verifiedCreationToken) {
-    clearAllCookies(req, res);
+    clearAuthCookies(res, ["creationToken", "verifiedCreationToken"]);
+
     res.cookie("verifiedCreationToken", tokenInfo.verifiedCreationToken, {
-      httpOnly: true,
-      secure: envVars.NODE_ENV === "production" ? true : false,
-      sameSite: envVars.NODE_ENV === "production" ? "none" : "lax",
+      ...baseCookieOptions,
       maxAge: 10 * 60 * 1000,
     });
   }
 
   if (tokenInfo.accessToken) {
-    clearAllCookies(req, res);
+    clearAuthCookies(res, ["accessToken", "inActiveToken", "blockedToken"]);
+
     res.cookie("accessToken", tokenInfo.accessToken, {
-      httpOnly: true,
-      secure: envVars.NODE_ENV === "production" ? true : false,
-      sameSite: envVars.NODE_ENV === "production" ? "none" : "lax",
+      ...baseCookieOptions,
       maxAge: 24 * 60 * 60 * 1000,
     });
   }
 
   if (tokenInfo.refreshToken) {
+    clearAuthCookies(res, ["refreshToken"]);
+
     res.cookie("refreshToken", tokenInfo.refreshToken, {
-      httpOnly: true,
-      secure: envVars.NODE_ENV === "production" ? true : false,
-      sameSite: envVars.NODE_ENV === "production" ? "none" : "lax",
+      ...baseCookieOptions,
       maxAge: 30 * 24 * 60 * 60 * 1000,
     });
   }
 
+  if (tokenInfo.forgotPassToken) {
+    clearAuthCookies(res, ["forgotPassToken"]);
+
+    res.cookie("forgotPassToken", tokenInfo.forgotPassToken, {
+      ...baseCookieOptions,
+      maxAge: 10 * 60 * 1000,
+    });
+  }
+
   if (tokenInfo.inActiveToken) {
+    clearAuthCookies(res, ["inActiveToken"]);
+
     res.cookie("inActiveToken", tokenInfo.inActiveToken, {
-      httpOnly: true,
-      secure: envVars.NODE_ENV === "production" ? true : false,
-      sameSite: envVars.NODE_ENV === "production" ? "none" : "lax",
+      ...baseCookieOptions,
     });
   }
 
   if (tokenInfo.blockedToken) {
+    clearAuthCookies(res, ["blockedToken"]);
+
     res.cookie("blockedToken", tokenInfo.blockedToken, {
-      httpOnly: true,
-      secure: envVars.NODE_ENV === "production" ? true : false,
-      sameSite: envVars.NODE_ENV === "production" ? "none" : "lax",
+      ...baseCookieOptions,
     });
   }
 };

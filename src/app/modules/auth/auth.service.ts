@@ -21,7 +21,7 @@ const createUserRequest = async (
   req: Request,
   res: Response,
   name: string,
-  email: string
+  email: string,
 ) => {
   if (!name) {
     throw new AppError(HttpStatusCodes.BAD_REQUEST, "Please Enter Your Name");
@@ -30,7 +30,7 @@ const createUserRequest = async (
   if (!email) {
     throw new AppError(
       HttpStatusCodes.BAD_REQUEST,
-      "Please enter a valid email address!"
+      "Please enter a valid email address!",
     );
   }
 
@@ -61,13 +61,13 @@ const createUserRequest = async (
   const creationToken = generateToken(
     jwtPayload,
     envVars.JWT_CREATION_SECRET,
-    envVars.JWT_CREATION_EXPIRES
+    envVars.JWT_CREATION_EXPIRES,
   );
 
   if (!creationToken) {
     throw new AppError(
       HttpStatusCodes.INTERNAL_SERVER_ERROR,
-      "Failed to create CREATION_TOKEN"
+      "Failed to create CREATION_TOKEN",
     );
   }
 
@@ -78,18 +78,18 @@ const createUserVerification = async (
   req: Request,
   res: Response,
   creationToken: string,
-  otp: string
+  otp: string,
 ) => {
   if (!creationToken) {
     throw new AppError(
       HttpStatusCodes.UNAUTHORIZED,
-      "No CREATION_TOKEN recieved"
+      "No CREATION_TOKEN recieved",
     );
   }
 
   const verifiedToken = verifyToken(
     creationToken,
-    envVars.JWT_CREATION_SECRET
+    envVars.JWT_CREATION_SECRET,
   ) as JwtPayload;
 
   const { name, email } = verifiedToken;
@@ -97,11 +97,9 @@ const createUserVerification = async (
   if (!name || !email) {
     throw new AppError(
       HttpStatusCodes.INTERNAL_SERVER_ERROR,
-      "Failed to decode Name and Email from CREATION_TOKEN"
+      "Failed to decode Name and Email from CREATION_TOKEN",
     );
   }
-
-  console.log(email,otp)
 
   await OTPServices.verifyOTP(email, otp);
 
@@ -113,13 +111,13 @@ const createUserVerification = async (
   const verifiedCreationToken = generateToken(
     jwtPayload,
     envVars.JWT_VERIFIED_CREATION_SECRET,
-    envVars.JWT_VERIFIED_CREATION_EXPIRES
+    envVars.JWT_VERIFIED_CREATION_EXPIRES,
   );
 
   if (!verifiedCreationToken) {
     throw new AppError(
       HttpStatusCodes.INTERNAL_SERVER_ERROR,
-      "Failed to create VERIFIED_CREATION_TOKEN"
+      "Failed to create VERIFIED_CREATION_TOKEN",
     );
   }
 
@@ -129,18 +127,18 @@ const createUserVerification = async (
 const createUserSuccess = async (
   res: Response,
   verifiedCreationToken: string,
-  payload: Partial<User>
+  payload: Partial<User>,
 ) => {
   if (!verifiedCreationToken) {
     throw new AppError(
       HttpStatusCodes.UNAUTHORIZED,
-      "No VERIFIED_CREATION_TOKEN received.Please verify your email first!"
+      "No VERIFIED_CREATION_TOKEN received.Please verify your email first!",
     );
   }
 
   const verifiedToken = verifyToken(
     verifiedCreationToken,
-    envVars.JWT_VERIFIED_CREATION_SECRET
+    envVars.JWT_VERIFIED_CREATION_SECRET,
   ) as JwtPayload;
 
   const { name, email } = verifiedToken;
@@ -148,7 +146,7 @@ const createUserSuccess = async (
   if (!name || !email) {
     throw new AppError(
       HttpStatusCodes.INTERNAL_SERVER_ERROR,
-      "Failed to decode Name and Email from VERIFIED_CREATION_TOKEN"
+      "Failed to decode Name and Email from VERIFIED_CREATION_TOKEN",
     );
   }
   const { password } = payload;
@@ -156,13 +154,13 @@ const createUserSuccess = async (
   if (!password) {
     throw new AppError(
       HttpStatusCodes.INTERNAL_SERVER_ERROR,
-      "Plase set a password"
+      "Plase set a password",
     );
   }
 
   const hashedPassword = await bcrypt.hash(
     password as string,
-    Number(envVars.BCRYPT_SALT_ROUND)
+    Number(envVars.BCRYPT_SALT_ROUND),
   );
 
   const authProvider: IAuthProvider = {
@@ -198,9 +196,8 @@ const createUserSuccess = async (
 };
 
 const getNewAccessToken = async (refreshToken: string) => {
-  const newAccessToken = await createNewAccessTokenWithRefreshToken(
-    refreshToken
-  );
+  const newAccessToken =
+    await createNewAccessTokenWithRefreshToken(refreshToken);
 
   return {
     accessToken: newAccessToken,
@@ -212,7 +209,7 @@ const changePassword = async (
   oldPass: string,
   newPass: string,
   confirmNewPass: string,
-  decodedToken: JwtPayload
+  decodedToken: JwtPayload,
 ) => {
   const userId = decodedToken.userId;
 
@@ -229,60 +226,60 @@ const changePassword = async (
   if (!user.password) {
     throw new AppError(
       HttpStatusCodes.BAD_REQUEST,
-      "User don't have a password.Please set a password first."
+      "User don't have a password.Please set a password first.",
     );
   }
 
   if (!oldPass) {
     throw new AppError(
       HttpStatusCodes.BAD_REQUEST,
-      "Please provide current password."
+      "Please provide current password.",
     );
   }
 
   if (!newPass) {
     throw new AppError(
       HttpStatusCodes.BAD_REQUEST,
-      "Please provide a new password."
+      "Please provide a new password.",
     );
   }
 
   if (!confirmNewPass) {
     throw new AppError(
       HttpStatusCodes.BAD_REQUEST,
-      "Please provide confirmed password."
+      "Please provide confirmed password.",
     );
   }
 
   const oldPassMatching = await bcrypt.compare(
     oldPass,
-    user.password as string
+    user.password as string,
   );
 
   if (!oldPassMatching) {
     throw new AppError(
       HttpStatusCodes.UNAUTHORIZED,
-      "Old Password does not match"
+      "Old Password does not match",
     );
   }
 
   if (oldPass === newPass) {
     throw new AppError(
       HttpStatusCodes.BAD_REQUEST,
-      "Please set a new password!"
+      "Please set a new password!",
     );
   }
 
   if (newPass !== confirmNewPass) {
     throw new AppError(
       HttpStatusCodes.BAD_REQUEST,
-      "New password and confirmation do not match."
+      "New password and confirmation do not match.",
     );
   }
 
   const hashedPassword = await bcrypt.hash(
     newPass,
-    Number(envVars.BCRYPT_SALT_ROUND)
+    Number(envVars.BCRYPT_SALT_ROUND),
   );
 
   await prisma.user.update({
@@ -297,12 +294,12 @@ const forgotPassword = async (req: Request, res: Response, email: string) => {
   if (accessToken) {
     const verifiedAccessToken = verifyToken(
       accessToken,
-      envVars.JWT_ACCESS_SECRET
+      envVars.JWT_ACCESS_SECRET,
     ) as JwtPayload;
     if (verifiedAccessToken) {
       throw new AppError(
         HttpStatusCodes.UNAUTHORIZED,
-        "A logged in user can't request for forget password.You can request for change password."
+        "A logged in user can't request for forget password.You can request for change password.",
       );
     }
   }
@@ -323,7 +320,7 @@ const forgotPassword = async (req: Request, res: Response, email: string) => {
   if (!user.password) {
     throw new AppError(
       HttpStatusCodes.BAD_REQUEST,
-      "You didn't set any password previously."
+      "You didn't set any password previously.",
     );
   }
 
@@ -336,7 +333,7 @@ const forgotPassword = async (req: Request, res: Response, email: string) => {
   const resetToken = generateToken(
     jwtPayload,
     envVars.JWT_ACCESS_SECRET,
-    "10m"
+    "10m",
   );
 
   const resetUILink = `${envVars.FRONTEND_URL}/reset-password?id=${user.id}&token=${resetToken}`;
@@ -357,17 +354,17 @@ const resetPassword = async (
   userId: string,
   forgotPassToken: string,
   newPass: string,
-  confirmNewPass: string
+  confirmNewPass: string,
 ) => {
   if (forgotPassToken) {
     const verifiedAccessToken = verifyToken(
       forgotPassToken,
-      envVars.JWT_ACCESS_SECRET
+      envVars.JWT_ACCESS_SECRET,
     ) as JwtPayload;
     if (!verifiedAccessToken) {
       throw new AppError(
         HttpStatusCodes.UNAUTHORIZED,
-        "Forgot password token is expired.Please Request again."
+        "Forgot password token is expired.Please Request again.",
       );
     }
   }
@@ -385,27 +382,27 @@ const resetPassword = async (
   if (!newPass) {
     throw new AppError(
       HttpStatusCodes.BAD_REQUEST,
-      "Please provide a new password."
+      "Please provide a new password.",
     );
   }
 
   if (!confirmNewPass) {
     throw new AppError(
       HttpStatusCodes.BAD_REQUEST,
-      "Please provide confirmed password."
+      "Please provide confirmed password.",
     );
   }
 
   if (newPass !== confirmNewPass) {
     throw new AppError(
       HttpStatusCodes.BAD_REQUEST,
-      "New password and confirmation does not match."
+      "New password and confirmation does not match.",
     );
   }
 
   const hashedPassword = await bcrypt.hash(
     newPass,
-    Number(envVars.BCRYPT_SALT_ROUND)
+    Number(envVars.BCRYPT_SALT_ROUND),
   );
 
   await prisma.user.update({
@@ -418,7 +415,7 @@ const addFinviaAdmin = async (
   name: string,
   email: string,
   role: string,
-  decodedToken: JwtPayload
+  decodedToken: JwtPayload,
 ) => {
   const userId = decodedToken.userId;
 
@@ -441,7 +438,7 @@ const addFinviaAdmin = async (
   if (newAdminCheck) {
     throw new AppError(
       HttpStatusCodes.NOT_FOUND,
-      `A ${newAdminCheck.role} can't be added as an Admin of Finvia`
+      `A ${newAdminCheck.role} can't be added as an Admin of Finvia`,
     );
   }
 
@@ -453,7 +450,7 @@ const addFinviaAdmin = async (
   const invitationToken = generateToken(
     payload,
     envVars.JWT_INVITATION_SECRET,
-    envVars.JWT_INVITATION_EXPIRES
+    envVars.JWT_INVITATION_EXPIRES,
   );
 
   const inviteLink = `${envVars.FRONTEND_URL}?token=${invitationToken}`;
@@ -476,17 +473,17 @@ const joinFinvia = async (
   req: Request,
   res: Response,
   decodedToken: JwtPayload,
-  invitationToken: string
+  invitationToken: string,
 ) => {
   const verifiedInvToken = verifyToken(
     invitationToken,
-    envVars.JWT_INVITATION_SECRET
+    envVars.JWT_INVITATION_SECRET,
   ) as JwtPayload;
 
   if (!verifiedInvToken) {
     throw new AppError(
       HttpStatusCodes.BAD_REQUEST,
-      "Invitation link has expired!"
+      "Invitation link has expired!",
     );
   }
 
@@ -496,7 +493,7 @@ const joinFinvia = async (
   if (userEmail !== invitationReceiver) {
     throw new AppError(
       HttpStatusCodes.UNAUTHORIZED,
-      "You're not the user who was invited to join!"
+      "You're not the user who was invited to join!",
     );
   }
 
