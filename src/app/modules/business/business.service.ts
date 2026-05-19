@@ -440,10 +440,12 @@ const getKPICardDetails = async (userId: string) => {
 
     totalRevenue += inv.subtotal;
 
-    if (inv.issueDate >= startOfThisMonth) {
-      thisMonthRevenue += inv.subtotal;
-    } else if (inv.issueDate >= startOfLastMonth) {
-      lastMonthRevenue += inv.subtotal;
+    if (inv.issueDate) {
+      if (inv.issueDate >= startOfThisMonth) {
+        thisMonthRevenue += inv.subtotal;
+      } else if (inv.issueDate >= startOfLastMonth) {
+        lastMonthRevenue += inv.subtotal;
+      }
     }
   }
 
@@ -532,11 +534,13 @@ const getMonthlyRevenue = async (userId: string) => {
   });
 
   allInvoices.forEach((inv) => {
-    const monthIndex = inv.issueDate.getMonth();
-    const monthName = months[monthIndex];
+    if (inv.issueDate) {
+      const monthIndex = inv.issueDate.getMonth();
+      const monthName = months[monthIndex];
 
-    if (monthlyRevenue[monthName] !== undefined) {
-      monthlyRevenue[monthName] += inv.subtotal;
+      if (monthlyRevenue[monthName] !== undefined) {
+        monthlyRevenue[monthName] += inv.subtotal;
+      }
     }
   });
 
@@ -558,6 +562,11 @@ const getTopClients = async (userId: string) => {
   const topClients = await prisma.client.findMany({
     where: {
       isDeleted: false,
+      links: {
+        some: {
+          businessId: business.businessId,
+        },
+      },
     },
     orderBy: {
       totalSpent: "desc",
@@ -593,6 +602,7 @@ const getRecentTransactions = async (userId: string) => {
   const recentTransactions = await prisma.invoice.findMany({
     where: {
       status: { not: "DRAFT" },
+      businessId: business.businessId,
     },
     orderBy: {
       updatedAt: "desc",
@@ -660,9 +670,9 @@ const getOverdueInvoices = async (userId: string) => {
 
   const formattedOverdueInvoices = overDueInvoices.map((tx) => ({
     ...tx,
-    formattedDueDate: formatDateTime(new Date(tx.dueDate)),
+    formattedDueDate: formatDateTime(new Date(tx.dueDate as Date)),
     daysAgo: Math.floor(
-      (new Date().getTime() - new Date(tx.dueDate).getTime()) /
+      (new Date().getTime() - new Date(tx.dueDate as Date).getTime()) /
         (24 * 60 * 60 * 1000),
     ),
   }));
@@ -714,7 +724,7 @@ const getUpcomingOverdueInvoices = async (userId: string) => {
   const formattedUpcomingOverdueInvoices = upcomingOverDueInvoices.map(
     (tx) => ({
       ...tx,
-      formattedDueDate: formatDateTime(new Date(tx.dueDate)),
+      formattedDueDate: formatDateTime(new Date(tx.dueDate as Date)),
     }),
   );
 

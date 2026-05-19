@@ -6,6 +6,7 @@ import { UserRole } from "@prisma/client";
 
 export const seedSuperAdmin = async () => {
   try {
+    // This query acts as your implicit database connection check during startup!
     const isSuperAdminExist = await prisma.user.findUnique({
       where: {
         email: envVars.SUPER_ADMIN_EMAIL,
@@ -13,7 +14,7 @@ export const seedSuperAdmin = async () => {
     });
 
     if (isSuperAdminExist && !isSuperAdminExist.isDeleted) {
-      console.log("Super Admin Already Exists!");
+      console.log("🚀 Super Admin Already Exists!");
       return;
     }
 
@@ -26,7 +27,7 @@ export const seedSuperAdmin = async () => {
           isDeleted: false,
         },
       });
-      console.log("Super Admin Revived!");
+      console.log("🔄 Super Admin Revived!");
       return;
     }
 
@@ -34,7 +35,7 @@ export const seedSuperAdmin = async () => {
 
     const hashedPassword = await bcryptjs.hash(
       envVars.SUPER_ADMIN_PASSWORD,
-      Number(envVars.BCRYPT_SALT_ROUND)
+      Number(envVars.BCRYPT_SALT_ROUND),
     );
 
     const authProvider: IAuthProvider = {
@@ -57,9 +58,10 @@ export const seedSuperAdmin = async () => {
         },
       },
     });
-    console.log("Super Admin Created Successfuly! \n");
+    console.log("✨ Super Admin Created Successfully! \n");
     console.log(superAdmin);
   } catch (error) {
-    console.error(error);
+    console.error("❌ Error running seedSuperAdmin:");
+    throw error;
   }
 };

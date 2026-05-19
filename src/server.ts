@@ -4,35 +4,41 @@ import { errorShutDown, gracefullShutDown } from "./app/utils/shutDown";
 import { envVars } from "./app/config/env";
 import { connectRedis } from "./app/config/redis.config";
 import { seedSuperAdmin } from "./app/utils/seedSuperAdmin";
+import { prisma } from "./lib/prisma";
 
 let server: Server;
-const startServer = async () => {
+
+const bootstrap = async () => {
   try {
+    await prisma.$connect();
+    console.log("💾 Database connection established successfully.");
+
+    await connectRedis();
+    await seedSuperAdmin();
 
     server = app.listen(envVars.PORT, () => {
       console.log(`Server is listening to PORT ${envVars.PORT}`);
     });
   } catch (error) {
-    console.error("Failed to run server. Error:", error);
+    console.error("⛔ Critical startup failure! Shutting down process.");
+    console.error(error);
+    process.exit(1);
   }
 };
 
-(async () => {
-  // await connectRedis();
-  await startServer();
-  await seedSuperAdmin();
-})();
+bootstrap();
 
-// Termination Signals
-
+// Handle graceful terminations
+process.on("SIGINT", () => gracefullShutDown("SIGINT", server));
 process.on("SIGTERM", () => gracefullShutDown("SIGTERM", server));
 
-process.on("SIGINT", () => gracefullShutDown("SIGTERM", server));
+// Handle unrecoverable core syntax or promise bugs
+process.on("unhandledRejection", (reason) => {
+  console.error("🚨 Unhandled Promise Rejection:", reason);
+  errorShutDown("Unhandled Rejection", server);
+});
 
-process.on("unhandledRejection", () =>
-  errorShutDown("Unhandled Rejection", server)
-);
-
-process.on("uncaughtException", () =>
-  errorShutDown("Uncaught Exception", server)
-);
+process.on("uncaughtException", (error) => {
+  console.error("🚨 Uncaught Exceptions:", error);
+  errorShutDown("Uncaught Exception", server);
+});

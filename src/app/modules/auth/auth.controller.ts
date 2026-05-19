@@ -8,7 +8,11 @@ import { HttpStatusCodes } from "../../utils/httpStatusCodes";
 import passport from "passport";
 import AppError from "../../errorHelpers/AppError";
 import { createUserTokens } from "../../utils/userTokens";
-import { clearAllCookies, setAuthCookie } from "../../utils/setCookie";
+import {
+  authCookies,
+  clearAuthCookies,
+  setAuthCookie,
+} from "../../utils/setCookie";
 import { JwtPayload } from "jsonwebtoken";
 import { User } from "@prisma/client";
 
@@ -23,7 +27,7 @@ const createUserRequest = catchAsync(
       message: "OTP sent successfully",
       data: null,
     });
-  }
+  },
 );
 
 const createUserVerification = catchAsync(
@@ -37,7 +41,7 @@ const createUserVerification = catchAsync(
       message: "OTP verified successfully",
       data: null,
     });
-  }
+  },
 );
 
 const createUserSuccess = catchAsync(
@@ -51,7 +55,7 @@ const createUserSuccess = catchAsync(
     const user = await AuthServices.createUserSuccess(
       res,
       verifiedCreationToken,
-      payload
+      payload,
     );
 
     sendResponse(res, {
@@ -60,7 +64,7 @@ const createUserSuccess = catchAsync(
       message: "User created successfully",
       data: user,
     });
-  }
+  },
 );
 
 const credentialsLogin = catchAsync(
@@ -91,7 +95,7 @@ const credentialsLogin = catchAsync(
         },
       });
     })(req, res, next);
-  }
+  },
 );
 
 const getNewAccessToken = catchAsync(
@@ -100,7 +104,7 @@ const getNewAccessToken = catchAsync(
     if (!refreshToken) {
       throw new AppError(
         HttpStatusCodes.BAD_REQUEST,
-        "No refresh token recieved from cookies"
+        "No refresh token recieved from cookies",
       );
     }
 
@@ -114,12 +118,12 @@ const getNewAccessToken = catchAsync(
       message: "New Access Token Retrived Successfully",
       data: tokenInfo,
     });
-  }
+  },
 );
 
 const logout = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
-    clearAllCookies(req, res);
+    clearAuthCookies(res, authCookies);
 
     sendResponse(res, {
       success: true,
@@ -127,7 +131,7 @@ const logout = catchAsync(
       message: "User Logged Out Successfully",
       data: null,
     });
-  }
+  },
 );
 
 const changePassword = catchAsync(
@@ -141,7 +145,7 @@ const changePassword = catchAsync(
       oldPass,
       newPass,
       confirmNewPass,
-      decodedToken
+      decodedToken,
     );
 
     sendResponse(res, {
@@ -150,7 +154,7 @@ const changePassword = catchAsync(
       message: "Password Changed Successfully",
       data: null,
     });
-  }
+  },
 );
 
 const forgotPassword = catchAsync(
@@ -165,7 +169,7 @@ const forgotPassword = catchAsync(
       message: "Email Sent Successfully",
       data: null,
     });
-  }
+  },
 );
 
 const resetPassword = catchAsync(
@@ -178,7 +182,7 @@ const resetPassword = catchAsync(
     if (!userId || !forgotPassToken) {
       throw new AppError(
         HttpStatusCodes.UNAUTHORIZED,
-        "No user id or forgot pass token found from query."
+        "No user id or forgot pass token found from query.",
       );
     }
 
@@ -187,7 +191,7 @@ const resetPassword = catchAsync(
       userId,
       forgotPassToken,
       newPass,
-      confirmNewPass
+      confirmNewPass,
     );
 
     sendResponse(res, {
@@ -196,7 +200,7 @@ const resetPassword = catchAsync(
       message: "Password Changed Successfully.Please login with new password",
       data: null,
     });
-  }
+  },
 );
 
 const addFinviaAdmin = catchAsync(
@@ -213,7 +217,7 @@ const addFinviaAdmin = catchAsync(
       message: "Invitation sent successfully.",
       data: null,
     });
-  }
+  },
 );
 
 const joinFinvia = catchAsync(
@@ -225,7 +229,7 @@ const joinFinvia = catchAsync(
       req,
       res,
       decodedToken,
-      invitationToken
+      invitationToken,
     );
 
     sendResponse(res, {
@@ -234,7 +238,7 @@ const joinFinvia = catchAsync(
       message: "Joined Finvia successfully.",
       data: newAdmin,
     });
-  }
+  },
 );
 
 export const AuthControllers = {
