@@ -5,6 +5,8 @@ import { JwtPayload } from "jsonwebtoken";
 import { sendResponse } from "../../utils/sendResponse";
 import { HttpStatusCodes } from "../../utils/httpStatusCodes";
 import { ClientServices } from "./client.service";
+import { pickQuery } from "../../utils/pickQuery";
+import { QueryFields } from "../../interfaces/constants";
 
 const addClient = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
@@ -28,16 +30,7 @@ const getAllClients = catchAsync(
     const user = req.user as JwtPayload;
     const userId = user.userId;
 
-    // Pull everything from query string
-    // e.g. GET /clients?page=2&search=john&status=ACTIVE&sortBy=name&order=asc
-    const query = {
-      page:    req.query.page    as string | undefined,
-      limit:   req.query.limit   as string | undefined,
-      search:  req.query.search  as string | undefined,
-      status:  req.query.status  as string | undefined,
-      sortBy:  req.query.sortBy  as string | undefined,
-      order:   req.query.order   as string | undefined,
-    };
+    const query = pickQuery(req.query, QueryFields);
 
     const clients = await ClientServices.getAllClients(userId, query);
 

@@ -4,6 +4,11 @@ import { prisma } from "../../../lib/prisma";
 import AppError from "../../errorHelpers/AppError";
 import { HttpStatusCodes } from "../../utils/httpStatusCodes";
 import { formatDateTime } from "../../utils/formatDT";
+import { Query } from "../../interfaces/query";
+import { validateBusinessOwner } from "../../utils/business/validateBusinessOwner";
+import { calculatePagination } from "../../utils/query/pagination";
+import { calculateSorting } from "../../utils/query/sorting";
+import { createPaginationMeta } from "../../utils/query/meta";
 
 const addClient = async (userId: string, payload: Client) => {
   const isOwner = await prisma.businessUser.findFirst({
@@ -63,47 +68,27 @@ const addClient = async (userId: string, payload: Client) => {
   return result;
 };
 
-const getAllClients = async (
-  userId: string,
-  query: {
-    page?: string;
-    limit?: string;
-    search?: string;
-    status?: string;
-    sortBy?: string;
-    order?: string;
-  },
-) => {
-  const isOwner = await prisma.businessUser.findFirst({
-    where: { userId: userId, business: { isDeleted: false } },
-  });
+const getAllClients = async (userId: string, query: Query) => {
+  const isOwner = await validateBusinessOwner(
+    userId,
+    "Only Business Owner or Admin can view all clients.",
+  );
 
-  if (!isOwner) {
-    throw new AppError(
-      HttpStatusCodes.NOT_FOUND,
-      "Only Business Owner or Admin can view all clients.",
-    );
-  }
+  const { page, limit, skip } = calculatePagination(query.page, query.limit);
 
-  const page = Math.max(1, parseInt(query.page || "1"));
+  const { sortBy, order } = calculateSorting(
+    query.sortBy,
+    query.order,
+    ["name", "createdAt"],
+    "createdAt",
+    "desc",
+  );
 
-  const limit = Math.min(100, parseInt(query.limit || "10"));
-
-  const skip = (page - 1) * limit;
-
-  const search = query.search?.trim() || undefined;
-
+  const search = query.search?.trim();
   const status =
     query.status === "ACTIVE" || query.status === "INACTIVE"
       ? (query.status as ClientStatus)
       : undefined;
-
-  const ALLOWED_SORT = ["name", "createdAt"];
-  const rawSortBy = query.sortBy || "createdAt";
-
-  const sortBy = ALLOWED_SORT.includes(rawSortBy) ? rawSortBy : "createdAt";
-
-  const order = query.order === "desc" ? "desc" : "asc";
 
   const where: Prisma.ClientWhereInput = {
     links: {
@@ -130,19 +115,8 @@ const getAllClients = async (
       where,
       skip,
       take: limit,
-      orderBy: { [sortBy]: order },
-      select: {
-        id: true,
-        name: true,
-        email: true,
-        phone: true,
-        address: true,
-        totalInvoices: true,
-        totalSpent: true,
-        status: true,
-        isDeleted: true,
-        createdAt: true,
-        updatedAt: true,
+      orderBy: {
+        [sortBy]: order,
       },
     }),
   ]);
@@ -152,16 +126,11 @@ const getAllClients = async (
     formattedDate: formatDateTime(new Date(client.createdAt)),
   }));
 
+  const metaData = createPaginationMeta(total, page, limit);
+
   return {
     data: formattedClients,
-    meta: {
-      total,
-      page,
-      limit,
-      totalPages: Math.ceil(total / limit),
-      hasNextPage: page < Math.ceil(total / limit),
-      hasPrevPage: page > 1,
-    },
+    meta: metaData,
   };
 };
 
