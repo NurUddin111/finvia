@@ -225,6 +225,7 @@ const successPayment = async (query: Record<string, string>) => {
           data: {
             totalSold: { increment: item.quantity },
             totalEarning: { increment: item.total },
+            pendingOrder: { decrement: item.quantity },
           },
         }),
       ),

@@ -25,7 +25,6 @@ const createInvoice = async (
 ) => {
   const userId = decodedToken.userId;
 
-  // ── Common setup ───────────────────────────────────────────────────────────
   const isOwner = await prisma.businessUser.findFirst({
     where: { userId, business: { isDeleted: false } },
   });
@@ -86,6 +85,18 @@ const createInvoice = async (
           total: item.pricePerUnit * item.quantity,
         })),
       });
+
+      // Update product totals
+      await Promise.all(
+        items.map((item) =>
+          tx.product.update({
+            where: { id: item.productId },
+            data: {
+              pendingOrder: { increment: item.quantity },
+            },
+          }),
+        ),
+      );
 
       await tx.payment.create({
         data: {
