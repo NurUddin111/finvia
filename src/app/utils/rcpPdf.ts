@@ -8,7 +8,7 @@ import { HttpStatusCodes } from "./httpStatusCodes";
 import { formatDateTime } from "./formatDT";
 
 export const generateRcpPdf = async (
-  invoice: Invoice
+  invoice: Invoice,
 ): Promise<Buffer<ArrayBufferLike>> => {
   const business = await prisma.business.findFirst({
     where: { id: invoice.businessId },
@@ -17,7 +17,7 @@ export const generateRcpPdf = async (
   if (!business) {
     throw new AppError(
       HttpStatusCodes.NOT_FOUND,
-      "Business details not found!"
+      "Business details not found!",
     );
   }
 
@@ -185,7 +185,7 @@ export const generateRcpPdf = async (
       headerY = doc.y;
 
       doc.text(`Payment Method:`, summaryX, headerY);
-      doc.text(payment.provider, 450, headerY);
+      doc.text(payment.provider as string, 450, headerY);
 
       doc.moveDown(0.5);
       headerY = doc.y;
