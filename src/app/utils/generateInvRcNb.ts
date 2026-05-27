@@ -5,7 +5,6 @@ export const generateInvoiceNumber = async (businessId: string) => {
   const count = await prisma.invoice.count({
     where: { businessId, createdAt: { gte: new Date(`${year}-01-01`) } },
   });
-  console.log(count);
   return `INV-${year}-${String(count + 1).padStart(5, "0")}`;
 };
 
