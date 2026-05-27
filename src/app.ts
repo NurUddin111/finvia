@@ -17,7 +17,7 @@ app.use(
     secret: envVars.EXPRESS_SESSION_SECRET,
     resave: false,
     saveUninitialized: false,
-  })
+  }),
 );
 app.use(passport.initialize());
 app.use(passport.session());
@@ -25,7 +25,7 @@ app.use(
   cors({
     origin: ["http://localhost:3000", "https://finvia-frontend.vercel.app"],
     credentials: true,
-  })
+  }),
 );
 app.use(express.json());
 
@@ -35,6 +35,10 @@ app.get("/", (req: Request, res: Response) => {
   res.status(200).json({
     message: "Welcome to Finvia",
   });
+});
+
+app.get("/health", (req, res) => {
+  res.status(200).json({ status: "ok" });
 });
 
 app.use(globalErrorHandler);
