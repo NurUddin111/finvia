@@ -234,7 +234,7 @@ const createInvoice = async (
     },
     attachments: [
       {
-        fileName: `Receipt-${payment.rcpNumber}`,
+        fileName: `Receipt-${payment.rcpNumber}.pdf`,
         content: rcpPdf,
         contentType: "application/pdf",
       },

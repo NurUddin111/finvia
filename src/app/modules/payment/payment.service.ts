@@ -161,7 +161,7 @@ const initPayment = async (invId: string) => {
     },
     attachments: [
       {
-        fileName: `Invoice-${invoice.invoiceNumber}`,
+        fileName: `Invoice-${invoice.invoiceNumber}.pdf`,
         content: invPdf,
         contentType: "application/pdf",
       },
@@ -284,7 +284,7 @@ const successPayment = async (query: Record<string, string>) => {
     },
     attachments: [
       {
-        fileName: `Receipt-${payment.rcpNumber}`,
+        fileName: `Receipt-${payment.rcpNumber}.pdf`,
         content: rcpPdf,
         contentType: "application/pdf",
       },
