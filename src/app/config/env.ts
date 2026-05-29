@@ -18,6 +18,7 @@ interface IEnvConfig {
     SMTP_PORT: string;
     SMTP_HOST: string;
     SMTP_FROM: string;
+    BREVO_API_KEY: string;
   };
   JWT_CREATION_SECRET: string;
   JWT_CREATION_EXPIRES: string;
@@ -68,6 +69,7 @@ const loadEnvVariables = (): IEnvConfig => {
     "SMTP_HOST",
     "SMTP_USER",
     "SMTP_FROM",
+    "BREVO_API_KEY",
     "JWT_CREATION_SECRET",
     "JWT_CREATION_EXPIRES",
     "JWT_VERIFIED_CREATION_SECRET",
@@ -119,6 +121,7 @@ const loadEnvVariables = (): IEnvConfig => {
       SMTP_PORT: process.env.SMTP_PORT as string,
       SMTP_HOST: process.env.SMTP_HOST as string,
       SMTP_FROM: process.env.SMTP_FROM as string,
+      BREVO_API_KEY: process.env.BREVO_API_KEY as string,
     },
     JWT_CREATION_SECRET: process.env.JWT_CREATION_SECRET as string,
     JWT_CREATION_EXPIRES: process.env.JWT_CREATION_EXPIRES as string,
