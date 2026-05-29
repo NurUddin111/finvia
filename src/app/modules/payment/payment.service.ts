@@ -11,7 +11,6 @@ import { ISSLCommerz } from "../sslCommerz/ssl.interface";
 import { SSLService } from "../sslCommerz/ssl.service";
 
 const initPayment = async (invId: string) => {
-  // ── 1. Atomic DB writes ────────────────────────────────────────────────────
   const result = await prisma.$transaction(async (tx) => {
     const invoice = await tx.invoice.findFirst({
       where: { id: invId },
@@ -21,7 +20,6 @@ const initPayment = async (invId: string) => {
       throw new AppError(HttpStatusCodes.NOT_FOUND, "Invoice not found");
     }
 
-    // More precise status guard — not just "not PAID"
     if (invoice.status === "PAID") {
       throw new AppError(
         HttpStatusCodes.BAD_REQUEST,
@@ -39,7 +37,6 @@ const initPayment = async (invId: string) => {
       Date.now() + invoice.dueDays * 24 * 60 * 60 * 1000,
     );
 
-    // Run independent lookups in parallel
     const [updatedInvoice, client, business, payment] = await Promise.all([
       tx.invoice.update({
         where: { id: invId },
@@ -70,7 +67,6 @@ const initPayment = async (invId: string) => {
       );
     }
 
-    // Run independent writes in parallel
     const [updatedClient, updatedPayment] = await Promise.all([
       tx.client.update({
         where: { id: client.id },
@@ -80,8 +76,8 @@ const initPayment = async (invId: string) => {
         where: { id: payment.id },
         data: {
           status: "INITIATED",
-          method: "ONLINE", // ← new field
-          provider: "SSLCOMMERZ", // ← now set here, not at creation
+          method: "ONLINE",
+          provider: "SSLCOMMERZ",
         },
       }),
     ]);
@@ -96,7 +92,6 @@ const initPayment = async (invId: string) => {
 
   const { invoice, client, business, payment } = result;
 
-  // ── 2. Generate & upload invoice PDF ──────────────────────────────────────
   const invPdf = await generateInvPdf(invoice);
   if (!invPdf) {
     throw new AppError(
@@ -113,8 +108,6 @@ const initPayment = async (invId: string) => {
     );
   }
 
-  // ── 3. Initiate SSL payment ────────────────────────────────────────────────
-
   const sslPayload: ISSLCommerz = {
     address: client.address || "Bangladesh",
     email: client.email,
@@ -126,7 +119,6 @@ const initPayment = async (invId: string) => {
 
   const sslPayment = await SSLService.sslPaymentInit(sslPayload);
 
-  // ── 4. Persist URLs (non-critical, outside transaction) ───────────────────
   await Promise.all([
     prisma.invoice.update({
       where: { id: invId },
@@ -142,31 +134,63 @@ const initPayment = async (invId: string) => {
     }),
   ]);
 
-  // ── 5. Send invoice email ──────────────────────────────────────────────────
-  await sendEmail({
-    to: client.email,
-    subject: "Invoice",
-    templateName: "invoice",
-    templateData: {
-      invoiceNumber: invoice.invoiceNumber,
-      businessName: business.name,
-      clientName: client.name,
-      issueDate: formatDateTime(invoice.issueDate),
-      dueDate: formatDateTime(invoice.dueDate),
-      currency: invoice.currency,
-      totalAmount: invoice.total,
-      paymentLink: sslPayment.GatewayPageURL,
-      invoicePdfLink: cloudinaryResult.secure_url,
-      supportEmail: business.email,
-    },
-    attachments: [
-      {
-        fileName: `Invoice-${invoice.invoiceNumber}.pdf`,
-        content: invPdf,
-        contentType: "application/pdf",
+  try {
+    await sendEmail({
+      to: client.email,
+      subject: "Invoice",
+      templateName: "invoice",
+      templateData: {
+        invoiceNumber: invoice.invoiceNumber,
+        businessName: business.name,
+        clientName: client.name,
+        issueDate: formatDateTime(invoice.issueDate),
+        dueDate: formatDateTime(invoice.dueDate),
+        currency: invoice.currency,
+        totalAmount: invoice.total,
+        paymentLink: sslPayment.GatewayPageURL,
+        invoicePdfLink: cloudinaryResult.secure_url,
+        supportEmail: business.email,
       },
-    ],
-  });
+      attachments: [
+        {
+          fileName: `Invoice-${invoice.invoiceNumber}.pdf`,
+          content: invPdf,
+          contentType: "application/pdf",
+        },
+      ],
+    });
+  } catch (emailError) {
+    console.error("Failed to send invoice email:", emailError);
+
+    // Revert everything back to pre-send state
+    await Promise.all([
+      prisma.invoice.update({
+        where: { id: invId },
+        data: {
+          status: "DRAFT",
+          issueDate: null,
+          dueDate: null,
+        },
+      }),
+      prisma.payment.update({
+        where: { id: payment.id },
+        data: {
+          status: "PENDING",
+          provider: null,
+          method: "ONLINE",
+        },
+      }),
+      prisma.client.update({
+        where: { id: client.id },
+        data: { totalInvoices: { decrement: 1 } },
+      }),
+    ]);
+
+    throw new AppError(
+      HttpStatusCodes.INTERNAL_SERVER_ERROR,
+      "Failed to send invoice email. Invoice reverted to draft.",
+    );
+  }
 
   return {
     invPdfUrl: cloudinaryResult.secure_url,

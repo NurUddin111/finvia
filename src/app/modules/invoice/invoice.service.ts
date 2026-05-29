@@ -86,7 +86,6 @@ const createInvoice = async (
         })),
       });
 
-      // Update product totals
       await Promise.all(
         items.map((item) =>
           tx.product.update({
@@ -161,7 +160,6 @@ const createInvoice = async (
         },
       });
 
-      // Update product totals
       await Promise.all(
         items.map((item) =>
           tx.product.update({
