@@ -61,7 +61,12 @@ export const setAuthCookie = (
   }
 
   if (tokenInfo.accessToken) {
-    clearAuthCookies(res, ["accessToken", "inActiveToken", "blockedToken"]);
+    clearAuthCookies(res, [
+      "accessToken",
+      "verifiedCreationToken",
+      "inActiveToken",
+      "blockedToken",
+    ]);
 
     res.cookie("accessToken", tokenInfo.accessToken, {
       ...baseCookieOptions,
