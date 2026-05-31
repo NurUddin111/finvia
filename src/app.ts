@@ -43,6 +43,7 @@ app.get("/", (req: Request, res: Response) => {
 
 app.get("/health", (req, res) => {
   res.status(200).json({ status: "ok" });
+  console.log("Ping...")
 });
 
 app.use(globalErrorHandler);

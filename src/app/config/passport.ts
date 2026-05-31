@@ -118,7 +118,7 @@ passport.use(
 
         return done(null, user);
       } catch (err) {
-        console.error("Google Strategy Error:", err);
+        console.error("Google OAuth strategy error:", err);
         return done(err, undefined);
       }
     },
