@@ -20,6 +20,11 @@ interface IEnvConfig {
     SMTP_FROM: string;
     BREVO_API_KEY: string;
   };
+  GOOGLE_STRATEGY: {
+    GOOGLE_CLIENT_ID: string;
+    GOOGLE_CLIENT_SECRET: string;
+    GOOGLE_CALLBACK_URL: string;
+  };
   JWT_CREATION_SECRET: string;
   JWT_CREATION_EXPIRES: string;
   JWT_VERIFIED_CREATION_SECRET: string;
@@ -97,6 +102,9 @@ const loadEnvVariables = (): IEnvConfig => {
     "SSL_FAIL_BACKEND_URL",
     "SSL_CANCEL_BACKEND_URL",
     // "SSL_IPN_URL"
+    "GOOGLE_CLIENT_ID",
+    "GOOGLE_CLIENT_SECRET",
+    "GOOGLE_CALLBACK_URL",
   ];
 
   requiredEnvVariables.forEach((key) => {
@@ -122,6 +130,11 @@ const loadEnvVariables = (): IEnvConfig => {
       SMTP_HOST: process.env.SMTP_HOST as string,
       SMTP_FROM: process.env.SMTP_FROM as string,
       BREVO_API_KEY: process.env.BREVO_API_KEY as string,
+    },
+    GOOGLE_STRATEGY: {
+      GOOGLE_CLIENT_ID: process.env.GOOGLE_CLIENT_ID as string,
+      GOOGLE_CLIENT_SECRET: process.env.GOOGLE_CLIENT_SECRET as string,
+      GOOGLE_CALLBACK_URL: process.env.GOOGLE_CALLBACK_URL as string,
     },
     JWT_CREATION_SECRET: process.env.JWT_CREATION_SECRET as string,
     JWT_CREATION_EXPIRES: process.env.JWT_CREATION_EXPIRES as string,

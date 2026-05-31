@@ -2,10 +2,12 @@
 
 import bcrypt from "bcryptjs";
 import { Strategy as LocalStrategy } from "passport-local";
+import { Strategy as GoogleStrategy } from "passport-google-oauth20";
 import passport from "passport";
 import { checkUserStatus } from "../utils/checkUserStatus";
 import { Request } from "express";
 import { prisma } from "../../lib/prisma";
+import { envVars } from "./env";
 
 passport.use(
   new LocalStrategy(
@@ -34,7 +36,7 @@ passport.use(
         checkUserStatus(req, user, email);
 
         const isGoogleAuthenticated = user.auths.some(
-          (providerObject) => providerObject.provider === "google"
+          (providerObject) => providerObject.provider === "google",
         );
 
         if (isGoogleAuthenticated && !user.password) {
@@ -46,7 +48,7 @@ passport.use(
 
         const isPasswordMatched = await bcrypt.compare(
           password,
-          user.password as string
+          user.password as string,
         );
 
         if (!isPasswordMatched) {
@@ -56,8 +58,70 @@ passport.use(
       } catch (error) {
         done(error);
       }
-    }
-  )
+    },
+  ),
+);
+
+passport.use(
+  new GoogleStrategy(
+    {
+      clientID: envVars.GOOGLE_STRATEGY.GOOGLE_CLIENT_ID,
+      clientSecret: envVars.GOOGLE_STRATEGY.GOOGLE_CLIENT_SECRET,
+      callbackURL: envVars.GOOGLE_STRATEGY.GOOGLE_CALLBACK_URL,
+    },
+    async (_accessToken, _refreshToken, profile, done) => {
+      try {
+        const email = profile.emails?.[0]?.value;
+        if (!email) return done(new Error("No email from Google"), undefined);
+
+        const existingAuth = await prisma.authProvider.findUnique({
+          where: {
+            provider_providerId: {
+              provider: "google",
+              providerId: profile.id,
+            },
+          },
+          include: { user: true },
+        });
+
+        if (existingAuth) {
+          return done(null, existingAuth.user);
+        }
+
+        let user = await prisma.user.findUnique({ where: { email } });
+
+        if (user) {
+          await prisma.authProvider.create({
+            data: {
+              provider: "google",
+              providerId: profile.id,
+              userId: user.id,
+            },
+          });
+        } else {
+          user = await prisma.user.create({
+            data: {
+              name: profile.displayName,
+              email,
+              password: "", 
+              isVerified: true,
+              avatar: profile.photos?.[0]?.value ?? null,
+              auths: {
+                create: {
+                  provider: "google",
+                  providerId: profile.id,
+                },
+              },
+            },
+          });
+        }
+
+        return done(null, user);
+      } catch (err) {
+        return done(err, undefined);
+      }
+    },
+  ),
 );
 
 passport.serializeUser((user: any, done: (err: any, id?: string) => void) => {
@@ -79,5 +143,5 @@ passport.deserializeUser(
     } catch (error) {
       done(error);
     }
-  }
+  },
 );
