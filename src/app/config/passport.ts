@@ -103,7 +103,7 @@ passport.use(
             data: {
               name: profile.displayName,
               email,
-              password: "", 
+              password: "",
               isVerified: true,
               avatar: profile.photos?.[0]?.value ?? null,
               auths: {
@@ -118,6 +118,7 @@ passport.use(
 
         return done(null, user);
       } catch (err) {
+        console.error("Google Strategy Error:", err);
         return done(err, undefined);
       }
     },
