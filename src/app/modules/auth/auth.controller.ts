@@ -15,6 +15,7 @@ import {
 } from "../../utils/setCookie";
 import { JwtPayload } from "jsonwebtoken";
 import { User } from "@prisma/client";
+import { envVars } from "../../config/env";
 
 const createUserRequest = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {

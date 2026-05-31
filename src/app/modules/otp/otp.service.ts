@@ -15,7 +15,7 @@ const sendOTP = async (
   sub: string,
   tempName: string,
   tempData: Record<string, unknown>,
-  OTP_EXPIRATION: number
+  OTP_EXPIRATION: number,
 ) => {
   const otp = generateOTP();
 
@@ -43,8 +43,6 @@ const verifyOTP = async (email: string, otp: string) => {
   const redisKey = `otp:${email}`;
 
   const savedOtp = await redisClient.get(redisKey);
-
-  console.log(email,otp,"Insideeeeeee")
 
   if (!savedOtp) {
     throw new AppError(401, "Invalid OTP");
