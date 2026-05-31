@@ -9,7 +9,6 @@ import {
   RegisterVerificationZodSchemaValidation,
 } from "./auth.validation";
 import passport from "passport";
-import { setAuthCookie } from "../../utils/setCookie";
 import { createUserTokens } from "../../utils/userTokens";
 import { envVars } from "../../config/env";
 
@@ -55,9 +54,9 @@ router.get(
 
     const userTokens = createUserTokens(user);
 
-    setAuthCookie(req, res, userTokens);
+    const params = new URLSearchParams(userTokens);
 
-    res.redirect(`${envVars.FRONTEND_URL}/auth/google/callback`);
+    res.redirect(`${envVars.FRONTEND_URL}/api/auth/callback/google?${params}`);
   },
 );
 
