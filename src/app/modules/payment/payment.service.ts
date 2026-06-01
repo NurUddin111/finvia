@@ -100,7 +100,11 @@ const initPayment = async (invId: string) => {
     );
   }
 
-  const cloudinaryResult = await uploadBufferToCloudinary(invPdf, "invoice");
+  const cloudinaryResult = await uploadBufferToCloudinary(
+    invPdf,
+    "invoice",
+    "pdf",
+  );
   if (!cloudinaryResult) {
     throw new AppError(
       HttpStatusCodes.BAD_REQUEST,
@@ -274,7 +278,11 @@ const successPayment = async (query: Record<string, string>) => {
     );
   }
 
-  const cloudinaryResult = await uploadBufferToCloudinary(rcpPdf, "receipt");
+  const cloudinaryResult = await uploadBufferToCloudinary(
+    rcpPdf,
+    "receipt",
+    "pdf",
+  );
   if (!cloudinaryResult) {
     throw new AppError(
       HttpStatusCodes.BAD_REQUEST,

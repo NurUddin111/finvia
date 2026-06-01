@@ -1,27 +1,29 @@
-import multer from "multer";
-import { CloudinaryStorage } from "multer-storage-cloudinary";
-import { cloudinaryUpload } from "./cloudinary.config";
+import multer, { FileFilterCallback } from "multer";
+import { Request } from "express";
+import AppError from "../errorHelpers/AppError";
+import { HttpStatusCodes } from "../utils/httpStatusCodes";
 
-const storage = new CloudinaryStorage({
-  cloudinary: cloudinaryUpload,
-  params: {
-    public_id: (req, file) => {
-      const fileName = file.originalname
-        .toLowerCase()
-        .replace(/\s+/g, "-")
-        .replace(/\./g, "-")
-        .replace(/[^a-z0-9\-.]/g, "");
+const imageFilter = (
+  _req: Request,
+  file: Express.Multer.File,
+  cb: FileFilterCallback,
+) => {
+  if (file.mimetype.startsWith("image/")) {
+    cb(null, true);
+  } else {
+    cb(
+      new AppError(
+        HttpStatusCodes.BAD_REQUEST,
+        "Only image files are allowed (jpeg, png, webp, etc.)",
+      ),
+    );
+  }
+};
 
-      const uniqueFileName =
-        Math.random().toString(36).substring(2) +
-        "-" +
-        Date.now() +
-        "-" +
-        fileName;
-
-      return uniqueFileName;
-    },
+export const multerUpload = multer({
+  storage: multer.memoryStorage(),
+  limits: {
+    fileSize: 5 * 1024 * 1024, 
   },
+  fileFilter: imageFilter,
 });
-
-export const multerUpload = multer({ storage: storage });

@@ -5,6 +5,8 @@ import { JwtPayload } from "jsonwebtoken";
 import { BusinessServices } from "./business.service";
 import { sendResponse } from "../../utils/sendResponse";
 import { HttpStatusCodes } from "../../utils/httpStatusCodes";
+import { uploadBufferToCloudinary } from "../../config/cloudinary.config";
+import AppError from "../../errorHelpers/AppError";
 
 const addBusiness = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
@@ -12,11 +14,31 @@ const addBusiness = catchAsync(
     const userId = user.userId;
     const payload = req.body;
 
+    let logoUrl: string | undefined;
+
+    if (req.file) {
+      const uploadResult = await uploadBufferToCloudinary(
+        req.file.buffer,
+        "business-logo",
+        "logos",
+      );
+
+      if (!uploadResult) {
+        throw new AppError(
+          HttpStatusCodes.BAD_REQUEST,
+          "Failed to upload business logo",
+        );
+      }
+
+      logoUrl = uploadResult.secure_url;
+    }
+
     const business = await BusinessServices.addBusiness(
       req,
       res,
       userId,
       payload,
+      logoUrl,
     );
 
     sendResponse(res, {

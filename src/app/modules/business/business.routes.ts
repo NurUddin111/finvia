@@ -7,12 +7,14 @@ import {
   CreateBusinessZodSchemaValidation,
   UpdateBusinessZodSchemaValidation,
 } from "./business.validation";
+import { multerUpload } from "../../config/multer.config";
 
 const router = Router();
 
 router.post(
   "/add",
   checkAuth(UserRole.USER),
+  multerUpload.single("logo"),
   validateRequest(CreateBusinessZodSchemaValidation),
   BusinessController.addBusiness,
 );

@@ -1,5 +1,5 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { v2 as cloudinary, UploadApiResponse } from "cloudinary";
-import stream from "stream";
 import { envVars } from "./env";
 import AppError from "../errorHelpers/AppError";
 import { HttpStatusCodes } from "../utils/httpStatusCodes";
@@ -12,37 +12,29 @@ cloudinary.config({
 
 export const uploadBufferToCloudinary = async (
   buffer: Buffer,
-  fileName: string
+  fileName: string,
+  folder: string,
 ): Promise<UploadApiResponse | undefined> => {
   try {
     return new Promise((resolve, reject) => {
-      const public_id = `pdf/${fileName}-${Date.now()}`;
-
-      const bufferStream = new stream.PassThrough();
-      bufferStream.end(buffer);
-
       cloudinary.uploader
         .upload_stream(
           {
             resource_type: "auto",
-            public_id: public_id,
-            folder: "pdf",
+            public_id: `${fileName}-${Date.now()}`,
+            folder,
           },
           (error, result) => {
-            if (error) {
-              return reject(error);
-            }
+            if (error) return reject(error);
             resolve(result);
-          }
+          },
         )
         .end(buffer);
     });
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } catch (error: any) {
-    console.log(error);
     throw new AppError(
       HttpStatusCodes.BAD_REQUEST,
-      `Error uploading file ${error.message}`
+      `Error uploading file: ${error.message}`,
     );
   }
 };
