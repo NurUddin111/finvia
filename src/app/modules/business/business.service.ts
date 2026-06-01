@@ -24,6 +24,7 @@ const addBusiness = async (
   res: Response,
   userId: string,
   payload: Business,
+  logoUrl?: string,
 ) => {
   const isOwner = await prisma.businessUser.findFirst({
     where: { userId, business: { isDeleted: false } },
@@ -45,6 +46,7 @@ const addBusiness = async (
         phone: payload.phone || null,
         address: payload.address || null,
         website: payload.website || null,
+        logoUrl: logoUrl || null,
       },
     });
 
@@ -67,7 +69,6 @@ const addBusiness = async (
     })) as User;
 
     const userTokens = createUserTokens(user);
-
     setAuthCookie(req, res, userTokens);
 
     return business;

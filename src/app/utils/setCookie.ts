@@ -56,7 +56,7 @@ export const setAuthCookie = (
 
     res.cookie("verifiedCreationToken", tokenInfo.verifiedCreationToken, {
       ...baseCookieOptions,
-      maxAge: 10 * 60 * 1000,
+      maxAge: 30 * 60 * 1000,
     });
   }
 
@@ -70,7 +70,7 @@ export const setAuthCookie = (
 
     res.cookie("accessToken", tokenInfo.accessToken, {
       ...baseCookieOptions,
-      maxAge: 24 * 60 * 60 * 1000,
+      maxAge: 7 * 24 * 60 * 60 * 1000,
     });
   }
 

@@ -17,21 +17,17 @@ export const CreateBusinessZodSchemaValidation = z.object({
     .max(100, {
       error: (issue) => {
         if (issue.code === "too_big") {
-          return `Name cannot exceed ${issue.minimum} characters!`;
+          return `Name cannot exceed ${issue.maximum} characters!`;
         }
       },
     }),
 
   category: z.enum(BusinessCategory, {
-    error: () => {
-      return "Category not available.";
-    },
+    error: () => "Category not available.",
   }),
 
   email: z
-    .email({
-      error: "Invalid Email",
-    })
+    .email({ error: "Invalid Email" })
     .min(5, {
       error: (issue) => {
         if (issue.code === "too_small") {
@@ -42,48 +38,25 @@ export const CreateBusinessZodSchemaValidation = z.object({
     .max(100, {
       error: (issue) => {
         if (issue.code === "too_big") {
-          return `Email cannot exceed ${issue.minimum} characters!`;
+          return `Email cannot exceed ${issue.maximum} characters!`;
         }
       },
     }),
 
   phone: z
-    .string({
-      error: () => {
-        return "Invalid Phone";
-      },
-    })
+    .string({ error: () => "Invalid Phone" })
     .regex(/^(?:\+8801\d{9}|01\d{9})$/, {
-      error: () => {
-        return "Phone number must be valid for Bangladesh. Format: +8801XXXXXXXXX or 01XXXXXXXXX";
-      },
+      error: () =>
+        "Phone number must be valid for Bangladesh. Format: +8801XXXXXXXXX or 01XXXXXXXXX",
     })
     .optional(),
 
   address: z
-    .string({
-      error: () => {
-        return "Invalid address!";
-      },
-    })
+    .string({ error: () => "Invalid address!" })
     .max(500, { message: "Address cannot exceed 500 characters." })
     .optional(),
 
-  website: z
-    .url({
-      error: () => {
-        return "Invalid website url!";
-      },
-    })
-    .optional(),
-
-  logoUrl: z
-    .url({
-      error: () => {
-        return "Invalid logo url!";
-      },
-    })
-    .optional(),
+  website: z.url({ error: () => "Invalid website url!" }).optional(),
 });
 
 export const UpdateBusinessZodSchemaValidation = z.object({
