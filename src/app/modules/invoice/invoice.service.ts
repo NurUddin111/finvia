@@ -200,7 +200,11 @@ const createInvoice = async (
     );
   }
 
-  const cloudinaryResult = await uploadBufferToCloudinary(rcpPdf, "receipt");
+  const cloudinaryResult = await uploadBufferToCloudinary(
+    rcpPdf,
+    "receipt",
+    "pdf",
+  );
   if (!cloudinaryResult) {
     throw new AppError(
       HttpStatusCodes.BAD_REQUEST,
