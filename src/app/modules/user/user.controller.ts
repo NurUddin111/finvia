@@ -8,6 +8,8 @@ import { HttpStatusCodes } from "../../utils/httpStatusCodes";
 import { JwtPayload } from "jsonwebtoken";
 import { User } from "@prisma/client";
 import pick from "../../utils/pick";
+import { uploadBufferToCloudinary } from "../../config/cloudinary.config";
+import AppError from "../../errorHelpers/AppError";
 
 const getAllFinviaUsers = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
@@ -23,7 +25,7 @@ const getAllFinviaUsers = catchAsync(
       meta: result.meta,
       data: result.data,
     });
-  }
+  },
 );
 
 const getSingleUser = catchAsync(
@@ -36,7 +38,7 @@ const getSingleUser = catchAsync(
       message: "User retrieved successfully",
       data: user,
     });
-  }
+  },
 );
 
 const getMe = catchAsync(
@@ -50,7 +52,7 @@ const getMe = catchAsync(
       message: "Your profile Retrieved Successfully",
       data: result.data,
     });
-  }
+  },
 );
 
 const updateUser = catchAsync(
@@ -58,14 +60,40 @@ const updateUser = catchAsync(
     const id = req.params.id;
     const payload: Partial<User> = req.body;
     const verifiedToken = req.user as JwtPayload;
-    const user = await UserServices.updateUser(id, payload, verifiedToken);
+
+    let avatarUrl: string | undefined;
+
+    if (req.file) {
+      const uploadResult = await uploadBufferToCloudinary(
+        req.file.buffer,
+        "user-avatar",
+        "avatars",
+      );
+
+      if (!uploadResult) {
+        throw new AppError(
+          HttpStatusCodes.BAD_REQUEST,
+          "Failed to upload avatar",
+        );
+      }
+
+      avatarUrl = uploadResult.secure_url;
+    }
+
+    const user = await UserServices.updateUser(
+      id,
+      payload,
+      verifiedToken,
+      avatarUrl,
+    );
+
     sendResponse(res, {
       success: true,
       statusCode: HttpStatusCodes.OK,
       message: "User updated successfully",
       data: user,
     });
-  }
+  },
 );
 
 const deleteUser = catchAsync(
@@ -78,7 +106,7 @@ const deleteUser = catchAsync(
       message: "User deleted successfully",
       data: null,
     });
-  }
+  },
 );
 
 export const UserControllers = {
