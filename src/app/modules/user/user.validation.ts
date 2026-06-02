@@ -17,47 +17,28 @@ export const UpdateUserZodSchemaValidation = z.object({
     .max(50, {
       error: (issue) => {
         if (issue.code === "too_big") {
-          return `Name cannot exceed ${issue.minimum} characters!`;
+          return `Name cannot exceed ${issue.maximum} characters!`;
         }
       },
     })
     .optional(),
 
   phone: z
-    .string({
-      error: () => {
-        return "Invalid Phone";
-      },
-    })
+    .string({ error: () => "Invalid Phone" })
     .regex(/^(?:\+8801\d{9}|01\d{9})$/, {
-      error: () => {
-        return "Phone number must be valid for Bangladesh. Format: +8801XXXXXXXXX or 01XXXXXXXXX";
-      },
-    })
-    .optional(),
-
-  avatar: z
-    .url({
-      error: () => {
-        return "Invalid url!";
-      },
+      error: () =>
+        "Phone number must be valid for Bangladesh. Format: +8801XXXXXXXXX or 01XXXXXXXXX",
     })
     .optional(),
 
   role: z
     .enum(UserRole, {
-      error: () => {
-        return "Invalid Role.";
-      },
+      error: () => "Invalid Role.",
     })
     .optional(),
 
   address: z
-    .string({
-      error: () => {
-        return "Invalid address!";
-      },
-    })
+    .string({ error: () => "Invalid address!" })
     .max(500, { message: "Address cannot exceed 500 characters." })
     .optional(),
 });

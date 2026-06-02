@@ -114,12 +114,11 @@ const getMe = async (userId: string) => {
 const updateUser = async (
   userId: string,
   payload: Partial<User>,
-  decodedToken: JwtPayload
+  decodedToken: JwtPayload,
+  avatarUrl?: string,
 ) => {
   const user = await prisma.user.findUnique({
-    where: {
-      id: userId,
-    },
+    where: { id: userId },
   });
 
   if (!user) {
@@ -133,7 +132,7 @@ const updateUser = async (
     if (userId !== decodedToken.userId) {
       throw new AppError(
         401,
-        "It looks like you're trying to edit another user's profile. You can only make changes to your own profile."
+        "It looks like you're trying to edit another user's profile. You can only make changes to your own profile.",
       );
     }
   }
@@ -142,7 +141,7 @@ const updateUser = async (
     if (decodedToken.role !== UserRole.ADMIN) {
       throw new AppError(
         HttpStatusCodes.FORBIDDEN,
-        "Setting up Admin role is a restricted action. For security, only users with an existing Admin role can assign it to others."
+        "Setting up Admin role is a restricted action. For security, only users with an existing Admin role can assign it to others.",
       );
     }
   }
@@ -151,16 +150,17 @@ const updateUser = async (
     if (decodedToken.role !== UserRole.ADMIN) {
       throw new AppError(
         HttpStatusCodes.FORBIDDEN,
-        "This is a restricted action. For security, only Admin can update these information."
+        "This is a restricted action. For security, only Admin can update these information.",
       );
     }
   }
 
   const updatedUser = await prisma.user.update({
-    where: {
-      id: userId,
+    where: { id: userId },
+    data: {
+      ...payload,
+      ...(avatarUrl !== undefined ? { avatar: avatarUrl } : {}),
     },
-    data: payload,
   });
 
   return updatedUser;
