@@ -37,6 +37,7 @@ const createUserRequest = async (
   const isUserExist = await prisma.user.findUnique({
     where: {
       email: email,
+      isDeleted: false,
     },
   });
 

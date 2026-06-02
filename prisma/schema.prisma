@@ -113,6 +113,8 @@ model BusinessUser {
 
   status MemberStatus @default(INVITED)
 
+  isExist Boolean @default(true)
+
   user     User     @relation(fields: [userId], references: [id])
   business Business @relation(fields: [businessId], references: [id])
 

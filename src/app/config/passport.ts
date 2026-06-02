@@ -21,6 +21,7 @@ passport.use(
         const user = await prisma.user.findUnique({
           where: {
             email: email,
+            isDeleted: false,
           },
           include: {
             auths: true,
@@ -74,6 +75,21 @@ passport.use(
         const email = profile.emails?.[0]?.value;
         if (!email) return done(new Error("No email from Google"), undefined);
 
+        let user = await prisma.user.findUnique({
+          where: { email },
+        });
+
+        if (user?.isDeleted) {
+          await prisma.user.update({
+            where: {
+              id: user.id,
+            },
+            data: {
+              isDeleted: false,
+            },
+          });
+        }
+
         const existingAuth = await prisma.authProvider.findUnique({
           where: {
             provider_providerId: {
@@ -87,8 +103,6 @@ passport.use(
         if (existingAuth) {
           return done(null, existingAuth.user);
         }
-
-        let user = await prisma.user.findUnique({ where: { email } });
 
         if (user) {
           await prisma.authProvider.create({

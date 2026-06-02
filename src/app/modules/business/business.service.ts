@@ -27,7 +27,7 @@ const addBusiness = async (
   logoUrl?: string,
 ) => {
   const isOwner = await prisma.businessUser.findFirst({
-    where: { userId, business: { isDeleted: false } },
+    where: { userId, isExist: true, business: { isDeleted: false } },
   });
 
   if (isOwner) {
@@ -91,7 +91,7 @@ const getSinglBusiness = async (businessId: string) => {
 
 const getMyBusiness = async (userId: string) => {
   const isOwner = await prisma.businessUser.findFirst({
-    where: { userId: userId, business: { isDeleted: false } },
+    where: { userId: userId, isExist: true, business: { isDeleted: false } },
   });
 
   if (!isOwner) {
@@ -171,7 +171,7 @@ const deleteBusiness = async (
   const userId = decodedToken.userId;
 
   const isOwner = await prisma.businessUser.findFirst({
-    where: { userId, business: { isDeleted: false } },
+    where: { userId, isExist: true, business: { isDeleted: false } },
   });
 
   if (!isOwner) {
@@ -196,6 +196,18 @@ const deleteBusiness = async (
       },
       data: {
         isDeleted: true,
+      },
+    });
+
+    await tx.businessUser.update({
+      where: {
+        userId_businessId: {
+          userId,
+          businessId,
+        },
+      },
+      data: {
+        isExist: false,
       },
     });
 

@@ -178,12 +178,27 @@ const deleteUser = async (userId: string) => {
     throw new AppError(HttpStatusCodes.BAD_REQUEST, "No user found.");
   }
 
+  const business = await prisma.businessUser.findFirst({
+    where: {
+      userId: user.id,
+      isExist: true,
+    },
+  });
+
+  if (business) {
+    throw new AppError(
+      HttpStatusCodes.BAD_REQUEST,
+      "You have to delete your business details before deleting your profile!",
+    );
+  }
+
   await prisma.user.update({
     where: {
       id: userId,
     },
     data: {
       isDeleted: true,
+      role: UserRole.USER,
     },
   });
 };
