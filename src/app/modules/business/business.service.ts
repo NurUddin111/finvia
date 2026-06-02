@@ -126,11 +126,10 @@ const getMyBusiness = async (userId: string) => {
 
 const updateBusiness = async (
   businessId: string,
-  payload: Business,
-  decodedToken: JwtPayload,
+  payload: Partial<Business>,
+  userId: string,
+  logoUrl?: string,
 ) => {
-  const userId = decodedToken.userId;
-
   const isOwner = await prisma.businessUser.findFirst({
     where: { userId, business: { isDeleted: false } },
   });
@@ -154,7 +153,10 @@ const updateBusiness = async (
       id: businessId,
       isDeleted: false,
     },
-    data: payload,
+    data: {
+      ...payload,
+      ...(logoUrl !== undefined ? { logoUrl } : {}),
+    },
   });
 
   return updatedBusiness;

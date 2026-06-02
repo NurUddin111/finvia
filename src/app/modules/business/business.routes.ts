@@ -92,9 +92,10 @@ router.get(
 );
 
 router.patch(
-  "/edit/:id",
-  validateRequest(UpdateBusinessZodSchemaValidation),
+  "/update/:id",
   checkAuth(UserRole.BUSINESS_OWNER),
+  multerUpload.single("logo"),
+  validateRequest(UpdateBusinessZodSchemaValidation),
   BusinessController.updateBusiness,
 );
 

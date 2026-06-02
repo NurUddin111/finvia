@@ -81,12 +81,35 @@ const updateBusiness = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
     const id = req.params.id;
     const payload = req.body;
-    const verifiedToken = req.user as JwtPayload;
+    const user = req.user as JwtPayload;
+    const userId = user.userId;
+
+    let logoUrl: string | undefined;
+
+    if (req.file) {
+      const uploadResult = await uploadBufferToCloudinary(
+        req.file.buffer,
+        "business-logo",
+        "logos",
+      );
+
+      if (!uploadResult) {
+        throw new AppError(
+          HttpStatusCodes.BAD_REQUEST,
+          "Failed to upload business logo",
+        );
+      }
+
+      logoUrl = uploadResult.secure_url;
+    }
+
     const business = await BusinessServices.updateBusiness(
       id,
       payload,
-      verifiedToken,
+      userId,
+      logoUrl,
     );
+
     sendResponse(res, {
       success: true,
       statusCode: HttpStatusCodes.OK,

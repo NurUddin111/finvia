@@ -355,7 +355,6 @@ const getAllInvoices = async (
     }),
   ]);
 
-  // ── STEP 5: Return ────────────────────────────────────────────────────────
   return {
     data: invoices,
     meta: {
@@ -365,7 +364,7 @@ const getAllInvoices = async (
       totalPages: Math.ceil(total / limit),
       hasNextPage: page < Math.ceil(total / limit),
       hasPrevPage: page > 1,
-      availableYears, // ← [2026, 2025, 2024] — sent to frontend for dropdown
+      availableYears,
     },
   };
 };
