@@ -4,8 +4,8 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.cloudinaryUpload = exports.uploadBufferToCloudinary = void 0;
+/* eslint-disable @typescript-eslint/no-explicit-any */
 const cloudinary_1 = require("cloudinary");
-const stream_1 = __importDefault(require("stream"));
 const env_1 = require("./env");
 const AppError_1 = __importDefault(require("../errorHelpers/AppError"));
 const httpStatusCodes_1 = require("../utils/httpStatusCodes");
@@ -14,30 +14,24 @@ cloudinary_1.v2.config({
     api_key: env_1.envVars.CLOUDINARY.CLOUDINARY_API_KEY,
     api_secret: env_1.envVars.CLOUDINARY.CLOUDINARY_API_SECRET,
 });
-const uploadBufferToCloudinary = async (buffer, fileName) => {
+const uploadBufferToCloudinary = async (buffer, fileName, folder) => {
     try {
         return new Promise((resolve, reject) => {
-            const public_id = `pdf/${fileName}-${Date.now()}`;
-            const bufferStream = new stream_1.default.PassThrough();
-            bufferStream.end(buffer);
             cloudinary_1.v2.uploader
                 .upload_stream({
                 resource_type: "auto",
-                public_id: public_id,
-                folder: "pdf",
+                public_id: `${fileName}-${Date.now()}`,
+                folder,
             }, (error, result) => {
-                if (error) {
+                if (error)
                     return reject(error);
-                }
                 resolve(result);
             })
                 .end(buffer);
         });
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
     }
     catch (error) {
-        console.log(error);
-        throw new AppError_1.default(httpStatusCodes_1.HttpStatusCodes.BAD_REQUEST, `Error uploading file ${error.message}`);
+        throw new AppError_1.default(httpStatusCodes_1.HttpStatusCodes.BAD_REQUEST, `Error uploading file: ${error.message}`);
     }
 };
 exports.uploadBufferToCloudinary = uploadBufferToCloudinary;

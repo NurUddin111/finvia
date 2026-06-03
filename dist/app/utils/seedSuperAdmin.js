@@ -10,13 +10,14 @@ const prisma_1 = require("../../lib/prisma");
 const client_1 = require("@prisma/client");
 const seedSuperAdmin = async () => {
     try {
+        // This query acts as your implicit database connection check during startup!
         const isSuperAdminExist = await prisma_1.prisma.user.findUnique({
             where: {
                 email: env_1.envVars.SUPER_ADMIN_EMAIL,
             },
         });
         if (isSuperAdminExist && !isSuperAdminExist.isDeleted) {
-            console.log("Super Admin Already Exists!");
+            console.log("🚀 Super Admin Already Exists!");
             return;
         }
         if (isSuperAdminExist && isSuperAdminExist.isDeleted) {
@@ -28,7 +29,7 @@ const seedSuperAdmin = async () => {
                     isDeleted: false,
                 },
             });
-            console.log("Super Admin Revived!");
+            console.log("🔄 Super Admin Revived!");
             return;
         }
         console.log("...Creating Super Admin");
@@ -52,11 +53,12 @@ const seedSuperAdmin = async () => {
                 },
             },
         });
-        console.log("Super Admin Created Successfuly! \n");
+        console.log("✨ Super Admin Created Successfully! \n");
         console.log(superAdmin);
     }
     catch (error) {
-        console.error(error);
+        console.error("❌ Error running seedSuperAdmin:");
+        throw error;
     }
 };
 exports.seedSuperAdmin = seedSuperAdmin;

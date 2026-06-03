@@ -5,7 +5,7 @@ const prisma_1 = require("../../lib/prisma");
 const generateInvoiceNumber = async (businessId) => {
     const year = new Date().getFullYear();
     const count = await prisma_1.prisma.invoice.count({
-        where: { businessId, issueDate: { gte: new Date(`${year}-01-01`) } },
+        where: { businessId, createdAt: { gte: new Date(`${year}-01-01`) } },
     });
     return `INV-${year}-${String(count + 1).padStart(5, "0")}`;
 };

@@ -10,6 +10,8 @@ const user_service_1 = require("./user.service");
 const sendResponse_1 = require("../../utils/sendResponse");
 const httpStatusCodes_1 = require("../../utils/httpStatusCodes");
 const pick_1 = __importDefault(require("../../utils/pick"));
+const cloudinary_config_1 = require("../../config/cloudinary.config");
+const AppError_1 = __importDefault(require("../../errorHelpers/AppError"));
 const getAllFinviaUsers = (0, catchAsync_1.catchAsync)(async (req, res, next) => {
     const filters = (0, pick_1.default)(req.query, user_constants_1.userFilterableFields);
     const options = (0, pick_1.default)(req.query, ["page", "limit", "sortBy", "sortOrder"]);
@@ -46,7 +48,15 @@ const updateUser = (0, catchAsync_1.catchAsync)(async (req, res, next) => {
     const id = req.params.id;
     const payload = req.body;
     const verifiedToken = req.user;
-    const user = await user_service_1.UserServices.updateUser(id, payload, verifiedToken);
+    let avatarUrl;
+    if (req.file) {
+        const uploadResult = await (0, cloudinary_config_1.uploadBufferToCloudinary)(req.file.buffer, "user-avatar", "avatars");
+        if (!uploadResult) {
+            throw new AppError_1.default(httpStatusCodes_1.HttpStatusCodes.BAD_REQUEST, "Failed to upload avatar");
+        }
+        avatarUrl = uploadResult.secure_url;
+    }
+    const user = await user_service_1.UserServices.updateUser(id, payload, verifiedToken, avatarUrl);
     (0, sendResponse_1.sendResponse)(res, {
         success: true,
         statusCode: httpStatusCodes_1.HttpStatusCodes.OK,

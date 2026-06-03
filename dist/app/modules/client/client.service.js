@@ -4,9 +4,15 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ClientServices = void 0;
+const client_1 = require("@prisma/client");
 const prisma_1 = require("../../../lib/prisma");
 const AppError_1 = __importDefault(require("../../errorHelpers/AppError"));
 const httpStatusCodes_1 = require("../../utils/httpStatusCodes");
+const formatDT_1 = require("../../utils/formatDT");
+const validateBusinessOwner_1 = require("../../utils/business/validateBusinessOwner");
+const pagination_1 = require("../../utils/query/pagination");
+const sorting_1 = require("../../utils/query/sorting");
+const meta_1 = require("../../utils/query/meta");
 const addClient = async (userId, payload) => {
     const isOwner = await prisma_1.prisma.businessUser.findFirst({
         where: { userId, business: { isDeleted: false } },
@@ -36,6 +42,8 @@ const addClient = async (userId, payload) => {
                 email: email,
                 phone: phone || null,
                 address: address || null,
+                totalInvoices: 0,
+                totalSpent: 0,
             },
         });
         await tx.businessClient.create({
@@ -48,28 +56,48 @@ const addClient = async (userId, payload) => {
     });
     return result;
 };
-const getAllClients = async (userId) => {
-    const isOwner = await prisma_1.prisma.businessUser.findFirst({
-        where: { userId: userId, business: { isDeleted: false } },
-    });
-    if (!isOwner) {
-        throw new AppError_1.default(httpStatusCodes_1.HttpStatusCodes.NOT_FOUND, "Only Business Owner or Admin can view all clients.");
-    }
-    const clients = await prisma_1.prisma.businessClient.findMany({
-        where: {
-            businessId: isOwner.businessId,
-            client: {
-                isDeleted: false,
+const getAllClients = async (userId, query) => {
+    const isOwner = await (0, validateBusinessOwner_1.validateBusinessOwner)(userId, "Only Business Owner or Admin can view all clients.");
+    const { page, limit, skip } = (0, pagination_1.calculatePagination)(query.page, query.limit);
+    const { sortBy, order } = (0, sorting_1.calculateSorting)(query.sortBy, query.order, ["name", "createdAt"], "createdAt", "desc");
+    const search = query.search?.trim();
+    const status = query.status === "ACTIVE" || query.status === "INACTIVE"
+        ? query.status
+        : undefined;
+    const where = {
+        links: {
+            some: { businessId: isOwner.businessId },
+        },
+        isDeleted: false,
+        ...(status && { status }),
+        ...(search && {
+            OR: [
+                { name: { contains: search, mode: "insensitive" } },
+                { email: { contains: search, mode: "insensitive" } },
+                { phone: { contains: search, mode: "insensitive" } },
+            ],
+        }),
+    };
+    const [total, clients] = await Promise.all([
+        prisma_1.prisma.client.count({ where }),
+        prisma_1.prisma.client.findMany({
+            where,
+            skip,
+            take: limit,
+            orderBy: {
+                [sortBy]: order,
             },
-        },
-        include: {
-            client: true,
-        },
-    });
-    if (!clients) {
-        throw new AppError_1.default(httpStatusCodes_1.HttpStatusCodes.NOT_FOUND, "No clients found.");
-    }
-    return clients;
+        }),
+    ]);
+    const formattedClients = clients.map((client) => ({
+        ...client,
+        formattedDate: (0, formatDT_1.formatDateTime)(new Date(client.createdAt)),
+    }));
+    const metaData = (0, meta_1.createPaginationMeta)(total, page, limit);
+    return {
+        data: formattedClients,
+        meta: metaData,
+    };
 };
 const getSingleClient = async (clientId) => {
     const client = await prisma_1.prisma.client.findUnique({
@@ -111,6 +139,62 @@ const getMyClient = async (userId, clientId) => {
         data: myClient,
     };
 };
+const getClientsStats = async (userId) => {
+    const isOwner = await prisma_1.prisma.businessUser.findFirst({
+        where: { userId: userId, business: { isDeleted: false } },
+    });
+    if (!isOwner) {
+        throw new AppError_1.default(httpStatusCodes_1.HttpStatusCodes.NOT_FOUND, "Only Business Owner or Admin can view all clients.");
+    }
+    const now = new Date();
+    const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+    const startOfNextMonth = new Date(now.getFullYear(), now.getMonth() + 1, 1);
+    const baseWhere = {
+        businessId: isOwner.businessId,
+        client: { isDeleted: false },
+    };
+    const [totalClients, currentMonthClients, activeClients, neverBilledClients] = await Promise.all([
+        prisma_1.prisma.businessClient.count({
+            where: baseWhere,
+        }),
+        prisma_1.prisma.businessClient.count({
+            where: {
+                ...baseWhere,
+                createdAt: {
+                    gte: startOfMonth,
+                    lt: startOfNextMonth,
+                },
+            },
+        }),
+        prisma_1.prisma.businessClient.count({
+            where: {
+                ...baseWhere,
+                client: {
+                    status: client_1.ClientStatus.ACTIVE,
+                },
+            },
+        }),
+        prisma_1.prisma.client.count({
+            where: {
+                links: {
+                    some: { businessId: isOwner.businessId },
+                },
+                totalInvoices: 0,
+                isDeleted: false,
+            },
+        }),
+    ]);
+    const activeClientPercentage = totalClients > 0 ? Math.round((activeClients / totalClients) * 100) : 0;
+    const inactiveClients = totalClients > 0 ? totalClients - activeClients : 0;
+    return {
+        totalClients,
+        currentMonthClients,
+        activeClients,
+        activeClientPercentage,
+        inactiveClients,
+        neverBilledClients,
+    };
+};
 const updateClient = async (clientId, payload, decodedToken) => {
     const userId = decodedToken.userId;
     const isOwner = await prisma_1.prisma.businessUser.findFirst({
@@ -140,6 +224,34 @@ const updateClient = async (clientId, payload, decodedToken) => {
         data: payload,
     });
     return updatedClient;
+};
+const updateClientStatus = async (userId) => {
+    const isOwner = await prisma_1.prisma.businessUser.findFirst({
+        where: { userId, business: { isDeleted: false } },
+    });
+    if (!isOwner) {
+        throw new AppError_1.default(httpStatusCodes_1.HttpStatusCodes.NOT_FOUND, "You do not belong to any business");
+    }
+    const thirtyDaysAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
+    const updatedClientStatus = await prisma_1.prisma.client.updateMany({
+        where: {
+            links: {
+                some: { businessId: isOwner.businessId },
+            },
+            invoices: {
+                none: {
+                    businessId: isOwner.businessId,
+                    createdAt: { gte: thirtyDaysAgo },
+                },
+            },
+            isDeleted: false,
+            status: client_1.ClientStatus.ACTIVE,
+        },
+        data: {
+            status: client_1.ClientStatus.INACTIVE,
+        },
+    });
+    return updatedClientStatus;
 };
 const deleteClient = async (clientId, decodedToken) => {
     const userId = decodedToken.userId;
@@ -177,6 +289,8 @@ exports.ClientServices = {
     getAllClients,
     getSingleClient,
     getMyClient,
+    getClientsStats,
     updateClient,
+    updateClientStatus,
     deleteClient,
 };

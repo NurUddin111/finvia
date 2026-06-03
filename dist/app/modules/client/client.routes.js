@@ -10,6 +10,8 @@ const validateRequest_1 = require("../../middlewares/validateRequest");
 const router = (0, express_1.Router)();
 router.post("/add", (0, checkAuth_1.checkAuth)(client_1.UserRole.BUSINESS_OWNER, client_1.UserRole.BUSINESS_ADMIN), (0, validateRequest_1.validateRequest)(client_validation_1.AddClientZodSchemaValidation), client_controller_1.ClientController.addClient);
 router.get("/all", (0, checkAuth_1.checkAuth)(client_1.UserRole.BUSINESS_OWNER, client_1.UserRole.BUSINESS_ADMIN), client_controller_1.ClientController.getAllClients);
+router.get("/stats", (0, checkAuth_1.checkAuth)(client_1.UserRole.BUSINESS_OWNER, client_1.UserRole.BUSINESS_ADMIN), client_controller_1.ClientController.getClietnsStats);
+router.patch("/update-status", (0, checkAuth_1.checkAuth)(client_1.UserRole.BUSINESS_OWNER, client_1.UserRole.BUSINESS_ADMIN), client_controller_1.ClientController.updateClientStatus);
 router.get("/:id", (0, checkAuth_1.checkAuth)(client_1.UserRole.BUSINESS_OWNER, client_1.UserRole.BUSINESS_ADMIN), client_controller_1.ClientController.getMyClient);
 // router.get(
 //   "/:id",

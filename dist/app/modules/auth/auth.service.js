@@ -26,6 +26,7 @@ const createUserRequest = async (req, res, name, email) => {
     const isUserExist = await prisma_1.prisma.user.findUnique({
         where: {
             email: email,
+            isDeleted: false,
         },
     });
     if (isUserExist) {
@@ -57,7 +58,6 @@ const createUserVerification = async (req, res, creationToken, otp) => {
     if (!name || !email) {
         throw new AppError_1.default(httpStatusCodes_1.HttpStatusCodes.INTERNAL_SERVER_ERROR, "Failed to decode Name and Email from CREATION_TOKEN");
     }
-    console.log(email, otp);
     await otp_service_1.OTPServices.verifyOTP(email, otp);
     const jwtPayload = {
         name: name,

@@ -40,9 +40,21 @@ const cancelPayment = (0, catchAsync_1.catchAsync)(async (req, res) => {
         res.redirect(`${env_1.envVars.SSL.SSL_CANCEL_FRONTEND_URL}?transactionId=${query.transactionId}&message=${result.message}&amount=${query.amount}&status=${query.status}`);
     }
 });
+const getPaymentMethodStats = (0, catchAsync_1.catchAsync)(async (req, res, next) => {
+    const user = req.user;
+    const userId = user.userId;
+    const result = await payment_service_1.PaymentServices.getPaymentMethodStats(userId);
+    (0, sendResponse_1.sendResponse)(res, {
+        statusCode: 200,
+        success: true,
+        message: "Payment method stats fetched successfully!",
+        data: result,
+    });
+});
 exports.PaymentController = {
     initPayment,
     successPayment,
     failPayment,
     cancelPayment,
+    getPaymentMethodStats,
 };

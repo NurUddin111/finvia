@@ -1,0 +1,18 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.ProductRoutes = void 0;
+const express_1 = require("express");
+const checkAuth_1 = require("../../middlewares/checkAuth");
+const client_1 = require("@prisma/client");
+const validateRequest_1 = require("../../middlewares/validateRequest");
+const product_validation_1 = require("./product.validation");
+const product_controller_1 = require("./product.controller");
+const router = (0, express_1.Router)();
+router.post("/add", (0, checkAuth_1.checkAuth)(client_1.UserRole.BUSINESS_OWNER, client_1.UserRole.BUSINESS_ADMIN), (0, validateRequest_1.validateRequest)(product_validation_1.AddProductZodSchemaValidation), product_controller_1.ProductController.addProduct);
+router.get("/", (0, checkAuth_1.checkAuth)(client_1.UserRole.BUSINESS_OWNER, client_1.UserRole.BUSINESS_ADMIN), product_controller_1.ProductController.getAllProducts);
+router.get("/stats", (0, checkAuth_1.checkAuth)(client_1.UserRole.BUSINESS_OWNER, client_1.UserRole.BUSINESS_ADMIN), product_controller_1.ProductController.getProductsStats);
+router.get("/top", (0, checkAuth_1.checkAuth)(client_1.UserRole.BUSINESS_OWNER, client_1.UserRole.BUSINESS_ADMIN), product_controller_1.ProductController.getTopProducts);
+router.get("/:productId", (0, checkAuth_1.checkAuth)(client_1.UserRole.BUSINESS_OWNER, client_1.UserRole.BUSINESS_ADMIN), product_controller_1.ProductController.getProductById);
+router.patch("/:productId", (0, checkAuth_1.checkAuth)(client_1.UserRole.BUSINESS_OWNER, client_1.UserRole.BUSINESS_ADMIN), (0, validateRequest_1.validateRequest)(product_validation_1.UpdateProductZodSchemaValidation), product_controller_1.ProductController.updateProduct);
+router.delete("/:productId", (0, checkAuth_1.checkAuth)(client_1.UserRole.BUSINESS_OWNER, client_1.UserRole.BUSINESS_ADMIN), product_controller_1.ProductController.deleteProduct);
+exports.ProductRoutes = router;

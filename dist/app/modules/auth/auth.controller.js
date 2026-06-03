@@ -85,7 +85,7 @@ const getNewAccessToken = (0, catchAsync_1.catchAsync)(async (req, res, next) =>
     });
 });
 const logout = (0, catchAsync_1.catchAsync)(async (req, res, next) => {
-    (0, setCookie_1.clearAllCookies)(req, res);
+    (0, setCookie_1.clearAuthCookies)(res, setCookie_1.authCookies);
     (0, sendResponse_1.sendResponse)(res, {
         success: true,
         statusCode: httpStatusCodes_1.HttpStatusCodes.OK,

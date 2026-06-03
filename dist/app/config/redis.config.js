@@ -9,6 +9,7 @@ exports.redisClient = (0, redis_1.createClient)({
     socket: {
         host: env_1.envVars.REDIS_HOST,
         port: Number(env_1.envVars.REDIS_PORT),
+        tls: true,
     },
 });
 exports.redisClient.on("error", (err) => console.error("Redis Client Error", err));

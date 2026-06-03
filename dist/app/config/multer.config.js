@@ -5,24 +5,20 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.multerUpload = void 0;
 const multer_1 = __importDefault(require("multer"));
-const multer_storage_cloudinary_1 = require("multer-storage-cloudinary");
-const cloudinary_config_1 = require("./cloudinary.config");
-const storage = new multer_storage_cloudinary_1.CloudinaryStorage({
-    cloudinary: cloudinary_config_1.cloudinaryUpload,
-    params: {
-        public_id: (req, file) => {
-            const fileName = file.originalname
-                .toLowerCase()
-                .replace(/\s+/g, "-")
-                .replace(/\./g, "-")
-                .replace(/[^a-z0-9\-.]/g, "");
-            const uniqueFileName = Math.random().toString(36).substring(2) +
-                "-" +
-                Date.now() +
-                "-" +
-                fileName;
-            return uniqueFileName;
-        },
+const AppError_1 = __importDefault(require("../errorHelpers/AppError"));
+const httpStatusCodes_1 = require("../utils/httpStatusCodes");
+const imageFilter = (_req, file, cb) => {
+    if (file.mimetype.startsWith("image/")) {
+        cb(null, true);
+    }
+    else {
+        cb(new AppError_1.default(httpStatusCodes_1.HttpStatusCodes.BAD_REQUEST, "Only image files are allowed (jpeg, png, webp, etc.)"));
+    }
+};
+exports.multerUpload = (0, multer_1.default)({
+    storage: multer_1.default.memoryStorage(),
+    limits: {
+        fileSize: 5 * 1024 * 1024,
     },
+    fileFilter: imageFilter,
 });
-exports.multerUpload = (0, multer_1.default)({ storage: storage });

@@ -98,11 +98,9 @@ const getMe = async (userId) => {
         data: user,
     };
 };
-const updateUser = async (userId, payload, decodedToken) => {
+const updateUser = async (userId, payload, decodedToken, avatarUrl) => {
     const user = await prisma_1.prisma.user.findUnique({
-        where: {
-            id: userId,
-        },
+        where: { id: userId },
     });
     if (!user) {
         throw new AppError_1.default(httpStatusCodes_1.HttpStatusCodes.NOT_FOUND, "User Not Found!");
@@ -124,10 +122,11 @@ const updateUser = async (userId, payload, decodedToken) => {
         }
     }
     const updatedUser = await prisma_1.prisma.user.update({
-        where: {
-            id: userId,
+        where: { id: userId },
+        data: {
+            ...payload,
+            ...(avatarUrl !== undefined ? { avatar: avatarUrl } : {}),
         },
-        data: payload,
     });
     return updatedUser;
 };
@@ -141,12 +140,22 @@ const deleteUser = async (userId) => {
     if (!user) {
         throw new AppError_1.default(httpStatusCodes_1.HttpStatusCodes.BAD_REQUEST, "No user found.");
     }
+    const business = await prisma_1.prisma.businessUser.findFirst({
+        where: {
+            userId: user.id,
+            isExist: true,
+        },
+    });
+    if (business) {
+        throw new AppError_1.default(httpStatusCodes_1.HttpStatusCodes.BAD_REQUEST, "You have to delete your business details before deleting your profile!");
+    }
     await prisma_1.prisma.user.update({
         where: {
             id: userId,
         },
         data: {
             isDeleted: true,
+            role: client_1.UserRole.USER,
         },
     });
 };

@@ -22,6 +22,7 @@ const loadEnvVariables = () => {
         "SMTP_HOST",
         "SMTP_USER",
         "SMTP_FROM",
+        "BREVO_API_KEY",
         "JWT_CREATION_SECRET",
         "JWT_CREATION_EXPIRES",
         "JWT_VERIFIED_CREATION_SECRET",
@@ -49,6 +50,9 @@ const loadEnvVariables = () => {
         "SSL_FAIL_BACKEND_URL",
         "SSL_CANCEL_BACKEND_URL",
         // "SSL_IPN_URL"
+        "GOOGLE_CLIENT_ID",
+        "GOOGLE_CLIENT_SECRET",
+        "GOOGLE_CALLBACK_URL",
     ];
     requiredEnvVariables.forEach((key) => {
         if (!process.env[key]) {
@@ -71,6 +75,12 @@ const loadEnvVariables = () => {
             SMTP_PORT: process.env.SMTP_PORT,
             SMTP_HOST: process.env.SMTP_HOST,
             SMTP_FROM: process.env.SMTP_FROM,
+            BREVO_API_KEY: process.env.BREVO_API_KEY,
+        },
+        GOOGLE_STRATEGY: {
+            GOOGLE_CLIENT_ID: process.env.GOOGLE_CLIENT_ID,
+            GOOGLE_CLIENT_SECRET: process.env.GOOGLE_CLIENT_SECRET,
+            GOOGLE_CALLBACK_URL: process.env.GOOGLE_CALLBACK_URL,
         },
         JWT_CREATION_SECRET: process.env.JWT_CREATION_SECRET,
         JWT_CREATION_EXPIRES: process.env.JWT_CREATION_EXPIRES,

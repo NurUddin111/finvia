@@ -8,6 +8,7 @@ const business_routes_1 = require("../modules/business/business.routes");
 const client_routes_1 = require("../modules/client/client.routes");
 const invoice_routes_1 = require("../modules/invoice/invoice.routes");
 const payment_routes_1 = require("../modules/payment/payment.routes");
+const product_routes_1 = require("../modules/product/product.routes");
 exports.router = (0, express_1.Router)();
 const apiRoutes = [
     {
@@ -33,6 +34,10 @@ const apiRoutes = [
     {
         path: "/payment",
         route: payment_routes_1.PaymentRoutes,
+    },
+    {
+        path: "/product",
+        route: product_routes_1.ProductRoutes,
     },
 ];
 apiRoutes.forEach((route) => {
