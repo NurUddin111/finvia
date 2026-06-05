@@ -6,10 +6,19 @@
 ![Node.js](https://img.shields.io/badge/Node.js-339933?style=for-the-badge&logo=node.js&logoColor=white)
 ![Express.js](https://img.shields.io/badge/Express.js-000000?style=for-the-badge)
 ![PostgreSQL](https://img.shields.io/badge/PostgreSQL-4169E1?style=for-the-badge&logo=postgresql&logoColor=white)
-
+![Prisma](https://img.shields.io/badge/Prisma-2D3748?style=for-the-badge&logo=prisma&logoColor=white)
+![JWT](https://img.shields.io/badge/JWT-000000?style=for-the-badge&logo=jsonwebtokens)
+![Google OAuth](https://img.shields.io/badge/Google_OAuth-4285F4?style=for-the-badge&logo=google&logoColor=white)
+![Multi-Tenant](https://img.shields.io/badge/Architecture-Multi--Tenant-success?style=for-the-badge)
 
 A full-featured **SaaS Backend System** built using modern web technologies.  
 Finvia helps businesses manage **clients, invoices, and payments** efficiently with secure authentication and scalable architecture.
+
+---
+
+## 🚀 Live Demo
+- 🔗 Live Application: https://finvia-finance-management.vercel.app
+- 🔗 Frontend Repository: https://github.com/NurUddin111/finvia-finance-management-frontend
 
 ---
 
@@ -72,24 +81,7 @@ This project focuses on **scalability**, **security**, and **clean API design**,
 - Centralized error handling and validation
 - Scalable and modular backend structure
 - Soft delete support
-
----
-
-## 🧰 Tech Stack
-
----
-
-| Category                   | Technologies                    |
-| -------------------------- | ------------------------------- |
-| **Backend**                | Node.js, Express.js, TypeScript |
-| **Database**               | PostgreSQL                      |
-| **ORM**                    | Prisma                          |
-| **Authentication**         | JWT (JSON Web Tokens), bcrypt   |
-| **Validation**             | Zod                             |
-| **API Testing**            | Postman                         |
-| **Environment Management** | dotenv                          |
-| **Version Control**        | Git & GitHub                    |
-
+  
 ---
 
 ## 🗄 Core Domain Models
@@ -100,6 +92,20 @@ This project focuses on **scalability**, **security**, and **clean API design**,
 - Client
 - Invoice
 - InvoiceItem
+
+---
+
+## 🏗 Architecture
+
+- Multi-Tenant SaaS Design
+- Business Data Isolation
+- JWT Authentication
+- Role-Based Access Control
+- Prisma ORM
+- PostgreSQL Database
+- Modular Feature-Based Architecture
+- Centralized Error Handling
+- Zod Validation
 
 ---
 
@@ -164,23 +170,11 @@ npm run dev
 
 ## 🧪 Testing the API
 
----
-
-## 📮 Postman Collection
+### 📮 Postman Collection
 - [Download Postman Collection](./postman/Finvia.postman_collection.json)
 - Set the base URL: http://localhost:1126
 
-## 🏗 Architecture
-
-- Multi-Tenant SaaS Design
-- Business Data Isolation
-- JWT Authentication
-- Role-Based Access Control
-- Prisma ORM
-- PostgreSQL Database
-- Modular Feature-Based Architecture
-- Centralized Error Handling
-- Zod Validation
+---
 
 ## 📁 Folder Structure
 
@@ -205,11 +199,11 @@ npm run dev
 
 ## 🧠 Future Improvements
 
-    Email service abstraction
-    Webhooks for invoice events
-    Activity & audit logs
-    Background jobs (queues)
-    Subscription & billing plans
+- Email service abstraction
+- Webhooks for invoice events
+- Activity & audit logs
+- Background jobs (queues)
+- Subscription & billing plans
 
 ## 👨‍💻 Author
 
