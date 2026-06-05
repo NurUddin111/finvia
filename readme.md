@@ -1,4 +1,4 @@
-# 💼 Finvia – Backend API
+# 💼 Finvia – Backend Service
 
 ![Live](https://img.shields.io/badge/Status-Live-success?style=for-the-badge)
 ![Version](https://img.shields.io/badge/Version-1.0-blue?style=for-the-badge)
@@ -89,10 +89,13 @@ This project focuses on **scalability**, **security**, and **clean API design**,
 - User
 - Business
 - BusinessAuthority
+- BusinessMember
 - Client
 - Invoice
 - InvoiceItem
-
+- InvoicePayment
+- Product
+  
 ---
 
 ## 🏗 Architecture
