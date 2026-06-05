@@ -151,10 +151,10 @@ For complete endpoint documentation, see:
 
 ```bash
 # Clone the repository
-git clone https://github.com/NurUddin111/finvia.git
+git clone https://github.com/NurUddin111/finvia-finance-management-backend.git
   
 # Navigate to the project directory
-cd finvia
+cd finvia-finance-management-backend
   
 # Install dependencies
 npm install
