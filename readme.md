@@ -167,8 +167,8 @@ npm run dev
 ---
 
 ## 📮 Postman Collection
-
-    Set the base URL: http://localhost:1126
+- [Download Postman Collection](./postman/Finvia.postman_collection.json)
+- Set the base URL: http://localhost:1126
 
 ## 🏗 Architecture
 
