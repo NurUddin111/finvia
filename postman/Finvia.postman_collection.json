@@ -1,0 +1,1605 @@
+{
+  "info": {
+    "_postman_id": "22b24d14-fb08-4166-ac42-514b8781d9b2",
+    "name": "Finvia",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "46020985"
+  },
+  "item": [
+    {
+      "name": "Auth",
+      "item": [
+        {
+          "name": "Register Request",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2OGM3ZjNjNTg0YzJkMzg2NDIzMzg2YWUiLCJlbWFpbCI6Im11aGFtbWFkbnVydWRkaW41NjJAZ21haWwuY29tIiwicm9sZSI6IlVTRVIiLCJpYXQiOjE3NTgwMjM2NTMsImV4cCI6MTc1ODExMDA1M30.ytT50JVEd7pEc-6LAJgYjS0WbCDCHa0bvbG16Pzfh6Y",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"name\": \"Safin\",\r\n    \"email\": \"safin33221@gmail.com\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:1126/api/v1/auth/signup",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "1126",
+              "path": [
+                "api",
+                "v1",
+                "auth",
+                "signup"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Register Request Verification",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2OGM3ZjNjNTg0YzJkMzg2NDIzMzg2YWUiLCJlbWFpbCI6Im11aGFtbWFkbnVydWRkaW41NjJAZ21haWwuY29tIiwicm9sZSI6IlVTRVIiLCJpYXQiOjE3NTgwMjM2NTMsImV4cCI6MTc1ODExMDA1M30.ytT50JVEd7pEc-6LAJgYjS0WbCDCHa0bvbG16Pzfh6Y",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"otp\": \"\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:1126/api/v1/auth/signup/verify",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "1126",
+              "path": [
+                "api",
+                "v1",
+                "auth",
+                "signup",
+                "verify"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Register Request Success",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2OGM3ZjNjNTg0YzJkMzg2NDIzMzg2YWUiLCJlbWFpbCI6Im11aGFtbWFkbnVydWRkaW41NjJAZ21haWwuY29tIiwicm9sZSI6IlVTRVIiLCJpYXQiOjE3NTgwMjM2NTMsImV4cCI6MTc1ODExMDA1M30.ytT50JVEd7pEc-6LAJgYjS0WbCDCHa0bvbG16Pzfh6Y",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"password\": \"User@12345\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:1126/api/v1/auth/register-success",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "1126",
+              "path": [
+                "api",
+                "v1",
+                "auth",
+                "register-success"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Credentials Login",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2OGM3ZjNjNTg0YzJkMzg2NDIzMzg2YWUiLCJlbWFpbCI6Im11aGFtbWFkbnVydWRkaW41NjJAZ21haWwuY29tIiwicm9sZSI6IlVTRVIiLCJpYXQiOjE3NTgwMjM2NTMsImV4cCI6MTc1ODExMDA1M30.ytT50JVEd7pEc-6LAJgYjS0WbCDCHa0bvbG16Pzfh6Y",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    // \"email\": \"super.admin@gmail.com\",\r\n    \"email\": \"nuruddinmuhammad38@gmail.com\",\r\n    // \"password\": \"Super@12345\"\r\n    \"password\": \"User@12345\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:1126/api/v1/auth/login",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "1126",
+              "path": [
+                "api",
+                "v1",
+                "auth",
+                "login"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "New Access Token",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2OGM3ZjNjNTg0YzJkMzg2NDIzMzg2YWUiLCJlbWFpbCI6Im11aGFtbWFkbnVydWRkaW41NjJAZ21haWwuY29tIiwicm9sZSI6IlVTRVIiLCJpYXQiOjE3NTgwMjM2NTMsImV4cCI6MTc1ODExMDA1M30.ytT50JVEd7pEc-6LAJgYjS0WbCDCHa0bvbG16Pzfh6Y",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "http://localhost:1126/api/v1/auth/refresh-token",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "1126",
+              "path": [
+                "api",
+                "v1",
+                "auth",
+                "refresh-token"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Logout",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2OGM3ZjNjNTg0YzJkMzg2NDIzMzg2YWUiLCJlbWFpbCI6Im11aGFtbWFkbnVydWRkaW41NjJAZ21haWwuY29tIiwicm9sZSI6IlVTRVIiLCJpYXQiOjE3NTgwMjM2NTMsImV4cCI6MTc1ODExMDA1M30.ytT50JVEd7pEc-6LAJgYjS0WbCDCHa0bvbG16Pzfh6Y",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "http://localhost:1126/api/v1/auth/logout",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "1126",
+              "path": [
+                "api",
+                "v1",
+                "auth",
+                "logout"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Change Password",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2OGM3ZjNjNTg0YzJkMzg2NDIzMzg2YWUiLCJlbWFpbCI6Im11aGFtbWFkbnVydWRkaW41NjJAZ21haWwuY29tIiwicm9sZSI6IlVTRVIiLCJpYXQiOjE3NTgwMjM2NTMsImV4cCI6MTc1ODExMDA1M30.ytT50JVEd7pEc-6LAJgYjS0WbCDCHa0bvbG16Pzfh6Y",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"oldPass\": \"User@12345\",\r\n    \"newPass\": \"User@12345678\",\r\n    \"confirmNewPass\": \"User@12345678\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:1126/api/v1/auth/change-password",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "1126",
+              "path": [
+                "api",
+                "v1",
+                "auth",
+                "change-password"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Forget Password",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2OGM3ZjNjNTg0YzJkMzg2NDIzMzg2YWUiLCJlbWFpbCI6Im11aGFtbWFkbnVydWRkaW41NjJAZ21haWwuY29tIiwicm9sZSI6IlVTRVIiLCJpYXQiOjE3NTgwMjM2NTMsImV4cCI6MTc1ODExMDA1M30.ytT50JVEd7pEc-6LAJgYjS0WbCDCHa0bvbG16Pzfh6Y",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"email\": \"\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:1126/api/v1/auth/forgot-password",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "1126",
+              "path": [
+                "api",
+                "v1",
+                "auth",
+                "forgot-password"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Add Admin",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2OGM3ZjNjNTg0YzJkMzg2NDIzMzg2YWUiLCJlbWFpbCI6Im11aGFtbWFkbnVydWRkaW41NjJAZ21haWwuY29tIiwicm9sZSI6IlVTRVIiLCJpYXQiOjE3NTgwMjM2NTMsImV4cCI6MTc1ODExMDA1M30.ytT50JVEd7pEc-6LAJgYjS0WbCDCHa0bvbG16Pzfh6Y",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"name\": \"\",\r\n    \"email\": \"\",\r\n    \"role\": \"ADMIN\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:1126/api/v1/auth/add-admin",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "1126",
+              "path": [
+                "api",
+                "v1",
+                "auth",
+                "add-admin"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Join Finvia",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2OGM3ZjNjNTg0YzJkMzg2NDIzMzg2YWUiLCJlbWFpbCI6Im11aGFtbWFkbnVydWRkaW41NjJAZ21haWwuY29tIiwicm9sZSI6IlVTRVIiLCJpYXQiOjE3NTgwMjM2NTMsImV4cCI6MTc1ODExMDA1M30.ytT50JVEd7pEc-6LAJgYjS0WbCDCHa0bvbG16Pzfh6Y",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"invitationToken\": \"\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:1126/api/v1/auth/join-finvia",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "1126",
+              "path": [
+                "api",
+                "v1",
+                "auth",
+                "join-finvia"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "User",
+      "item": [
+        {
+          "name": "Read Single",
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          },
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2OGM3ZjNjNTg0YzJkMzg2NDIzMzg2YWUiLCJlbWFpbCI6Im11aGFtbWFkbnVydWRkaW41NjJAZ21haWwuY29tIiwicm9sZSI6IlVTRVIiLCJpYXQiOjE3NTgwMjM2NTMsImV4cCI6MTc1ODExMDA1M30.ytT50JVEd7pEc-6LAJgYjS0WbCDCHa0bvbG16Pzfh6Y",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"name\": \"Nur Uddin\",\r\n    // \"email\": \"nuruddinmuhammad38@gmail.com\"\r\n    \"email\":\"muhammadnuruddin562@gmail.com\"\r\n}"
+            },
+            "url": {
+              "raw": "http://localhost:1126/api/v1/user/c441fc10-f34d-4a7e-8a69-3f39cc80ec96",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "1126",
+              "path": [
+                "api",
+                "v1",
+                "user",
+                "c441fc10-f34d-4a7e-8a69-3f39cc80ec96"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Read Own",
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          },
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2OGM3ZjNjNTg0YzJkMzg2NDIzMzg2YWUiLCJlbWFpbCI6Im11aGFtbWFkbnVydWRkaW41NjJAZ21haWwuY29tIiwicm9sZSI6IlVTRVIiLCJpYXQiOjE3NTgwMjM2NTMsImV4cCI6MTc1ODExMDA1M30.ytT50JVEd7pEc-6LAJgYjS0WbCDCHa0bvbG16Pzfh6Y",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"name\": \"Nur Uddin\",\r\n    // \"email\": \"nuruddinmuhammad38@gmail.com\"\r\n    \"email\":\"muhammadnuruddin562@gmail.com\"\r\n}"
+            },
+            "url": {
+              "raw": "http://localhost:1126/api/v1/user/my-profile",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "1126",
+              "path": [
+                "api",
+                "v1",
+                "user",
+                "my-profile"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Read All",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:1126/api/v1/user/all",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "1126",
+              "path": [
+                "api",
+                "v1",
+                "user",
+                "all"
+              ],
+              "query": [
+                {
+                  "key": "role",
+                  "value": "ADMIN",
+                  "disabled": true
+                },
+                {
+                  "key": "status",
+                  "value": "ACTIVE",
+                  "type": "text",
+                  "disabled": true
+                }
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Business",
+      "item": [
+        {
+          "name": "Create Business",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2OGM3ZjNjNTg0YzJkMzg2NDIzMzg2YWUiLCJlbWFpbCI6Im11aGFtbWFkbnVydWRkaW41NjJAZ21haWwuY29tIiwicm9sZSI6IlVTRVIiLCJpYXQiOjE3NTgwMjM2NTMsImV4cCI6MTc1ODExMDA1M30.ytT50JVEd7pEc-6LAJgYjS0WbCDCHa0bvbG16Pzfh6Y",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"name\": \"\",\r\n    \"email\": \"\",\r\n    \"category\":\"AGENCY\"\r\n\r\n    //   AGENCY ECOMMERCE, RESTAURANT, FREELANCER, SERVICE_PROVIDER, RETAIL, SOFTWARE_COMPANY, EDUCATION, HEALTHCARE, REAL_ESTATE, OTHER\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:1126/api/v1/business/add",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "1126",
+              "path": [
+                "api",
+                "v1",
+                "business",
+                "add"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Read Single",
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          },
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2OGM3ZjNjNTg0YzJkMzg2NDIzMzg2YWUiLCJlbWFpbCI6Im11aGFtbWFkbnVydWRkaW41NjJAZ21haWwuY29tIiwicm9sZSI6IlVTRVIiLCJpYXQiOjE3NTgwMjM2NTMsImV4cCI6MTc1ODExMDA1M30.ytT50JVEd7pEc-6LAJgYjS0WbCDCHa0bvbG16Pzfh6Y",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"name\": \"Finvia Service\",\r\n    \"email\": \"nuruddinmuhammad38@gmail.com\",\r\n    \"category\":\"AGENCY\"\r\n    // \"email\":\"muhammadnuruddin562@gmail.com\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:1126/api/v1/business/3c36bd1f-ed8f-43c6-b843-4294500ee3e8",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "1126",
+              "path": [
+                "api",
+                "v1",
+                "business",
+                "3c36bd1f-ed8f-43c6-b843-4294500ee3e8"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Read Single[Own]",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2OGM3ZjNjNTg0YzJkMzg2NDIzMzg2YWUiLCJlbWFpbCI6Im11aGFtbWFkbnVydWRkaW41NjJAZ21haWwuY29tIiwicm9sZSI6IlVTRVIiLCJpYXQiOjE3NTgwMjM2NTMsImV4cCI6MTc1ODExMDA1M30.ytT50JVEd7pEc-6LAJgYjS0WbCDCHa0bvbG16Pzfh6Y",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "http://localhost:1126/api/v1/business/my-business",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "1126",
+              "path": [
+                "api",
+                "v1",
+                "business",
+                "my-business"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "KPI Card Details",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2OGM3ZjNjNTg0YzJkMzg2NDIzMzg2YWUiLCJlbWFpbCI6Im11aGFtbWFkbnVydWRkaW41NjJAZ21haWwuY29tIiwicm9sZSI6IlVTRVIiLCJpYXQiOjE3NTgwMjM2NTMsImV4cCI6MTc1ODExMDA1M30.ytT50JVEd7pEc-6LAJgYjS0WbCDCHa0bvbG16Pzfh6Y",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "http://localhost:1126/api/v1/business/kpi-card-details",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "1126",
+              "path": [
+                "api",
+                "v1",
+                "business",
+                "kpi-card-details"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Monthly Revenue",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2OGM3ZjNjNTg0YzJkMzg2NDIzMzg2YWUiLCJlbWFpbCI6Im11aGFtbWFkbnVydWRkaW41NjJAZ21haWwuY29tIiwicm9sZSI6IlVTRVIiLCJpYXQiOjE3NTgwMjM2NTMsImV4cCI6MTc1ODExMDA1M30.ytT50JVEd7pEc-6LAJgYjS0WbCDCHa0bvbG16Pzfh6Y",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "http://localhost:1126/api/v1/business/monthly-revenue",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "1126",
+              "path": [
+                "api",
+                "v1",
+                "business",
+                "monthly-revenue"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Top Clients",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2OGM3ZjNjNTg0YzJkMzg2NDIzMzg2YWUiLCJlbWFpbCI6Im11aGFtbWFkbnVydWRkaW41NjJAZ21haWwuY29tIiwicm9sZSI6IlVTRVIiLCJpYXQiOjE3NTgwMjM2NTMsImV4cCI6MTc1ODExMDA1M30.ytT50JVEd7pEc-6LAJgYjS0WbCDCHa0bvbG16Pzfh6Y",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "http://localhost:1126/api/v1/business/top-clients",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "1126",
+              "path": [
+                "api",
+                "v1",
+                "business",
+                "top-clients"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Recent Transactions",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2OGM3ZjNjNTg0YzJkMzg2NDIzMzg2YWUiLCJlbWFpbCI6Im11aGFtbWFkbnVydWRkaW41NjJAZ21haWwuY29tIiwicm9sZSI6IlVTRVIiLCJpYXQiOjE3NTgwMjM2NTMsImV4cCI6MTc1ODExMDA1M30.ytT50JVEd7pEc-6LAJgYjS0WbCDCHa0bvbG16Pzfh6Y",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "http://localhost:1126/api/v1/business/recent-transactions",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "1126",
+              "path": [
+                "api",
+                "v1",
+                "business",
+                "recent-transactions"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Upcoming Overdue Invoices",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2OGM3ZjNjNTg0YzJkMzg2NDIzMzg2YWUiLCJlbWFpbCI6Im11aGFtbWFkbnVydWRkaW41NjJAZ21haWwuY29tIiwicm9sZSI6IlVTRVIiLCJpYXQiOjE3NTgwMjM2NTMsImV4cCI6MTc1ODExMDA1M30.ytT50JVEd7pEc-6LAJgYjS0WbCDCHa0bvbG16Pzfh6Y",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "http://localhost:1126/api/v1/business/upcoming-overdue-invoices",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "1126",
+              "path": [
+                "api",
+                "v1",
+                "business",
+                "upcoming-overdue-invoices"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Overdue Invoices",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2OGM3ZjNjNTg0YzJkMzg2NDIzMzg2YWUiLCJlbWFpbCI6Im11aGFtbWFkbnVydWRkaW41NjJAZ21haWwuY29tIiwicm9sZSI6IlVTRVIiLCJpYXQiOjE3NTgwMjM2NTMsImV4cCI6MTc1ODExMDA1M30.ytT50JVEd7pEc-6LAJgYjS0WbCDCHa0bvbG16Pzfh6Y",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "http://localhost:1126/api/v1/business/overdue-invoices",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "1126",
+              "path": [
+                "api",
+                "v1",
+                "business",
+                "overdue-invoices"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Client Pie Chart Data",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2OGM3ZjNjNTg0YzJkMzg2NDIzMzg2YWUiLCJlbWFpbCI6Im11aGFtbWFkbnVydWRkaW41NjJAZ21haWwuY29tIiwicm9sZSI6IlVTRVIiLCJpYXQiOjE3NTgwMjM2NTMsImV4cCI6MTc1ODExMDA1M30.ytT50JVEd7pEc-6LAJgYjS0WbCDCHa0bvbG16Pzfh6Y",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "http://localhost:1126/api/v1/business/clients-pie-chart",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "1126",
+              "path": [
+                "api",
+                "v1",
+                "business",
+                "clients-pie-chart"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Clients By Month",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2OGM3ZjNjNTg0YzJkMzg2NDIzMzg2YWUiLCJlbWFpbCI6Im11aGFtbWFkbnVydWRkaW41NjJAZ21haWwuY29tIiwicm9sZSI6IlVTRVIiLCJpYXQiOjE3NTgwMjM2NTMsImV4cCI6MTc1ODExMDA1M30.ytT50JVEd7pEc-6LAJgYjS0WbCDCHa0bvbG16Pzfh6Y",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "http://localhost:1126/api/v1/business/clients-by-month",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "1126",
+              "path": [
+                "api",
+                "v1",
+                "business",
+                "clients-by-month"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2OGM3ZjNjNTg0YzJkMzg2NDIzMzg2YWUiLCJlbWFpbCI6Im11aGFtbWFkbnVydWRkaW41NjJAZ21haWwuY29tIiwicm9sZSI6IlVTRVIiLCJpYXQiOjE3NTgwMjM2NTMsImV4cCI6MTc1ODExMDA1M30.ytT50JVEd7pEc-6LAJgYjS0WbCDCHa0bvbG16Pzfh6Y",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"name\": \"\",\r\n    \"email\": \"\",\r\n    \"category\": \"\",\r\n    \"phone\": \"\",\r\n    \"address\": \"\"\r\n\r\n     //   AGENCY ECOMMERCE, RESTAURANT, FREELANCER, SERVICE_PROVIDER, RETAIL, SOFTWARE_COMPANY, EDUCATION, HEALTHCARE, REAL_ESTATE, OTHER\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:1126/api/v1/business/edit/ebaf4df9-7b99-4348-8307-0f589494dd46",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "1126",
+              "path": [
+                "api",
+                "v1",
+                "business",
+                "edit",
+                "ebaf4df9-7b99-4348-8307-0f589494dd46"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Delete",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2OGM3ZjNjNTg0YzJkMzg2NDIzMzg2YWUiLCJlbWFpbCI6Im11aGFtbWFkbnVydWRkaW41NjJAZ21haWwuY29tIiwicm9sZSI6IlVTRVIiLCJpYXQiOjE3NTgwMjM2NTMsImV4cCI6MTc1ODExMDA1M30.ytT50JVEd7pEc-6LAJgYjS0WbCDCHa0bvbG16Pzfh6Y",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "http://localhost:1126/api/v1/business/delete/8395ecd9-8dfd-441a-a96c-aa760f544a85",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "1126",
+              "path": [
+                "api",
+                "v1",
+                "business",
+                "delete",
+                "8395ecd9-8dfd-441a-a96c-aa760f544a85"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Add Authority",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2OGM3ZjNjNTg0YzJkMzg2NDIzMzg2YWUiLCJlbWFpbCI6Im11aGFtbWFkbnVydWRkaW41NjJAZ21haWwuY29tIiwicm9sZSI6IlVTRVIiLCJpYXQiOjE3NTgwMjM2NTMsImV4cCI6MTc1ODExMDA1M30.ytT50JVEd7pEc-6LAJgYjS0WbCDCHa0bvbG16Pzfh6Y",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"name\": \"\",\r\n    \"email\": \"\",\r\n    \"role\": \"ADMIN\"\r\n    // \"role\": \"OWNER\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:1126/api/v1/business/add-authority",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "1126",
+              "path": [
+                "api",
+                "v1",
+                "business",
+                "add-authority"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Join Business",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2OGM3ZjNjNTg0YzJkMzg2NDIzMzg2YWUiLCJlbWFpbCI6Im11aGFtbWFkbnVydWRkaW41NjJAZ21haWwuY29tIiwicm9sZSI6IlVTRVIiLCJpYXQiOjE3NTgwMjM2NTMsImV4cCI6MTc1ODExMDA1M30.ytT50JVEd7pEc-6LAJgYjS0WbCDCHa0bvbG16Pzfh6Y",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"invitationToken\": \"\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:1126/api/v1/business/join",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "1126",
+              "path": [
+                "api",
+                "v1",
+                "business",
+                "join"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Client",
+      "item": [
+        {
+          "name": "Create",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"name\": \"Praveen Kumar\",\r\n    \"email\": \"praveen@gmail.com\"\r\n    // \"phone\": \"\", //Optional\r\n    // \"address\": \"\" //Optional\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:1126/api/v1/client/add",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "1126",
+              "path": [
+                "api",
+                "v1",
+                "client",
+                "add"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Read All",
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          },
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2OGM3ZjNjNTg0YzJkMzg2NDIzMzg2YWUiLCJlbWFpbCI6Im11aGFtbWFkbnVydWRkaW41NjJAZ21haWwuY29tIiwicm9sZSI6IlVTRVIiLCJpYXQiOjE3NTgwMjM2NTMsImV4cCI6MTc1ODExMDA1M30.ytT50JVEd7pEc-6LAJgYjS0WbCDCHa0bvbG16Pzfh6Y",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"email\": \"nuruddinmuhammad887@gmail.com\",\r\n    // \"email\": \"nuruddinmuhammad38@gmail.com\",\r\n    // \"email\": \"super.admin@gmail.com\",\r\n    // \"email\": \"muhammadnuruddin562@gmail.com\",\r\n    // \"password\": \"Gmail@100\"\r\n    // \"password\": \"Super@12345\"\r\n    \"password\": \"User@12345\"\r\n}"
+            },
+            "url": {
+              "raw": "http://localhost:1126/api/v1/client/all",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "1126",
+              "path": [
+                "api",
+                "v1",
+                "client",
+                "all"
+              ],
+              "query": [
+                {
+                  "key": "status",
+                  "value": "ACTIVE",
+                  "disabled": true
+                },
+                {
+                  "key": "sortBy",
+                  "value": "name",
+                  "disabled": true
+                },
+                {
+                  "key": "search",
+                  "value": "nur",
+                  "disabled": true
+                },
+                {
+                  "key": "order",
+                  "value": "desc",
+                  "disabled": true
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Read Single",
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          },
+          "request": {
+            "method": "GET",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"name\": \"Miraz Hakim\",\r\n    \"email\": \"miraz1gmail.com\"\r\n}"
+            },
+            "url": {
+              "raw": "http://localhost:1126/api/v1/client/c5391d36-7d93-4cf5-811b-07a67069cce8",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "1126",
+              "path": [
+                "api",
+                "v1",
+                "client",
+                "c5391d36-7d93-4cf5-811b-07a67069cce8"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Read Single [Own]",
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          },
+          "request": {
+            "method": "GET",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"name\": \"Miraz Hakim\",\r\n    \"email\": \"miraz1gmail.com\"\r\n}"
+            },
+            "url": {
+              "raw": "http://localhost:1126/api/v1/client/c5391d36-7d93-4cf5-811b-07a67069cce8",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "1126",
+              "path": [
+                "api",
+                "v1",
+                "client",
+                "c5391d36-7d93-4cf5-811b-07a67069cce8"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Stats",
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          },
+          "request": {
+            "method": "GET",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"name\": \"Miraz Hakim\",\r\n    \"email\": \"miraz1gmail.com\"\r\n}"
+            },
+            "url": {
+              "raw": "http://localhost:1126/api/v1/client/stats",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "1126",
+              "path": [
+                "api",
+                "v1",
+                "client",
+                "stats"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update",
+          "request": {
+            "method": "PATCH",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"name\": \"\",\r\n    \"email\": \"\",\r\n    \"phone\": \"\",\r\n    \"address\": \"\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:1126/api/v1/client/edit/c5391d36-7d93-4cf5-811b-07a67069cce8",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "1126",
+              "path": [
+                "api",
+                "v1",
+                "client",
+                "edit",
+                "c5391d36-7d93-4cf5-811b-07a67069cce8"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update Status",
+          "request": {
+            "method": "PATCH",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"name\": \"\",\r\n    \"email\": \"\",\r\n    \"phone\": \"\",\r\n    \"address\": \"\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:1126/api/v1/client/update-status",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "1126",
+              "path": [
+                "api",
+                "v1",
+                "client",
+                "update-status"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Delete",
+          "request": {
+            "method": "PATCH",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"name\": \"Miraz Sarif Stripe\",\r\n    \"email\": \"miraz6@gmail.com\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:1126/api/v1/client/delete/c5391d36-7d93-4cf5-811b-07a67069cce8",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "1126",
+              "path": [
+                "api",
+                "v1",
+                "client",
+                "delete",
+                "c5391d36-7d93-4cf5-811b-07a67069cce8"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Invoice",
+      "item": [
+        {
+          "name": "Create",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"email\": \"muhammadnuruddin562@gmail.com\",\r\n    \"dueDays\": 3,\r\n    \"method\":\"ONLINE\",\r\n    \"items\": [\r\n        {\r\n            \"productId\": \"2c355842-4360-471b-b36e-0f4b68d7db15\",\r\n            \"name\": \"Web Design 2.0\",\r\n            \"pricePerUnit\": 1000,\r\n            \"quantity\": 3\r\n        }\r\n        // ,\r\n        // {\r\n        //     \"name\": \"Hosting\",\r\n        //     \"pricePerUnit\": 500,\r\n        //     \"quantity\": 1\r\n        // },\r\n        // {\r\n        //     \"name\": \"Domain\",\r\n        //     \"pricePerUnit\": 1200,\r\n        //     \"quantity\": 1\r\n        // }\r\n    ],\r\n    \"taxRate\": 15,\r\n    \"notes\": \"First Customer\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:1126/api/v1/invoice/create",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "1126",
+              "path": [
+                "api",
+                "v1",
+                "invoice",
+                "create"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Send",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:1126/api/v1/invoice/send/cmpbmraff0003egvmv3r10r63",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "1126",
+              "path": [
+                "api",
+                "v1",
+                "invoice",
+                "send",
+                "cmpbmraff0003egvmv3r10r63"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Read All",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:1126/api/v1/invoice/all",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "1126",
+              "path": [
+                "api",
+                "v1",
+                "invoice",
+                "all"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Read Single",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:1126/api/v1/invoice/cmjqyc4ka000ddovmfci6enu2",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "1126",
+              "path": [
+                "api",
+                "v1",
+                "invoice",
+                "cmjqyc4ka000ddovmfci6enu2"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Stats",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:1126/api/v1/invoice/stats",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "1126",
+              "path": [
+                "api",
+                "v1",
+                "invoice",
+                "stats"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Overdue Invoices",
+          "request": {
+            "method": "PATCH",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"name\": \"\",\r\n    \"email\": \"\",\r\n    \"phone\": \"\",\r\n    \"address\": \"\"\r\n}"
+            },
+            "url": {
+              "raw": "http://localhost:1126/api/v1/invoice/update-status",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "1126",
+              "path": [
+                "api",
+                "v1",
+                "invoice",
+                "update-status"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Product",
+      "item": [
+        {
+          "name": "Add Product",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"productsName\": [\r\n        {\r\n            \"name\": \"HTML\"\r\n        }\r\n        \r\n    ]\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:1126/api/v1/product/add",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "1126",
+              "path": [
+                "api",
+                "v1",
+                "product",
+                "add"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "All Products",
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          },
+          "request": {
+            "method": "GET",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"productsName\": [\r\n        {\r\n            \"name\": \"Web Design\"\r\n        },\r\n        {\r\n            \"name\": \"SEO\"\r\n        },\r\n        {\r\n            \"name\": \"Logo Design\"\r\n        }\r\n    ]\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:1126/api/v1/product",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "1126",
+              "path": [
+                "api",
+                "v1",
+                "product"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Single Product",
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          },
+          "request": {
+            "method": "GET",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"productsName\": [\r\n        {\r\n            \"name\": \"Web Design\"\r\n        },\r\n        {\r\n            \"name\": \"SEO\"\r\n        },\r\n        {\r\n            \"name\": \"Logo Design\"\r\n        }\r\n    ]\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:1126/api/v1/product/2c355842-4360-471b-b36e-0f4b68d7db15",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "1126",
+              "path": [
+                "api",
+                "v1",
+                "product",
+                "2c355842-4360-471b-b36e-0f4b68d7db15"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Stats",
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          },
+          "request": {
+            "method": "GET",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"productsName\": [\r\n        {\r\n            \"name\": \"Web Design\"\r\n        },\r\n        {\r\n            \"name\": \"SEO\"\r\n        },\r\n        {\r\n            \"name\": \"Logo Design\"\r\n        }\r\n    ]\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:1126/api/v1/product/stats",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "1126",
+              "path": [
+                "api",
+                "v1",
+                "product",
+                "stats"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update Product",
+          "request": {
+            "method": "PATCH",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"name\": \"Web Design 2.0\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:1126/api/v1/product/2c355842-4360-471b-b36e-0f4b68d7db15",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "1126",
+              "path": [
+                "api",
+                "v1",
+                "product",
+                "2c355842-4360-471b-b36e-0f4b68d7db15"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Product",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"name\": \"Web Design 2.0\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:1126/api/v1/product/2c355842-4360-471b-b36e-0f4b68d7db15",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "1126",
+              "path": [
+                "api",
+                "v1",
+                "product",
+                "2c355842-4360-471b-b36e-0f4b68d7db15"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Payment",
+      "item": [
+        {
+          "name": "Method Stats",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:1126/api/v1/payment/method-stats",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "1126",
+              "path": [
+                "api",
+                "v1",
+                "payment",
+                "method-stats"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    }
+  ]
+}
