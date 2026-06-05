@@ -8,10 +8,23 @@ Finvia helps businesses manage **clients, invoices, and payments** efficiently w
 ## 🚀 Project Overview
 
 Finvia is designed as a **multi-tenant SaaS backend**, where multiple businesses can operate independently.
-
 It supports different user roles — **Owner, Admin, Client, User** — each with controlled access and permissions.
-
 This project focuses on **scalability**, **security**, and **clean API design**, making it suitable for real-world SaaS applications.
+
+---
+
+## 🚀 Highlights
+
+- Multi-Tenant SaaS Architecture
+- JWT Authentication & Authorization
+- Google OAuth Integration
+- Role-Based Access Control
+- PostgreSQL + Prisma ORM
+- Invoice Management System
+- Client Management System
+- Business Management System
+- Secure Cookie Authentication
+- Scalable Modular Architecture
 
 ---
 
@@ -71,6 +84,27 @@ This project focuses on **scalability**, **security**, and **clean API design**,
 
 ---
 
+## 🗄 Core Domain Models
+
+- User
+- Business
+- BusinessAuthority
+- Client
+- Invoice
+- InvoiceItem
+
+---
+
+## 🏆 Key Achievements
+
+- Built a multi-tenant SaaS backend
+- Designed scalable PostgreSQL schema using Prisma
+- Implemented JWT and Google OAuth authentication
+- Developed role-based access control system
+- Built invoice lifecycle management workflows
+- Implemented secure business-level data isolation
+- Created modular API architecture with TypeScript
+  
 ---
 
 ## 🧩 API Endpoints
@@ -135,12 +169,6 @@ This project focuses on **scalability**, **security**, and **clean API design**,
     |        |                               |  "phone":"+880...",        |                           |
     |        |                               | ...                        |                           |
     |        |                               | }                          |                           |
-    ---------------------------------------------------------------------------------------------------
-    | PATCH  | /api/v1/user/vehicle-locat    | {                          | Update driver’s vehicle   |
-    |        |  ion/:id                      |  "address":"...address"    | location                  |
-    |        |                               | }                          |                           |
-    ---------------------------------------------------------------------------------------------------
-    | PATCH  | /api/v1/user/delete/:id       |                            | Soft delete a user        |
     ---------------------------------------------------------------------------------------------------
 
 ### 🏢 BUSINESS MODULE
@@ -233,23 +261,23 @@ This project focuses on **scalability**, **security**, and **clean API design**,
 
 ## ⚙️ Installation & Setup
 
-    ```bash
+```bash
     # Clone the repository
     git clone https://github.com/NurUddin111/finvia.git
-
+    
     # Navigate to the project directory
     cd finvia
-
+    
     # Install dependencies
     npm install
-
+    
     # Create an .env file
     cp .env.example .env
     # (Add your environment variables)
-
+    
     # Run database migrations
     npx prisma migrate dev
-
+    
     # Run the development server
     npm run dev
 
@@ -262,6 +290,18 @@ This project focuses on **scalability**, **security**, and **clean API design**,
     🔗 **[Finvia  – Postman Collection](https://api.postman.com/collections/46020985-22b24d14-fb08-4166-ac42-514b8781d9b2?access_key=PMAT-01KE57YWFWCY8PSR7X7K7JCVV8)**
 
     Set the base URL: http://localhost:1126
+
+## 🏗 Architecture
+
+- Multi-Tenant SaaS Design
+- Business Data Isolation
+- JWT Authentication
+- Role-Based Access Control
+- Prisma ORM
+- PostgreSQL Database
+- Modular Feature-Based Architecture
+- Centralized Error Handling
+- Zod Validation
 
 ## 📁 Folder Structure
 
