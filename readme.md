@@ -30,7 +30,7 @@ Finvia helps businesses manage **clients, invoices, and payments** efficiently w
 
 ---
 
-## 🚀 Project Overview
+## 💻 Project Overview
 
 Finvia is designed as a **multi-tenant SaaS backend**, where multiple businesses can operate independently.
 It supports different user roles — **Owner, Admin, Client, User** — each with controlled access and permissions.
@@ -38,7 +38,27 @@ This project focuses on **scalability**, **security**, and **clean API design**,
 
 ---
 
-## 🚀 Highlights
+## 🎯 Problem Statement
+
+Freelancers and small businesses often struggle to manage clients, invoices, payments, and business operations across multiple disconnected tools.
+
+This fragmented workflow can lead to inefficient record keeping, delayed payments, inconsistent client management, and limited visibility into business performance.
+
+Additionally, many existing solutions are either overly complex, expensive, or lack proper multi-business support for growing organizations.
+
+---
+
+## 💡 Solution
+
+Finvia provides a centralized multi-tenant SaaS platform that enables businesses to manage clients, invoices, payments, and team members from a single system.
+
+The platform combines secure authentication, role-based access control, business-level data isolation, and invoice lifecycle management to deliver a scalable solution for modern business operations.
+
+By consolidating essential business workflows into one platform, Finvia helps organizations improve efficiency, maintain data integrity, and streamline financial management.
+
+---
+
+## 🔥 Highlights
 
 - Multi-Tenant SaaS Architecture
 - JWT Authentication & Authorization
