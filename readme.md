@@ -23,6 +23,12 @@ Finvia helps businesses manage **clients, invoices, and payments** efficiently w
 
 ---
 
+## 📊 ERD
+
+<img width="2387" height="1080" alt="Finvia_ERD pgerd" src="https://github.com/user-attachments/assets/9ec46960-01df-4746-ab9c-32cfccf6d2f7" />
+
+---
+
 ## 🚀 Project Overview
 
 Finvia is designed as a **multi-tenant SaaS backend**, where multiple businesses can operate independently.
