@@ -211,8 +211,14 @@ npm run dev
 
 ## 👨‍💻 Author
 
-    Muhammad Nur Uddin
+**Muhammad Nur Uddin**
 
-    “Don’t be shy, know the why!”
-    📧 nuruddinmuhammad38@gmail.com
-    🌐 https://github.com/NurUddin111
+Backend-Focused Full-Stack Developer
+
+📧 Email: nuruddinmuhammad38@gmail.com
+
+💼 [LinkedIn](https://www.linkedin.com/in/muhammad-nur-uddin)
+
+🐙 [GitHub](https://github.com/NurUddin111)
+
+> "Don't be shy, know the why!"
