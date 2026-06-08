@@ -126,6 +126,7 @@ const createUserVerification = async (
 };
 
 const createUserSuccess = async (
+  req: Request,
   res: Response,
   verifiedCreationToken: string,
   payload: Partial<User>,
@@ -182,8 +183,9 @@ const createUserSuccess = async (
         },
       },
     },
-    include: {
-      auths: true,
+    select: {
+      name: true,
+      email: true,
     },
   });
 
@@ -192,6 +194,10 @@ const createUserSuccess = async (
     secure: false,
     sameSite: "lax",
   });
+
+  const userTokens = createUserTokens(user);
+
+  setAuthCookie(req, res, userTokens);
 
   return user;
 };

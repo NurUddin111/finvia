@@ -54,6 +54,7 @@ const createUserSuccess = catchAsync(
     };
 
     const user = await AuthServices.createUserSuccess(
+      req,
       res,
       verifiedCreationToken,
       payload,
