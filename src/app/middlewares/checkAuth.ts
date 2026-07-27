@@ -30,7 +30,7 @@ export const checkAuth = (...authRoles: string[]) =>
     if (!authRoles.includes(userRole)) {
       throw new AppError(
         HttpStatusCodes.UNAUTHORIZED,
-        "You are not permitted to view this route!!!"
+        "You are not permitted to access this route!"
       );
     }
 
@@ -42,7 +42,7 @@ export const checkAuth = (...authRoles: string[]) =>
     });
 
     if (!user) {
-      throw new AppError(HttpStatusCodes.BAD_REQUEST, "No User Found!");
+      throw new AppError(HttpStatusCodes.BAD_REQUEST, "No user found with this email!");
     }
 
     checkUserStatus(req, user, email);
